@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PostParade — Race recommendations and eligibility, automated.</title>
+<meta name="description" content="PostParade reads condition books, matches eligible races to your horses, and ranks the best spots in seconds — for trainers, owners, and racing offices." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        colors: {
+          ink: {
+            900: '#0b1220',
+            800: '#11192b',
+            700: '#1a2336',
+            600: '#2a3447',
+            500: '#475569',
+            400: '#94a3b8',
+          },
+          turf: {
+            50:  '#ecfdf5',
+            100: '#d1fae5',
+            300: '#6ee7b7',
+            500: '#10b981',
+            600: '#059669',
+            700: '#047857',
+            800: '#065f46',
+          },
+          silk: {
+            400: '#f59e0b',
+            500: '#d97706',
+          },
+        },
+      },
+    },
+  }
+</script>
+<style>
+  html, body { background:#fbfaf7; }
+  body { font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased; color:#0b1220; }
+  .pill { display:inline-flex; align-items:center; gap:.25rem; font-size:.7rem; font-weight:600; padding:.15rem .5rem; border-radius:9999px; letter-spacing:.01em; }
+  .kbd { font-family:'JetBrains Mono', monospace; font-size:.7rem; padding:.1rem .35rem; border-radius:4px; background:#eef0f4; color:#475569; }
+  .card { background:#fff; border:1px solid #eef0f4; border-radius:14px; }
+  .ring-soft { box-shadow:0 1px 0 rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.08); }
+  .score-ring { background:conic-gradient(var(--c,#10b981) calc(var(--p,0) * 1%), #e5e7eb 0); }
+  .star { color:#f59e0b; }
+  .star.dim { color:#e5e7eb; }
+
+  /* Hero backdrop — soft horizon */
+  .hero-bg {
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(16,185,129,.16), transparent 60%),
+      radial-gradient(800px 500px at -10% 30%, rgba(245,158,11,.10), transparent 60%),
+      linear-gradient(180deg, #fbfaf7 0%, #f4f7f4 100%);
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(11,18,32,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(11,18,32,.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+  }
+
+  /* Light parallax on scroll */
+  .float-slow { animation: float 10s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  /* Modal */
+  .modal-backdrop { background: rgba(11,18,32,.55); backdrop-filter: blur(2px); }
+  .modal { transform: translate(-50%, -50%); }
+
+  /* Marquee */
+  .marquee { mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+</style>
+</head>
+<body>
+
+<!-- ============== Top nav ============== -->
+<header class="absolute top-0 left-0 right-0 z-20">
+  <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-ink-900 flex items-center justify-center">
+        <i data-lucide="flag" class="w-4 h-4 text-turf-300"></i>
+      </div>
+      <div class="font-semibold tracking-tight">PostParade</div>
+    </a>
+    <nav class="hidden md:flex items-center gap-7 text-sm text-ink-600">
+      <a href="#how" class="hover:text-ink-900">How it works</a>
+      <a href="#who" class="hover:text-ink-900">Who it's for</a>
+      <a href="#features" class="hover:text-ink-900">Features</a>
+      <a href="#pricing" class="hover:text-ink-900">Pricing</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <button id="openLogin" class="text-sm text-ink-700 hover:text-ink-900 px-3 py-1.5 rounded-lg">Log in</button>
+      <a href="app.html" class="text-sm px-3 py-1.5 rounded-lg bg-turf-600 hover:bg-turf-700 text-white inline-flex items-center gap-1.5">
+        Try the demo <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ============== Hero ============== -->
+<section class="relative hero-bg overflow-hidden">
+  <div class="absolute inset-0 grid-bg opacity-60 pointer-events-none"></div>
+
+  <div class="relative max-w-6xl mx-auto px-6 pt-32 pb-20 lg:pb-28">
+    <div class="grid lg:grid-cols-12 gap-10 items-center">
+
+      <div class="lg:col-span-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs text-ink-700 mb-5">
+          <span class="w-1.5 h-1.5 rounded-full bg-turf-500"></span>
+          For trainers, owners, and racing offices
+        </div>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
+          Find the right race.<br>
+          <span class="text-turf-700">Every horse. Every week.</span>
+        </h1>
+        <p class="mt-5 text-lg text-ink-600 max-w-xl">
+          PostParade reads every condition book on your circuit, matches eligible races to your horses, and ranks the best spots — in seconds, not hours.
+        </p>
+
+        <div class="mt-7 flex items-center gap-3 flex-wrap">
+          <a href="app.html" class="px-5 py-3 rounded-lg bg-ink-900 hover:bg-ink-800 text-white text-sm font-medium inline-flex items-center gap-2">
+            Try the interactive demo <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+          <button id="openLogin2" class="px-5 py-3 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-sm font-medium inline-flex items-center gap-2">
+            <i data-lucide="lock" class="w-4 h-4"></i>Log in
+          </button>
+        </div>
+
+        <div class="mt-6 text-xs text-ink-500 flex items-center gap-4">
+          <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-turf-600"></i>No setup</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-turf-600"></i>Live sample data</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-turf-600"></i>2 min to walk through</span>
+        </div>
+      </div>
+
+      <!-- Hero visual: faked recommendation card -->
+      <div class="lg:col-span-6 relative">
+        <div class="relative float-slow">
+
+          <!-- Background card peeking -->
+          <div class="absolute -right-4 top-6 w-[88%] h-[88%] card ring-soft rotate-3 opacity-70 bg-gradient-to-br from-white to-turf-50"></div>
+          <div class="absolute -left-3 top-3 w-[82%] h-[82%] card ring-soft -rotate-2 opacity-80 bg-gradient-to-br from-white to-slate-50"></div>
+
+          <!-- Foreground card -->
+          <div class="relative card ring-soft p-5 bg-white">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-xs text-ink-500">
+                <i data-lucide="target" class="w-3.5 h-3.5"></i>
+                Top spot for Zengraya
+              </div>
+              <span class="pill bg-turf-50 text-turf-700">Top pick</span>
+            </div>
+
+            <div class="mt-4 flex items-start gap-4">
+              <div class="relative w-14 h-14 rounded-full score-ring flex items-center justify-center" style="--p:94; --c:#10b981;">
+                <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center">
+                  <div class="text-center leading-none">
+                    <div class="text-base font-bold text-turf-700">94</div>
+                    <div class="text-[9px] text-ink-500">FIT</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="font-semibold">Churchill Downs · R3</div>
+                <div class="text-xs text-ink-500">Sat Jun 6 · Post 2:14 CT · Closes Wed Jun 3</div>
+                <div class="mt-2 flex flex-wrap gap-1.5">
+                  <span class="pill bg-slate-100 text-ink-700">Mdn 75k</span>
+                  <span class="pill bg-slate-100 text-ink-700">6f Dirt</span>
+                  <span class="pill bg-slate-100 text-ink-700">$85k purse</span>
+                  <span class="pill bg-slate-100 text-ink-700">9 likely</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-3 gap-2 text-xs">
+              <div class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-turf-600"></i>Eligible · pref tier</div>
+              <div class="flex items-center gap-1.5"><i data-lucide="user-round" class="w-3.5 h-3.5 text-turf-600"></i>Foley G. open</div>
+              <div class="flex items-center gap-1.5"><i data-lucide="truck" class="w-3.5 h-3.5 text-turf-600"></i>Ship 0 mi</div>
+            </div>
+
+            <div class="mt-4 px-3 py-2 rounded-lg bg-turf-50 text-turf-800 text-xs flex items-start gap-2">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 mt-0.5"></i>
+              <span><span class="font-semibold">Why this fits:</span> drops 45k in class, exact surface/distance match, par speed at her last figure.</span>
+            </div>
+          </div>
+
+          <!-- Decoration: comparison badge -->
+          <div class="absolute -bottom-5 -left-5 card ring-soft bg-white px-3 py-2 text-xs rotate-[-4deg] hidden md:flex items-center gap-2">
+            <span class="pill bg-red-50 text-red-700">Before</span>
+            <span class="text-ink-600">~3 hrs per horse, per week</span>
+          </div>
+          <div class="absolute -top-5 -right-3 card ring-soft bg-white px-3 py-2 text-xs rotate-[3deg] hidden md:flex items-center gap-2">
+            <span class="pill bg-turf-50 text-turf-700">After</span>
+            <span class="text-ink-600">2 minutes, ranked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Problem strip ============== -->
+<section class="bg-white border-y border-slate-100">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-wider text-ink-500">The problem</div>
+        <h2 class="mt-2 text-2xl md:text-3xl font-semibold tracking-tight">Placing a horse takes a whole afternoon.</h2>
+        <p class="mt-3 text-ink-600">Reading condition books. Cross-checking eligibility. Comparing purse value. Checking jockey availability. Coordinating shipping. It's all manual — and easy to miss the right spot.</p>
+      </div>
+      <ul class="space-y-2.5 text-sm text-ink-700">
+        <li class="flex items-start gap-2"><i data-lucide="circle-x" class="w-4 h-4 text-red-500 mt-0.5"></i>Condition language is dense and inconsistent across tracks</li>
+        <li class="flex items-start gap-2"><i data-lucide="circle-x" class="w-4 h-4 text-red-500 mt-0.5"></i>One missed preference tier and your entry doesn't draw</li>
+        <li class="flex items-start gap-2"><i data-lucide="circle-x" class="w-4 h-4 text-red-500 mt-0.5"></i>Jockey conflicts only show up after you've committed</li>
+        <li class="flex items-start gap-2"><i data-lucide="circle-x" class="w-4 h-4 text-red-500 mt-0.5"></i>The right spot at another track gets missed entirely</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============== How it works ============== -->
+<section id="how" class="max-w-6xl mx-auto px-6 py-20">
+  <div class="text-center max-w-2xl mx-auto">
+    <div class="text-xs uppercase tracking-wider text-turf-700">How it works</div>
+    <h2 class="mt-2 text-3xl md:text-4xl font-semibold tracking-tight">Three steps. Then ranked spots, every morning.</h2>
+  </div>
+
+  <div class="mt-12 grid md:grid-cols-3 gap-5">
+    <div class="card ring-soft p-6 relative">
+      <div class="absolute -top-3 left-6 w-7 h-7 rounded-full bg-ink-900 text-white text-sm font-semibold flex items-center justify-center">1</div>
+      <div class="mt-2 flex items-center gap-2">
+        <i data-lucide="rabbit" class="w-5 h-5 text-turf-700"></i>
+        <h3 class="font-semibold">Connect your stable</h3>
+      </div>
+      <p class="mt-2 text-sm text-ink-600">Import horses from Equibase, or add them manually. We sync past performances, workouts, and earnings automatically.</p>
+    </div>
+    <div class="card ring-soft p-6 relative">
+      <div class="absolute -top-3 left-6 w-7 h-7 rounded-full bg-ink-900 text-white text-sm font-semibold flex items-center justify-center">2</div>
+      <div class="mt-2 flex items-center gap-2">
+        <i data-lucide="scan-text" class="w-5 h-5 text-turf-700"></i>
+        <h3 class="font-semibold">We read every condition book</h3>
+      </div>
+      <p class="mt-2 text-sm text-ink-600">Every track on your circuit, every night. Conditions get parsed into structured eligibility rules — preferences, weight allowances, all of it.</p>
+    </div>
+    <div class="card ring-soft p-6 relative">
+      <div class="absolute -top-3 left-6 w-7 h-7 rounded-full bg-ink-900 text-white text-sm font-semibold flex items-center justify-center">3</div>
+      <div class="mt-2 flex items-center gap-2">
+        <i data-lucide="target" class="w-5 h-5 text-turf-700"></i>
+        <h3 class="font-semibold">You get ranked spots</h3>
+      </div>
+      <p class="mt-2 text-sm text-ink-600">For each horse, your top 5 races — with eligibility, jockey availability, projected field, and shipping logistics all checked.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Who it's for ============== -->
+<section id="who" class="bg-white border-y border-slate-100">
+  <div class="max-w-6xl mx-auto px-6 py-20">
+    <div class="text-center max-w-2xl mx-auto">
+      <div class="text-xs uppercase tracking-wider text-turf-700">Who it's for</div>
+      <h2 class="mt-2 text-3xl md:text-4xl font-semibold tracking-tight">One platform. Three sides of the race.</h2>
+      <p class="mt-3 text-ink-600">Sign in once. Switch between your trainer, owner, and racing-office workspaces.</p>
+    </div>
+
+    <div class="mt-12 grid md:grid-cols-3 gap-5">
+
+      <div class="card ring-soft p-6 border-t-4 border-turf-600">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-turf-50 flex items-center justify-center"><i data-lucide="users" class="w-4 h-4 text-turf-700"></i></div>
+          <h3 class="font-semibold">Trainers</h3>
+        </div>
+        <p class="mt-3 text-sm text-ink-600">Place horses faster, miss fewer spots, and stop pulling condition books at 6 AM. Every horse, ranked options, every week.</p>
+        <ul class="mt-4 space-y-1.5 text-sm text-ink-700">
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Top-5 spot recommendations</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Eligibility auto-check</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Jockey conflict detection</li>
+        </ul>
+      </div>
+
+      <div class="card ring-soft p-6 border-t-4" style="border-color:#d97706">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:#fffbeb"><i data-lucide="user-round" class="w-4 h-4" style="color:#b45309"></i></div>
+          <h3 class="font-semibold">Owners</h3>
+        </div>
+        <p class="mt-3 text-sm text-ink-600">See every horse you own — across every trainer — in one place. Approve entries with context, not blind sign-offs.</p>
+        <ul class="mt-4 space-y-1.5 text-sm text-ink-700">
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4" style="color:#d97706"></i>Multi-trainer portfolio view</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4" style="color:#d97706"></i>Entry approvals with rationale</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4" style="color:#d97706"></i>Earnings &amp; results ledger</li>
+        </ul>
+      </div>
+
+      <div class="card ring-soft p-6 border-t-4" style="border-color:#4f46e5">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:#eef2ff"><i data-lucide="flag-triangle-right" class="w-4 h-4" style="color:#4338ca"></i></div>
+          <h3 class="font-semibold">Racing Offices</h3>
+        </div>
+        <p class="mt-3 text-sm text-ink-600">Fill races by reaching the right trainers at the right time. Spot underfilled conditions before entries close.</p>
+        <ul class="mt-4 space-y-1.5 text-sm text-ink-700">
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4" style="color:#4f46e5"></i>Live card-fill dashboard</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4" style="color:#4f46e5"></i>Targeted trainer outreach</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4" style="color:#4f46e5"></i>Field-strength trend tracking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Features ============== -->
+<section id="features" class="max-w-6xl mx-auto px-6 py-20 space-y-20">
+
+  <div class="text-center max-w-2xl mx-auto">
+    <div class="text-xs uppercase tracking-wider text-turf-700">Features</div>
+    <h2 class="mt-2 text-3xl md:text-4xl font-semibold tracking-tight">Built around the work you already do.</h2>
+  </div>
+
+  <!-- Feature 1: eligibility -->
+  <div class="grid lg:grid-cols-2 gap-10 items-center">
+    <div>
+      <span class="pill bg-turf-50 text-turf-700"><i data-lucide="badge-check" class="w-3 h-3"></i>Eligibility</span>
+      <h3 class="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Every condition, checked.</h3>
+      <p class="mt-3 text-ink-600">Age, sex, prior wins, claim history, state restrictions, preference tiers — all validated against each horse's record automatically. If they qualify, you know. If they don't, you know why.</p>
+      <ul class="mt-5 space-y-2 text-sm text-ink-700">
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Catches preference-tier qualifiers other tools miss</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Flags weight allowances you'd otherwise calculate by hand</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Shows the rule next to the pass/fail — auditable, not magic</li>
+      </ul>
+    </div>
+    <div class="card ring-soft p-5 bg-gradient-to-br from-white to-turf-50">
+      <div class="flex items-center gap-2">
+        <i data-lucide="badge-check" class="w-4 h-4 text-turf-700"></i>
+        <div class="font-semibold">Eligibility · Zengraya</div>
+      </div>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>3yo &amp; up fillies and mares</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Maidens · career 0 wins</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Has not started for less than $50,000</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Weight: 118 lbs</li>
+        <li class="flex items-start gap-2 pt-2 border-t border-turf-100 mt-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-silk-500 mt-0.5"></i>
+          <span class="text-turf-800"><span class="font-medium">Qualifies for preference tier</span></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Feature 2: condition parser -->
+  <div class="grid lg:grid-cols-2 gap-10 items-center">
+    <div class="card ring-soft p-5 order-2 lg:order-1 bg-white">
+      <div class="font-mono text-xs leading-relaxed text-ink-700 bg-slate-50 border border-slate-100 p-4 rounded-lg">
+        Mdn 120k · 6½ Furlongs · Purse $120,000. FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD. Three Year Olds, 118 lbs., Older, 124 lbs. (Preference To Horses That Have Not Started For Less Than $50,000).
+      </div>
+      <div class="mt-3 flex items-center gap-2 text-xs text-ink-500">
+        <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>parsed in 1.4s
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+        <div><div class="text-xs text-ink-500">Race type</div><div class="font-medium">Maiden Special Weight</div></div>
+        <div><div class="text-xs text-ink-500">Distance · Surface</div><div class="font-medium">6.5f · Dirt</div></div>
+        <div><div class="text-xs text-ink-500">Sex / Age</div><div class="font-medium">F&amp;M · 3yo+</div></div>
+        <div><div class="text-xs text-ink-500">Preference</div><div class="font-medium">Started for &lt; $50k</div></div>
+      </div>
+    </div>
+    <div class="order-1 lg:order-2">
+      <span class="pill bg-turf-50 text-turf-700"><i data-lucide="scan-text" class="w-3 h-3"></i>Parser</span>
+      <h3 class="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Condition books, parsed.</h3>
+      <p class="mt-3 text-ink-600">Modern LLMs read condition language better than any rules engine ever could. We extract ~45 structured fields per race, validate against jockey-club rules, and flag anything ambiguous for human review.</p>
+      <ul class="mt-5 space-y-2 text-sm text-ink-700">
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Every track, every night, end-to-end</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>98% confidence on standard conditions</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Human-in-the-loop on the edge cases</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Feature 3: jockey -->
+  <div class="grid lg:grid-cols-2 gap-10 items-center">
+    <div>
+      <span class="pill bg-turf-50 text-turf-700"><i data-lucide="user-round" class="w-3 h-3"></i>Jockeys &amp; logistics</span>
+      <h3 class="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Conflicts caught before you commit.</h3>
+      <p class="mt-3 text-ink-600">PostParade knows which jockey you want, who's already named on other mounts that card, and whether shipping is feasible. Suggested backups, ship-share opportunities, the whole picture.</p>
+      <ul class="mt-5 space-y-2 text-sm text-ink-700">
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Preferred jockey availability cross-checked</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Backup riders ranked by your win-rate together</li>
+        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Ship-share suggestions across your stable</li>
+      </ul>
+    </div>
+    <div class="card ring-soft p-5 bg-white space-y-3">
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-turf-50 border border-turf-100">
+        <div class="w-8 h-8 rounded-full bg-turf-600 text-white flex items-center justify-center text-xs font-semibold">FG</div>
+        <div class="flex-1">
+          <div class="font-medium text-sm">Foley G.</div>
+          <div class="text-xs text-ink-500">Preferred · 21% w/ this trainer</div>
+        </div>
+        <span class="pill bg-turf-600 text-white">Available</span>
+      </div>
+      <div class="flex items-center gap-3 p-3 rounded-lg border border-slate-100">
+        <div class="w-8 h-8 rounded-full bg-slate-200 text-ink-700 flex items-center justify-center text-xs font-semibold">VR</div>
+        <div class="flex-1">
+          <div class="font-medium text-sm">Velazquez J.</div>
+          <div class="text-xs text-ink-500">Backup · Belmont R5 conflict</div>
+        </div>
+        <span class="pill bg-red-50 text-red-700">Conflict</span>
+      </div>
+      <div class="px-3 py-2 rounded-lg bg-slate-50 text-xs text-ink-700">
+        <span class="font-semibold">Ship-share:</span> Tammy's Kiss heading to CD same day — save ~$420 on the van.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Pricing teaser ============== -->
+<section id="pricing" class="bg-white border-y border-slate-100">
+  <div class="max-w-5xl mx-auto px-6 py-20">
+    <div class="text-center max-w-2xl mx-auto">
+      <div class="text-xs uppercase tracking-wider text-turf-700">Pricing</div>
+      <h2 class="mt-2 text-3xl md:text-4xl font-semibold tracking-tight">Pilot pricing for early stables.</h2>
+      <p class="mt-3 text-ink-600">We're working with a small group of trainers and owners to shape v1. Pricing scales with stable size; pilot members get founding rates locked in.</p>
+    </div>
+
+    <div class="mt-10 grid md:grid-cols-3 gap-5">
+      <div class="card ring-soft p-6">
+        <div class="text-sm text-ink-500">Independent trainer</div>
+        <div class="mt-2 flex items-baseline gap-1">
+          <div class="text-3xl font-semibold">$200</div>
+          <div class="text-sm text-ink-500">/ month</div>
+        </div>
+        <div class="text-xs text-ink-500">Up to 15 horses</div>
+        <ul class="mt-5 space-y-2 text-sm text-ink-700">
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>All trainer features</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>One circuit</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Email support</li>
+        </ul>
+      </div>
+      <div class="card ring-soft p-6 border-2 border-turf-500 relative">
+        <span class="absolute -top-3 left-6 pill bg-turf-600 text-white">Most popular</span>
+        <div class="text-sm text-ink-500">Mid-size stable</div>
+        <div class="mt-2 flex items-baseline gap-1">
+          <div class="text-3xl font-semibold">$600</div>
+          <div class="text-sm text-ink-500">/ month</div>
+        </div>
+        <div class="text-xs text-ink-500">Up to 60 horses · multi-circuit</div>
+        <ul class="mt-5 space-y-2 text-sm text-ink-700">
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Everything in Trainer</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Owner workspace included</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Jockey booking workflow</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Phone &amp; SMS alerts</li>
+        </ul>
+      </div>
+      <div class="card ring-soft p-6">
+        <div class="text-sm text-ink-500">Racing office</div>
+        <div class="mt-2 flex items-baseline gap-1">
+          <div class="text-3xl font-semibold">Custom</div>
+        </div>
+        <div class="text-xs text-ink-500">Per meet</div>
+        <ul class="mt-5 space-y-2 text-sm text-ink-700">
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Card-fill dashboard</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>Trainer outreach automation</li>
+          <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>White-glove onboarding</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CTA strip ============== -->
+<section class="bg-ink-900 text-white">
+  <div class="max-w-5xl mx-auto px-6 py-16 text-center">
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">See it in your own barn.</h2>
+    <p class="mt-3 text-ink-400 max-w-xl mx-auto">Walk through the demo first, then we'll wire up your stable. No setup work on your side.</p>
+    <div class="mt-7 flex items-center justify-center gap-3 flex-wrap">
+      <a href="app.html" class="px-5 py-3 rounded-lg bg-turf-500 hover:bg-turf-600 text-ink-900 text-sm font-semibold inline-flex items-center gap-2">
+        Try the interactive demo <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </a>
+      <button id="openLogin3" class="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm font-medium inline-flex items-center gap-2">
+        <i data-lucide="lock" class="w-4 h-4"></i>Log in
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Footer ============== -->
+<footer class="bg-white border-t border-slate-100">
+  <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-ink-500">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 rounded-lg bg-ink-900 flex items-center justify-center"><i data-lucide="flag" class="w-3.5 h-3.5 text-turf-300"></i></div>
+      <span class="text-ink-700 font-medium">PostParade</span>
+      <span class="text-ink-400">·</span>
+      <span>Concept prototype · 2026</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <a href="#how" class="hover:text-ink-900">How it works</a>
+      <a href="#features" class="hover:text-ink-900">Features</a>
+      <a href="#pricing" class="hover:text-ink-900">Pricing</a>
+      <a href="app.html" class="hover:text-ink-900">Demo</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============== Login modal ============== -->
+<div id="loginModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 modal-backdrop" data-close></div>
+  <div class="modal absolute left-1/2 top-1/2 w-[92%] max-w-md card ring-soft bg-white p-7">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-ink-900 flex items-center justify-center"><i data-lucide="flag" class="w-3.5 h-3.5 text-turf-300"></i></div>
+        <div class="font-semibold">Welcome back</div>
+      </div>
+      <button data-close class="text-ink-500 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+
+    <div class="mt-5 space-y-2">
+      <a href="app.html" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm font-medium">
+        <svg width="16" height="16" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 01-1.79 2.72v2.26h2.9c1.7-1.56 2.69-3.87 2.69-6.63z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.95-2.18l-2.9-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.32-1.58-5.03-3.7H.97v2.33A9 9 0 009 18z" fill="#34A853"/><path d="M3.97 10.72A5.41 5.41 0 013.68 9c0-.6.1-1.18.29-1.72V4.95H.97A9 9 0 000 9c0 1.45.35 2.83.97 4.05l3-2.33z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 009 0 9 9 0 00.97 4.95l3 2.33C4.68 5.16 6.66 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </a>
+      <a href="app.html" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm font-medium">
+        <i data-lucide="apple" class="w-4 h-4"></i>Continue with Apple
+      </a>
+    </div>
+
+    <div class="my-5 flex items-center gap-3 text-xs text-ink-500">
+      <div class="flex-1 h-px bg-slate-200"></div>
+      <span>or sign in with email</span>
+      <div class="flex-1 h-px bg-slate-200"></div>
+    </div>
+
+    <form onsubmit="event.preventDefault(); location.href='app.html'" class="space-y-2.5">
+      <input type="email" placeholder="you@stable.com" class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:border-turf-500 focus:outline-none">
+      <input type="password" placeholder="Password" class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:border-turf-500 focus:outline-none">
+      <button type="submit" class="w-full px-4 py-2.5 rounded-lg bg-ink-900 hover:bg-ink-800 text-white text-sm font-medium">Sign in</button>
+    </form>
+
+    <div class="mt-5 pt-4 border-t border-slate-100 text-center text-xs text-ink-500">
+      No account? <a href="app.html" class="text-turf-700 font-medium hover:underline">Skip — try the demo</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  const modal = document.getElementById('loginModal');
+  const openButtons = ['openLogin','openLogin2','openLogin3'].map(id => document.getElementById(id)).filter(Boolean);
+  openButtons.forEach(b => b.addEventListener('click', () => { modal.classList.remove('hidden'); }));
+  modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => modal.classList.add('hidden')));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.add('hidden'); });
+</script>
+</body>
+</html>
