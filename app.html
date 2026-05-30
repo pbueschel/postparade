@@ -93,8 +93,13 @@
   .ws-menu { display: none; }
   .ws-menu.open { display: block; }
 
-  /* Active nav highlight */
-  .nav-item.is-active { background: rgba(255,255,255,.10); color: #fff; }
+  /* Light sidebar treatment */
+  .sidebar { background: #fafaf7; }
+  .sidebar-border { border-color: #e7e5df; }
+
+  /* Active nav highlight — tinted by current workspace accent */
+  .nav-item.is-active { background: var(--accent-bg); color: var(--accent-strong); font-weight: 500; }
+  .nav-item.is-active i { color: var(--accent-strong); }
 </style>
 </head>
 <body class="min-h-screen" data-ws="trainer">
@@ -113,66 +118,66 @@
 <div class="flex min-h-[calc(100vh-28px)]">
 
   <!-- Sidebar -->
-  <aside class="w-60 bg-ink-900 text-slate-200 hidden md:flex md:flex-col">
-    <div class="px-5 py-5 border-b border-white/5">
+  <aside class="sidebar w-60 text-ink-700 hidden md:flex md:flex-col border-r sidebar-border">
+    <div class="px-5 py-5 border-b sidebar-border">
       <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-md bg-turf-500 flex items-center justify-center">
-          <i data-lucide="flag" class="w-4 h-4 text-ink-900"></i>
+        <div class="w-7 h-7 rounded-md bg-ink-900 flex items-center justify-center">
+          <i data-lucide="flag" class="w-4 h-4 text-turf-300"></i>
         </div>
-        <div class="font-semibold tracking-tight">PostParade</div>
+        <div class="font-semibold tracking-tight text-ink-900">PostParade</div>
       </div>
     </div>
 
     <!-- Workspace switcher -->
-    <div class="px-3 py-3 border-b border-white/5 relative">
-      <button id="wsSwitcher" class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm">
+    <div class="px-3 py-3 border-b sidebar-border relative">
+      <button id="wsSwitcher" class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-sm">
         <span class="flex items-center gap-2">
           <span id="wsAbbr" class="w-5 h-5 rounded-full accent-bg text-white text-[10px] font-bold flex items-center justify-center">SR</span>
           <span class="text-left leading-tight">
-            <span id="wsName" class="block text-slate-100">Snellgrove Racing</span>
-            <span id="wsRole" class="block text-[10px] text-slate-400">Trainer workspace</span>
+            <span id="wsName" class="block text-ink-900">Snellgrove Racing</span>
+            <span id="wsRole" class="block text-[10px] text-ink-500">Trainer workspace</span>
           </span>
         </span>
-        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 opacity-60"></i>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-500"></i>
       </button>
 
       <!-- Dropdown -->
-      <div id="wsMenu" class="ws-menu absolute left-3 right-3 top-full mt-1 z-40 rounded-lg bg-ink-800 border border-white/10 shadow-xl overflow-hidden">
-        <div class="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wider text-slate-500">Your workspaces</div>
+      <div id="wsMenu" class="ws-menu absolute left-3 right-3 top-full mt-1 z-40 rounded-lg bg-white border border-slate-200 shadow-lg overflow-hidden">
+        <div class="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wider text-ink-500">Your workspaces</div>
 
-        <button data-go="trainer" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-200 hover:bg-white/5 text-left">
+        <button data-go="trainer" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
           <span class="w-6 h-6 rounded-full bg-turf-600 text-white text-[10px] font-bold flex items-center justify-center">SR</span>
           <span class="flex-1">
             <span class="block">Snellgrove Racing</span>
-            <span class="block text-[10px] text-slate-400">Trainer · 14 horses</span>
+            <span class="block text-[10px] text-ink-500">Trainer · 14 horses</span>
           </span>
-          <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-300"></i>
+          <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600"></i>
         </button>
 
-        <button data-go="owner" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-200 hover:bg-white/5 text-left">
+        <button data-go="owner" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
           <span class="w-6 h-6 rounded-full bg-silk-500 text-white text-[10px] font-bold flex items-center justify-center">BB</span>
           <span class="flex-1">
             <span class="block">Bush Bloodstock</span>
-            <span class="block text-[10px] text-slate-400">Owner · 5 horses</span>
+            <span class="block text-[10px] text-ink-500">Owner · 5 horses</span>
           </span>
-          <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-300 hidden"></i>
+          <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600 hidden"></i>
         </button>
 
-        <button data-go="office" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-200 hover:bg-white/5 text-left">
+        <button data-go="office" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
           <span class="w-6 h-6 rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center">CD</span>
           <span class="flex-1">
             <span class="block">Churchill Downs</span>
-            <span class="block text-[10px] text-slate-400">Racing Office · summer meet</span>
+            <span class="block text-[10px] text-ink-500">Racing Office · summer meet</span>
           </span>
-          <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-300 hidden"></i>
+          <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600 hidden"></i>
         </button>
 
-        <div class="border-t border-white/5 mt-1">
-          <a href="#parser-playground" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-white/5">
+        <div class="border-t border-slate-100 mt-1">
+          <a href="#parser-playground" class="flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-slate-50">
             <i data-lucide="flask-conical" class="w-3.5 h-3.5"></i>Condition parser playground
-            <span class="ml-auto text-[10px] text-slate-500">Tool</span>
+            <span class="ml-auto text-[10px] text-ink-500">Tool</span>
           </a>
-          <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:bg-white/5 text-left">
+          <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-500 hover:bg-slate-50 text-left">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i>Join a workspace
           </button>
         </div>
@@ -181,52 +186,52 @@
 
     <!-- Trainer nav -->
     <nav data-nav="trainer" class="p-2 text-sm flex-1">
-      <a href="#dashboard"        class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard</a>
-      <a href="#horse/zengraya"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="rabbit" class="w-4 h-4"></i>Horses</a>
-      <a href="#recs/zengraya"    class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="target" class="w-4 h-4"></i>Recommendations</a>
-      <a href="#race/cd-jun6-r3"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="calendar-clock" class="w-4 h-4"></i>Race detail</a>
-      <a href="#parser"           class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="scan-text" class="w-4 h-4"></i>Condition parser</a>
+      <a href="#dashboard"        class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard</a>
+      <a href="#horse/zengraya"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="rabbit" class="w-4 h-4"></i>Horses</a>
+      <a href="#recs/zengraya"    class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="target" class="w-4 h-4"></i>Recommendations</a>
+      <a href="#race/cd-jun6-r3"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-clock" class="w-4 h-4"></i>Race detail</a>
+      <a href="#parser"           class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="scan-text" class="w-4 h-4"></i>Condition parser</a>
 
-      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-slate-500">Stable</div>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400"><i data-lucide="users" class="w-4 h-4"></i>Owners</a>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400"><i data-lucide="user-round" class="w-4 h-4"></i>Jockeys</a>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400"><i data-lucide="truck" class="w-4 h-4"></i>Shipping</a>
+      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Stable</div>
+      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="users" class="w-4 h-4"></i>Owners</a>
+      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="user-round" class="w-4 h-4"></i>Jockeys</a>
+      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="truck" class="w-4 h-4"></i>Shipping</a>
     </nav>
 
     <!-- Owner nav -->
     <nav data-nav="owner" class="p-2 text-sm flex-1">
-      <a href="#owner/dashboard" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Stable overview</a>
-      <a href="#owner/approvals" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Entry approvals
+      <a href="#owner/dashboard" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Stable overview</a>
+      <a href="#owner/approvals" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Entry approvals
         <span class="ml-auto pill bg-silk-500 text-white">2</span>
       </a>
-      <a href="#owner/results"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="trophy" class="w-4 h-4"></i>Results &amp; earnings</a>
+      <a href="#owner/results"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="trophy" class="w-4 h-4"></i>Results &amp; earnings</a>
 
-      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-slate-500">Portfolio</div>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400"><i data-lucide="receipt" class="w-4 h-4"></i>Billing</a>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Tax docs</a>
+      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Portfolio</div>
+      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="receipt" class="w-4 h-4"></i>Billing</a>
+      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Tax docs</a>
     </nav>
 
     <!-- Racing office nav -->
     <nav data-nav="office" class="p-2 text-sm flex-1">
-      <a href="#office/card"     class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="calendar-days" class="w-4 h-4"></i>Card builder</a>
-      <a href="#office/outreach" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="megaphone" class="w-4 h-4"></i>Trainer outreach
+      <a href="#office/card"     class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-days" class="w-4 h-4"></i>Card builder</a>
+      <a href="#office/outreach" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="megaphone" class="w-4 h-4"></i>Trainer outreach
         <span class="ml-auto pill bg-indigo-500 text-white">3</span>
       </a>
-      <a href="#office/strength" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5"><i data-lucide="activity" class="w-4 h-4"></i>Field strength</a>
+      <a href="#office/strength" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="activity" class="w-4 h-4"></i>Field strength</a>
 
-      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-slate-500">Meet</div>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400"><i data-lucide="warehouse" class="w-4 h-4"></i>Stalls &amp; ship-ins</a>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400"><i data-lucide="book-open" class="w-4 h-4"></i>Condition books</a>
+      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Meet</div>
+      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="warehouse" class="w-4 h-4"></i>Stalls &amp; ship-ins</a>
+      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="book-open" class="w-4 h-4"></i>Condition books</a>
     </nav>
 
-    <div class="p-3 border-t border-white/5 text-xs text-slate-400">
+    <div class="p-3 border-t sidebar-border text-xs text-ink-500">
       <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-full bg-ink-700 flex items-center justify-center text-slate-200 font-semibold">JS</div>
+        <div class="w-7 h-7 rounded-full bg-ink-900 flex items-center justify-center text-white font-semibold">JS</div>
         <div class="flex-1 min-w-0">
-          <div class="text-slate-200 truncate">Jack Snellgrove</div>
+          <div class="text-ink-900 truncate">Jack Snellgrove</div>
           <div id="userRole" class="text-[11px] truncate">Head trainer</div>
         </div>
-        <a href="index.html" title="Sign out" class="p-1.5 rounded hover:bg-white/10">
+        <a href="index.html" title="Sign out" class="p-1.5 rounded hover:bg-slate-100">
           <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
         </a>
       </div>
