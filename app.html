@@ -100,6 +100,39 @@
   /* Active nav highlight — tinted by current workspace accent */
   .nav-item.is-active { background: var(--accent-bg); color: var(--accent-strong); font-weight: 500; }
   .nav-item.is-active i { color: var(--accent-strong); }
+
+  /* Mobile drawer behavior */
+  @media (max-width: 767px) {
+    .sidebar {
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      width: 16rem;
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform .22s ease;
+    }
+    body.sidebar-open .sidebar {
+      transform: translateX(0);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
+    }
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(11,18,32,.5);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease;
+  }
+  body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Mobile user popover */
+  .user-pop { display: none; }
+  .user-pop.open { display: block; }
 </style>
 </head>
 <body class="min-h-screen" data-ws="trainer">
@@ -117,8 +150,11 @@
 
 <div class="flex min-h-[calc(100vh-28px)]">
 
+  <!-- Mobile sidebar backdrop -->
+  <div class="sidebar-backdrop md:hidden" id="sidebarBackdrop"></div>
+
   <!-- Sidebar -->
-  <aside class="sidebar w-60 text-ink-700 hidden md:flex md:flex-col border-r sidebar-border">
+  <aside class="sidebar w-60 text-ink-700 flex flex-col border-r sidebar-border">
     <div class="px-5 py-5 border-b sidebar-border">
       <div class="flex items-center gap-2">
         <div class="w-7 h-7 rounded-md bg-ink-900 flex items-center justify-center">
@@ -242,16 +278,56 @@
   <main class="flex-1 min-w-0">
 
     <!-- Top bar -->
-    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center gap-4">
-      <div class="md:hidden font-semibold">PostParade</div>
-      <div class="flex-1 max-w-xl">
+    <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex items-center gap-2 md:gap-4 relative">
+      <!-- Hamburger (mobile only) -->
+      <button id="openSidebar" aria-label="Open menu" class="md:hidden p-1.5 -ml-1.5 rounded hover:bg-slate-100">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Mobile brand -->
+      <div class="md:hidden flex items-center gap-1.5 font-semibold">
+        <div class="w-6 h-6 rounded-md bg-ink-900 flex items-center justify-center">
+          <i data-lucide="flag" class="w-3 h-3 text-turf-300"></i>
+        </div>
+        <span>PostParade</span>
+      </div>
+
+      <!-- Search (desktop only) -->
+      <div class="flex-1 max-w-xl hidden md:block">
         <div class="relative">
           <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
           <input placeholder="Search horses, races, tracks…" class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-100 border border-transparent focus:bg-white focus:border-slate-300 focus:outline-none">
         </div>
       </div>
+
+      <!-- Mobile spacer -->
+      <div class="flex-1 md:hidden"></div>
+
+      <!-- Notifications (desktop only) -->
       <button class="hidden md:inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-ink-900"><i data-lucide="bell" class="w-4 h-4"></i></button>
-      <button id="topCta" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg accent-bg accent-bg-h text-white"><i data-lucide="plus" class="w-4 h-4"></i><span id="topCtaLabel">Add horse</span></button>
+
+      <!-- Primary CTA — icon-only on mobile, full on desktop -->
+      <button id="topCta" class="inline-flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 text-sm rounded-lg accent-bg accent-bg-h text-white">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        <span id="topCtaLabel" class="hidden md:inline">Add horse</span>
+      </button>
+
+      <!-- Mobile user avatar with popover -->
+      <div class="md:hidden relative">
+        <button id="mobileUserBtn" aria-label="Account" class="w-8 h-8 rounded-full bg-ink-900 text-white text-xs font-semibold flex items-center justify-center hover:opacity-90">JS</button>
+        <div id="userPop" class="user-pop absolute right-0 top-full mt-2 w-56 rounded-lg bg-white border border-slate-200 shadow-lg z-40 overflow-hidden">
+          <div class="px-3 py-3 border-b border-slate-100 flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full bg-ink-900 text-white text-sm font-semibold flex items-center justify-center">JS</div>
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-ink-900 truncate">Jack Snellgrove</div>
+              <div id="userRoleMobile" class="text-[11px] text-ink-500 truncate">Head trainer</div>
+            </div>
+          </div>
+          <a href="index.html" class="flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-slate-50">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>Sign out
+          </a>
+        </div>
+      </div>
     </header>
 
     <!-- =========================================================== -->
@@ -1840,6 +1916,8 @@
     document.getElementById('wsAbbr').textContent = ws.abbr;
     document.getElementById('wsRole').textContent = ws.role;
     document.getElementById('userRole').textContent = ws.userRole;
+    const mobileRole = document.getElementById('userRoleMobile');
+    if (mobileRole) mobileRole.textContent = ws.userRole;
     document.getElementById('topCtaLabel').textContent = ws.cta;
     // checkmark in dropdown
     document.querySelectorAll('.ws-opt').forEach(opt => {
@@ -1883,7 +1961,34 @@
       const key = opt.dataset.go;
       wsMenu.classList.remove('open');
       location.hash = '#' + workspaces[key].home;
+      closeSidebar();
     });
+  });
+
+  /* ---------- Mobile sidebar drawer ---------- */
+  const openSidebarBtn = document.getElementById('openSidebar');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+  function openSidebar()  { document.body.classList.add('sidebar-open'); }
+  function closeSidebar() { document.body.classList.remove('sidebar-open'); }
+  openSidebarBtn.addEventListener('click', openSidebar);
+  sidebarBackdrop.addEventListener('click', closeSidebar);
+  // Close drawer after picking a nav item
+  document.querySelectorAll('.nav-item').forEach(a => {
+    a.addEventListener('click', () => {
+      if (window.matchMedia('(max-width: 767px)').matches) closeSidebar();
+    });
+  });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+
+  /* ---------- Mobile user popover ---------- */
+  const mobileUserBtn = document.getElementById('mobileUserBtn');
+  const userPop = document.getElementById('userPop');
+  mobileUserBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userPop.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!userPop.contains(e.target)) userPop.classList.remove('open');
   });
 
   /* ---------- Parser playground ---------- */
