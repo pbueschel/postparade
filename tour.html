@@ -67,8 +67,9 @@
 
   /* Workspace accent system */
   body[data-ws="trainer"] { --accent:#059669; --accent-bg:#ecfdf5; --accent-border:#a7f3d0; --accent-strong:#047857; --ws-tag:'Trainer'; }
+  body[data-ws="track"]   { --accent:#4f46e5; --accent-bg:#eef2ff; --accent-border:#c7d2fe; --accent-strong:#4338ca; --ws-tag:'Track'; }
+  /* owner accent parked for future guest-access (see docs/races-and-recommendations.md §1) */
   body[data-ws="owner"]   { --accent:#d97706; --accent-bg:#fffbeb; --accent-border:#fde68a; --accent-strong:#b45309; --ws-tag:'Owner'; }
-  body[data-ws="office"]  { --accent:#4f46e5; --accent-bg:#eef2ff; --accent-border:#c7d2fe; --accent-strong:#4338ca; --ws-tag:'Racing Office'; }
 
   .accent-bg     { background: var(--accent); }
   .accent-bg-h:hover { background: var(--accent-strong); }
@@ -78,16 +79,16 @@
   .accent-dot    { background: var(--accent); }
 
   body[data-ws="trainer"] .demo-banner { background: linear-gradient(90deg, #065f46, #0b1220); }
+  body[data-ws="track"]   .demo-banner { background: linear-gradient(90deg, #3730a3, #0b1220); }
   body[data-ws="owner"]   .demo-banner { background: linear-gradient(90deg, #92400e, #0b1220); }
-  body[data-ws="office"]  .demo-banner { background: linear-gradient(90deg, #3730a3, #0b1220); }
 
   /* Sidebar nav visibility per workspace */
   body[data-ws="trainer"] [data-nav="trainer"],
-  body[data-ws="owner"]   [data-nav="owner"],
-  body[data-ws="office"]  [data-nav="office"] { display: block; }
+  body[data-ws="track"]   [data-nav="track"],
+  body[data-ws="owner"]   [data-nav="owner"] { display: block; }
   body[data-ws="trainer"] [data-nav]:not([data-nav="trainer"]),
-  body[data-ws="owner"]   [data-nav]:not([data-nav="owner"]),
-  body[data-ws="office"]  [data-nav]:not([data-nav="office"]) { display: none; }
+  body[data-ws="track"]   [data-nav]:not([data-nav="track"]),
+  body[data-ws="owner"]   [data-nav]:not([data-nav="owner"]) { display: none; }
 
   /* Workspace dropdown */
   .ws-menu { display: none; }
@@ -265,20 +266,11 @@
           <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600"></i>
         </button>
 
-        <button data-go="owner" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
-          <span class="w-6 h-6 rounded-full bg-silk-500 text-white text-[10px] font-bold flex items-center justify-center">BB</span>
-          <span class="flex-1">
-            <span class="block">Bush Bloodstock</span>
-            <span class="block text-[10px] text-ink-500">Owner · 5 horses</span>
-          </span>
-          <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600 hidden"></i>
-        </button>
-
-        <button data-go="office" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
+        <button data-go="track" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
           <span class="w-6 h-6 rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center">CD</span>
           <span class="flex-1">
             <span class="block">Churchill Downs</span>
-            <span class="block text-[10px] text-ink-500">Racing Office · summer meet</span>
+            <span class="block text-[10px] text-ink-500">Track · summer meet</span>
           </span>
           <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600 hidden"></i>
         </button>
@@ -300,39 +292,37 @@
       <a href="#dashboard"        class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard</a>
       <a href="#horse/zengraya"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="rabbit" class="w-4 h-4"></i>Horses</a>
       <a href="#recs/zengraya"    class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="target" class="w-4 h-4"></i>Recommendations</a>
+      <a href="#trainer/requests" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="inbox" class="w-4 h-4"></i>Requests
+        <span class="ml-auto pill bg-indigo-500 text-white">2</span>
+      </a>
       <a href="#race/cd-jun6-r3"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-clock" class="w-4 h-4"></i>Race detail</a>
       <a href="#parser"           class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="scan-text" class="w-4 h-4"></i>Condition parser</a>
 
       <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Stable</div>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="users" class="w-4 h-4"></i>Owners</a>
       <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="user-round" class="w-4 h-4"></i>Jockeys</a>
       <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="truck" class="w-4 h-4"></i>Shipping</a>
     </nav>
 
-    <!-- Owner nav -->
-    <nav data-nav="owner" class="p-2 text-sm flex-1">
-      <a href="#owner/dashboard" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Stable overview</a>
-      <a href="#owner/approvals" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Entry approvals
-        <span class="ml-auto pill bg-silk-500 text-white">2</span>
-      </a>
-      <a href="#owner/results"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="trophy" class="w-4 h-4"></i>Results &amp; earnings</a>
-
-      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Portfolio</div>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="receipt" class="w-4 h-4"></i>Billing</a>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Tax docs</a>
-    </nav>
-
-    <!-- Racing office nav -->
-    <nav data-nav="office" class="p-2 text-sm flex-1">
-      <a href="#office/card"     class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-days" class="w-4 h-4"></i>Card builder</a>
-      <a href="#office/outreach" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="megaphone" class="w-4 h-4"></i>Trainer outreach
+    <!-- Track nav -->
+    <nav data-nav="track" class="p-2 text-sm flex-1">
+      <a href="#track/weekend"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-range" class="w-4 h-4"></i>Weekend</a>
+      <a href="#track/raceday"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-days" class="w-4 h-4"></i>Raceday card</a>
+      <a href="#track/race/cd-jun6-r3" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="flag-triangle-right" class="w-4 h-4"></i>Race builder</a>
+      <a href="#track/requests" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="megaphone" class="w-4 h-4"></i>Fill &amp; request
         <span class="ml-auto pill bg-indigo-500 text-white">3</span>
       </a>
-      <a href="#office/strength" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="activity" class="w-4 h-4"></i>Field strength</a>
+      <a href="#track/strength" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="activity" class="w-4 h-4"></i>Field strength</a>
 
       <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Meet</div>
       <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="warehouse" class="w-4 h-4"></i>Stalls &amp; ship-ins</a>
       <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="book-open" class="w-4 h-4"></i>Condition books</a>
+    </nav>
+
+    <!-- Owner nav parked for future guest-access (see docs/races-and-recommendations.md §1) -->
+    <nav data-nav="owner" class="p-2 text-sm flex-1">
+      <a href="#owner/dashboard" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Stable overview</a>
+      <a href="#owner/approvals" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Entry approvals</a>
+      <a href="#owner/results"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="trophy" class="w-4 h-4"></i>Results &amp; earnings</a>
     </nav>
 
     <div class="p-3 border-t sidebar-border text-xs text-ink-500">
@@ -1242,7 +1232,77 @@
     </section>
 
     <!-- =========================================================== -->
-    <!-- OWNER · DASHBOARD                                            -->
+    <!-- TRAINER · INBOUND REQUESTS                                   -->
+    <!-- =========================================================== -->
+    <section id="trainer/requests" class="screen p-6 space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Requests from tracks</h1>
+        <div class="text-sm text-slate-600">Racing offices asking for one of your horses. Accept to submit the entry, or pass.</div>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Open requests</div><div class="mt-1 text-2xl font-semibold">2</div></div>
+        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">With ship bonus</div><div class="mt-1 text-2xl font-semibold accent-text">2</div><div class="text-xs text-slate-500">$3,000 total</div></div>
+        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Closing in 48h</div><div class="mt-1 text-2xl font-semibold text-red-600">1</div></div>
+      </div>
+
+      <div class="card ring-soft p-6" data-tour="trainer-inbound">
+        <div class="flex items-start gap-5 flex-wrap">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white"><i data-lucide="flag-triangle-right" class="w-5 h-5"></i></div>
+          <div class="flex-1 min-w-[240px]">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="font-semibold">Churchill Downs R3</h2>
+              <span class="pill bg-indigo-50 text-indigo-700">wants Zengraya</span>
+            </div>
+            <div class="text-sm text-slate-500 mt-1">Mdn 75k · 6f Dirt · F&amp;M 3yo+ · $85,000 · Sat Jun 6, post 2:14 CT</div>
+            <div class="text-xs text-slate-500 mt-2">Requested by <span class="text-ink-900 font-medium">CD Racing Office</span> · fit score 94 · qualifies preference tier</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-slate-500">Entries close</div>
+            <div class="text-sm font-semibold">Wed Jun 3, 10am</div>
+            <div class="text-xs text-red-600">3d 21h</div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg accent-soft text-sm">
+          <i data-lucide="truck" class="w-4 h-4"></i><span><span class="font-semibold">Ship-in bonus: $1,500</span> — Zengraya is stabled at CD, so no ship needed, but the bonus still applies to this fill.</span>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+          <button class="pp-accept-request text-sm px-4 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-horse="Zengraya" data-race="Churchill Downs R3"><i data-lucide="check" class="w-4 h-4"></i>Accept &amp; submit</button>
+          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="message-square" class="w-4 h-4"></i>Reply</button>
+          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600">Pass</button>
+        </div>
+      </div>
+
+      <div class="card ring-soft p-6">
+        <div class="flex items-start gap-5 flex-wrap">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white"><i data-lucide="flag-triangle-right" class="w-5 h-5"></i></div>
+          <div class="flex-1 min-w-[240px]">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="font-semibold">Keeneland R5</h2>
+              <span class="pill bg-indigo-50 text-indigo-700">wants Battis Grove</span>
+            </div>
+            <div class="text-sm text-slate-500 mt-1">Alw 1m · 4yo+ · $95,000 · Sun Jun 8, post 3:40 ET</div>
+            <div class="text-xs text-slate-500 mt-2">Requested by <span class="text-ink-900 font-medium">Keeneland Racing Office</span> · fit score 86 · soft field, good spot</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-slate-500">Entries close</div>
+            <div class="text-sm font-semibold">Fri Jun 6, 12pm</div>
+            <div class="text-xs text-amber-600">6d</div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg accent-soft text-sm">
+          <i data-lucide="truck" class="w-4 h-4"></i><span><span class="font-semibold">Ship-in bonus: $1,500</span> — covers most of the 78-mi van from CD. Ship-share available with a Keeneland-bound stablemate.</span>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+          <button class="pp-accept-request text-sm px-4 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-horse="Battis Grove" data-race="Keeneland R5"><i data-lucide="check" class="w-4 h-4"></i>Accept &amp; submit</button>
+          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="message-square" class="w-4 h-4"></i>Reply</button>
+          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600">Pass</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================== -->
+    <!-- OWNER · DASHBOARD (parked — guest-access backlog)           -->
     <!-- =========================================================== -->
     <section id="owner/dashboard" class="screen p-6 space-y-6">
       <div class="flex items-end justify-between flex-wrap gap-3">
@@ -1612,13 +1672,238 @@
     </section>
 
     <!-- =========================================================== -->
-    <!-- OFFICE · CARD BUILDER                                        -->
+    <!-- TRACK · WEEKEND OVERVIEW                                     -->
     <!-- =========================================================== -->
-    <section id="office/card" class="screen p-6 space-y-6">
+    <section id="track/weekend" class="screen p-6 space-y-6">
       <div class="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div class="text-xs text-slate-500 uppercase tracking-wider">Churchill Downs · Summer meet</div>
-          <h1 class="text-2xl font-semibold tracking-tight">Card builder — Sat Jun 6</h1>
+          <h1 class="text-2xl font-semibold tracking-tight">Jun 6–8 weekend</h1>
+          <div class="text-sm text-slate-600">3 racedays · 29 races · <span class="text-red-600 font-medium">5 underfilled</span> · ship-in bonus pool $45k</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i>Weekend ship bonus</button>
+          <a href="#track/race/cd-jun6-r3" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="track-weekend">
+        <div class="card ring-soft p-4">
+          <div class="text-xs text-slate-500">Avg field, weekend</div>
+          <div class="mt-1 text-2xl font-semibold">8.1</div>
+          <div class="text-xs text-slate-500">target ≥ 8</div>
+        </div>
+        <div class="card ring-soft p-4">
+          <div class="text-xs text-slate-500">Underfilled races</div>
+          <div class="mt-1 text-2xl font-semibold text-red-600">5</div>
+          <div class="text-xs text-slate-500">need horses</div>
+        </div>
+        <div class="card ring-soft p-4">
+          <div class="text-xs text-slate-500">Ship-in bonus pool</div>
+          <div class="mt-1 text-2xl font-semibold">$45k</div>
+          <div class="text-xs accent-text">$12k committed</div>
+        </div>
+        <div class="card ring-soft p-4">
+          <div class="text-xs text-slate-500">Requests out</div>
+          <div class="mt-1 text-2xl font-semibold" id="wk-requests-stat">3</div>
+          <div class="text-xs text-slate-500">awaiting trainers</div>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-4">
+        <a href="#track/raceday" class="card ring-soft p-5 hover:border-indigo-300 transition block">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold">Friday Jun 6</div>
+            <span class="pill bg-amber-100 text-amber-800">2 soft</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">9 races · published</div>
+          <div class="mt-3 flex items-center gap-2 text-xs">
+            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-500" style="width:78%"></div></div>
+            <span class="text-slate-500">avg 7.8</span>
+          </div>
+        </a>
+        <a href="#track/raceday" class="card ring-soft p-5 hover:border-indigo-300 transition block ring-2 ring-indigo-100">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold">Saturday Jun 6</div>
+            <span class="pill bg-red-100 text-red-700">3 underfilled</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">10 races · published · headline G3</div>
+          <div class="mt-3 flex items-center gap-2 text-xs">
+            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-500" style="width:84%"></div></div>
+            <span class="text-slate-500">avg 8.4</span>
+          </div>
+        </a>
+        <a href="#track/raceday" class="card ring-soft p-5 hover:border-indigo-300 transition block">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold">Sunday Jun 8</div>
+            <span class="pill accent-soft">healthy</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">10 races · draft</div>
+          <div class="mt-3 flex items-center gap-2 text-xs">
+            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full accent-bg" style="width:90%"></div></div>
+            <span class="text-slate-500">avg 9.0</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card ring-soft p-5 stripe">
+        <div class="flex items-center gap-2 accent-text">
+          <i data-lucide="truck" class="w-4 h-4"></i>
+          <div class="font-semibold">Ship-in bonus, weekend-wide</div>
+        </div>
+        <div class="mt-2 text-sm text-slate-700">
+          <span class="font-medium">$1,500</span> to any horse shipping in <span class="font-medium">≥ 150 mi</span> from outside the grounds, applied to underfilled races. Individual races can override.
+          <span class="text-slate-500">Pool $45,000 · $12,000 committed across 8 horses.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================== -->
+    <!-- TRACK · RACE BUILDER / DETAIL                                -->
+    <!-- =========================================================== -->
+    <section id="track/race/cd-jun6-r3" class="screen p-6 space-y-6">
+      <div class="text-xs text-slate-500 flex items-center gap-1.5">
+        <a href="#track/weekend" class="hover:text-ink-900">Jun 6–8 weekend</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <a href="#track/raceday" class="hover:text-ink-900">Sat Jun 6</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-ink-900 font-medium">R3 · build</span>
+      </div>
+
+      <div class="flex items-end justify-between flex-wrap gap-3">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight">Build Race 3 — Sat Jun 6</h1>
+          <div class="text-sm text-slate-600">Spec the conditions, then PostParade ranks who fits and lets you request them.</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="pill bg-red-50 text-red-700" id="rb-status-pill">Underfilled</span>
+          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Save draft</button>
+          <button class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i>Publish</button>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-4">
+        <!-- Spec form -->
+        <div class="card ring-soft p-5 lg:col-span-2" data-tour="track-spec">
+          <div class="font-semibold">Race spec</div>
+          <div class="text-xs text-slate-500">Edit any field — matches recompute on the right.</div>
+
+          <div class="mt-4 grid sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            <label class="block">
+              <div class="text-xs text-slate-500 mb-1">Race type</div>
+              <select id="rb-type" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+                <option value="S">Maiden Special Weight</option>
+                <option value="M">Maiden Claiming</option>
+                <option value="A">Allowance</option>
+                <option value="C">Claiming</option>
+                <option value="AO">Allowance Optional Claiming</option>
+                <option value="N">Stakes</option>
+              </select>
+            </label>
+            <label class="block">
+              <div class="text-xs text-slate-500 mb-1">Surface</div>
+              <select id="rb-surface" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+                <option value="D">Dirt</option>
+                <option value="T">Turf</option>
+                <option value="A">All-weather</option>
+              </select>
+            </label>
+            <label class="block">
+              <div class="text-xs text-slate-500 mb-1">Distance</div>
+              <select id="rb-distance" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+                <option value="1100">5½ furlongs</option>
+                <option value="1320" selected>6 furlongs</option>
+                <option value="1430">6½ furlongs</option>
+                <option value="1540">7 furlongs</option>
+                <option value="1760">1 mile</option>
+              </select>
+            </label>
+            <label class="block">
+              <div class="text-xs text-slate-500 mb-1">Purse</div>
+              <input id="rb-purse" type="text" value="$85,000" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+            </label>
+            <label class="block">
+              <div class="text-xs text-slate-500 mb-1">Age / sex restriction</div>
+              <select id="rb-restrict" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+                <option value="FM3U" selected>F&amp;M 3yo and up</option>
+                <option value="3U">3yo and up (open)</option>
+                <option value="F3">Fillies 3yo</option>
+                <option value="2U">2yo and up</option>
+              </select>
+            </label>
+            <label class="block">
+              <div class="text-xs text-slate-500 mb-1">Field target</div>
+              <select id="rb-target" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+                <option value="8">8</option>
+                <option value="10" selected>10</option>
+                <option value="12">12</option>
+              </select>
+            </label>
+            <label class="block sm:col-span-2">
+              <div class="text-xs text-slate-500 mb-1">Condition text</div>
+              <textarea id="rb-conditions" rows="3" class="w-full font-mono text-xs leading-relaxed p-3 rounded-lg bg-slate-50 border border-slate-200">FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD. Three Year Olds, 118 lbs.; Older, 124 lbs. (Preference To Horses That Have Not Started For Less Than $50,000).</textarea>
+            </label>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-100">
+            <div class="flex items-center gap-2 accent-text">
+              <i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold text-ink-900">Shipping bonus</div>
+            </div>
+            <div class="mt-3 grid sm:grid-cols-3 gap-x-4 gap-y-3 text-sm items-end">
+              <label class="block">
+                <div class="text-xs text-slate-500 mb-1">Bonus amount</div>
+                <input id="rb-bonus" type="number" value="1500" step="250" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+              </label>
+              <label class="block">
+                <div class="text-xs text-slate-500 mb-1">Min ship distance (mi)</div>
+                <input id="rb-bonus-mi" type="number" value="150" step="25" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
+              </label>
+              <button id="rb-recompute" class="px-3 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center justify-center gap-1.5"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Recompute matches</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fill status -->
+        <div class="card ring-soft p-5">
+          <div class="font-semibold">Fill status</div>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="text-3xl font-semibold" id="rb-fill-count">5</div>
+            <div class="text-slate-500">/ <span id="rb-fill-target">10</span> entered</div>
+          </div>
+          <div class="mt-2 h-2 rounded bg-slate-100 overflow-hidden">
+            <div id="rb-fill-bar" class="h-full bg-red-500" style="width:50%"></div>
+          </div>
+          <div class="mt-2 text-xs text-slate-500" id="rb-fill-note">5 short of target · request qualifying horses below</div>
+
+          <div class="mt-4 pt-4 border-t border-slate-100 text-sm space-y-2">
+            <div class="flex items-center justify-between"><span class="text-slate-500">Entries close</span><span class="font-medium">Wed Jun 3, 10am</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-500">Eligible, not entered</span><span class="font-medium" id="rb-eligible-count">—</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-500">Requests sent</span><span class="font-medium" id="rb-requests-count">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Who fits — engine output (Track → Request side) -->
+      <div class="card ring-soft" data-tour="track-fits">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <div class="font-semibold">Horses that fit this race</div>
+            <div class="text-xs text-slate-500">Eligible horses across stables on the circuit · ranked by fit + likelihood to accept</div>
+          </div>
+          <div class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5"></i>PostParade recommendation engine</div>
+        </div>
+        <div id="rb-fits" class="divide-y divide-slate-100 text-sm"><!-- engine fills this --></div>
+      </div>
+    </section>
+
+    <!-- =========================================================== -->
+    <!-- TRACK · RACEDAY CARD                                        -->
+    <!-- =========================================================== -->
+    <section id="track/raceday" class="screen p-6 space-y-6">
+      <div class="flex items-end justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider">Churchill Downs · Summer meet</div>
+          <h1 class="text-2xl font-semibold tracking-tight">Raceday card — Sat Jun 6</h1>
           <div class="text-sm text-slate-600">10 races · 6 closing in 48 hours · 3 underfilled</div>
         </div>
         <div class="flex items-center gap-2">
@@ -1723,7 +2008,7 @@
             </div>
             <div class="col-span-3 text-xs text-red-700">Underfilled · 12 horses qualify but unentered</div>
             <div class="col-span-1 text-right">
-              <a href="#office/outreach" class="pill bg-red-600 text-white">Outreach</a>
+              <a href="#track/requests" class="pill bg-red-600 text-white">Outreach</a>
             </div>
           </div>
 
@@ -1765,7 +2050,7 @@
             </div>
             <div class="col-span-3 text-xs text-amber-700">Soft · 6 horses qualify but unentered</div>
             <div class="col-span-1 text-right">
-              <a href="#office/outreach" class="pill bg-amber-500 text-white">Outreach</a>
+              <a href="#track/requests" class="pill bg-amber-500 text-white">Outreach</a>
             </div>
           </div>
 
@@ -1807,7 +2092,7 @@
             </div>
             <div class="col-span-3 text-xs text-red-700">Likely off-the-turf · consider swap to dirt condition</div>
             <div class="col-span-1 text-right">
-              <a href="#office/outreach" class="pill bg-red-600 text-white">Outreach</a>
+              <a href="#track/requests" class="pill bg-red-600 text-white">Outreach</a>
             </div>
           </div>
 
@@ -1817,12 +2102,12 @@
     </section>
 
     <!-- =========================================================== -->
-    <!-- OFFICE · OUTREACH                                            -->
+    <!-- TRACK · FILL & REQUEST                                            -->
     <!-- =========================================================== -->
-    <section id="office/outreach" class="screen p-6 space-y-6">
+    <section id="track/requests" class="screen p-6 space-y-6">
 
       <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#office/card" class="hover:text-ink-900">Card builder</a>
+        <a href="#track/raceday" class="hover:text-ink-900">Raceday card</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <span class="text-ink-900 font-medium">Outreach · R3 Sat Jun 6</span>
       </div>
@@ -1907,9 +2192,9 @@
     </section>
 
     <!-- =========================================================== -->
-    <!-- OFFICE · FIELD STRENGTH                                      -->
+    <!-- TRACK · FIELD STRENGTH                                      -->
     <!-- =========================================================== -->
-    <section id="office/strength" class="screen p-6 space-y-6">
+    <section id="track/strength" class="screen p-6 space-y-6">
       <div>
         <h1 class="text-2xl font-semibold tracking-tight">Field strength — next 14 days</h1>
         <div class="text-sm text-slate-600">Spot weak cards and short conditions before they cost handle.</div>
@@ -2079,8 +2364,18 @@
       home: 'dashboard',
       cta: 'Add horse',
       // any of these prefixes count as belonging to this workspace
-      prefixes: ['dashboard','horse/','recs/','race/','parser'],
+      prefixes: ['dashboard','horse/','recs/','race/','trainer/','parser'],
     },
+    track: {
+      name: 'Churchill Downs',
+      abbr: 'CD',
+      role: 'Track workspace',
+      userRole: 'Racing secretary',
+      home: 'track/weekend',
+      cta: 'Build a race',
+      prefixes: ['track/'],
+    },
+    // owner parked for future guest-access (see docs/races-and-recommendations.md §1)
     owner: {
       name: 'Bush Bloodstock',
       abbr: 'BB',
@@ -2089,15 +2384,6 @@
       home: 'owner/dashboard',
       cta: 'Invite trainer',
       prefixes: ['owner/'],
-    },
-    office: {
-      name: 'Churchill Downs',
-      abbr: 'CD',
-      role: 'Racing Office',
-      userRole: 'Racing secretary',
-      home: 'office/card',
-      cta: 'Write condition',
-      prefixes: ['office/'],
     },
   };
 
@@ -2309,19 +2595,222 @@
     renderSample(0);
   }
 
+  /* =====================================================================
+     RECOMMENDATION ENGINE  (see docs/races-and-recommendations.md §5)
+     One score(horse, race) powers both directions:
+       Trainer → Submit a horse to a race
+       Track   → Request a horse for a race
+     ===================================================================== */
+  const HORSES = [
+    { name:'Zengraya',     stable:'Snellgrove Racing', trainer:'Beschizza A.', sex:'F', age:3, maiden:true,  under50k:false, surf:['D'], sweet:[1320,1540], classR:121, lastSpeed:82, daysSince:49, home:'CD',  shipMi:0,   trainerPct:0.21 },
+    { name:'Tammy\'s Kiss', stable:'Snellgrove Racing', trainer:'Bauer P.',    sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:114, lastSpeed:0,  daysSince:0,  home:'CD',  shipMi:0,   trainerPct:0.18 },
+    { name:'Island Barbie', stable:'Murphy Racing',     trainer:'Murphy C.',   sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1540], classR:107, lastSpeed:64, daysSince:120,home:'CD',  shipMi:0,   trainerPct:0.11 },
+    { name:'Halcyon Days',  stable:'Cox Thoroughbreds', trainer:'Cox B.',      sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1540,1760], classR:110, lastSpeed:0,  daysSince:0,  home:'CD',  shipMi:0,   trainerPct:0.19 },
+    { name:'Painted Lily',  stable:'Mott Stable',       trainer:'Mott W.',     sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:112, lastSpeed:75, daysSince:35, home:'KEE', shipMi:78,  trainerPct:0.14 },
+    { name:'River Sonata',  stable:'Stewart Racing',    trainer:'Stewart D.',  sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:108, lastSpeed:71, daysSince:28, home:'ELP', shipMi:130, trainerPct:0.13 },
+    { name:'Quiet Storm',   stable:'Asmussen Stable',   trainer:'Asmussen S.', sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1540], classR:111, lastSpeed:80, daysSince:25, home:'OP',  shipMi:560, trainerPct:0.20 },
+    { name:'Cajun Belle',   stable:'Lobo Stable',       trainer:'Lobo P.',     sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1430,1760], classR:105, lastSpeed:73, daysSince:40, home:'FG',  shipMi:700, trainerPct:0.16 },
+    { name:'Battis Grove',  stable:'Walden Racing',     trainer:'Walden W.',   sex:'G', age:4, maiden:false, under50k:false, surf:['D'], sweet:[1320,1540], classR:112, lastSpeed:90, daysSince:30, home:'CD',  shipMi:0,   trainerPct:0.22 },
+  ];
+
+  const fill = { entered: 5, requested: new Set(), submitted: new Set() };
+
+  function readRaceSpec() {
+    const restrict = document.getElementById('rb-restrict').value;
+    const type = document.getElementById('rb-type').value;
+    return {
+      type,
+      surface: document.getElementById('rb-surface').value,
+      distance: +document.getElementById('rb-distance').value,
+      target: +document.getElementById('rb-target').value,
+      par: 84,
+      sexes: restrict.startsWith('FM') || restrict.startsWith('F') ? ['F','M'] : ['F','M','G','C','H','R'],
+      minAge: restrict.includes('2') ? 2 : 3,
+      maidenOnly: (type === 'S' || type === 'M'),
+      bonusAmount: +document.getElementById('rb-bonus').value || 0,
+      bonusMi: +document.getElementById('rb-bonus-mi').value || 0,
+    };
+  }
+
+  function eligibility(h, r) {
+    const reasons = [];
+    const sexOk = r.sexes.includes(h.sex);
+    reasons.push({ pass: sexOk });
+    const ageOk = h.age >= r.minAge;
+    reasons.push({ pass: ageOk });
+    if (r.maidenOnly) reasons.push({ pass: h.maiden });
+    return { eligible: reasons.every(x => x.pass), reasons };
+  }
+
+  function shipping(h, r) {
+    const qualifies = r.bonusAmount > 0 && h.shipMi >= r.bonusMi;
+    return { shipMi: h.shipMi, shipIn: h.shipMi > 0, bonus: qualifies ? r.bonusAmount : 0 };
+  }
+
+  function score(h, r) {
+    const elig = eligibility(h, r);
+    if (!elig.eligible) return { eligible: false, ...elig };
+    const within = (v, [lo, hi]) => v >= lo && v <= hi;
+    const distFit  = within(r.distance, h.sweet) ? 100 : Math.max(40, 100 - Math.abs(r.distance - (h.sweet[0]+h.sweet[1])/2) / 12);
+    const surfFit  = h.surf.includes(r.surface) ? 100 : 45;
+    const classFit = Math.max(30, Math.min(100, 50 + (h.classR - 108) * 4));
+    const speed    = h.lastSpeed === 0 ? 62 : Math.max(30, Math.min(100, 60 + (h.lastSpeed - r.par) * 2.5));
+    const fresh    = h.daysSince === 0 ? 70 : (h.daysSince <= 45 ? 100 - Math.abs(h.daysSince - 28) : Math.max(35, 100 - (h.daysSince - 45)));
+    const connect  = Math.min(100, h.trainerPct * 380);
+    const fieldStr = 80;
+    const W = { dist:20, surf:15, class:25, speed:15, fresh:10, connect:10, fieldStr:5 };
+    const fit = Math.round(
+      (distFit*W.dist + surfFit*W.surf + classFit*W.class + speed*W.speed + fresh*W.fresh + connect*W.connect + fieldStr*W.fieldStr)
+      / (W.dist+W.surf+W.class+W.speed+W.fresh+W.connect+W.fieldStr)
+    );
+    const ship = shipping(h, r);
+    const shipPenalty = ship.shipMi > 400 ? -22 : ship.shipMi > 150 ? -10 : 0;
+    const bonusBoost  = ship.bonus > 0 ? 12 : 0;
+    let accept = Math.round(fit * 0.7 + 22 + bonusBoost + shipPenalty + h.trainerPct * 30);
+    accept = Math.max(30, Math.min(95, accept));
+    return { eligible:true, reasons:elig.reasons, fit, accept, ship };
+  }
+
+  function fitsForRace(r) {
+    return HORSES.map(h => ({ h, s: score(h, r) }))
+                 .filter(x => x.s.eligible)
+                 .sort((a,b) => b.s.accept - a.s.accept);
+  }
+
+  function toast(msg) {
+    let t = document.getElementById('pp-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pp-toast';
+      t.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-lg bg-ink-900 text-white text-sm shadow-lg flex items-center gap-2 transition-opacity duration-300';
+      document.body.appendChild(t);
+    }
+    t.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-turf-300"></i><span>${msg}</span>`;
+    t.style.opacity = '1';
+    lucide.createIcons();
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2600);
+  }
+
+  function fmtMoney(n) { return '$' + n.toLocaleString(); }
+
+  function updateFillUI() {
+    const r = readRaceSpec();
+    const countEl = document.getElementById('rb-fill-count');
+    if (!countEl) return;
+    const targetEl = document.getElementById('rb-fill-target');
+    const barEl = document.getElementById('rb-fill-bar');
+    const noteEl = document.getElementById('rb-fill-note');
+    const reqEl = document.getElementById('rb-requests-count');
+    const pill = document.getElementById('rb-status-pill');
+    const entered = fill.entered + fill.submitted.size;
+    const pct = Math.min(100, Math.round(entered / r.target * 100));
+    countEl.textContent = entered;
+    targetEl.textContent = r.target;
+    barEl.style.width = pct + '%';
+    barEl.className = 'h-full ' + (entered >= r.target ? 'accent-bg' : entered >= r.target - 2 ? 'bg-amber-500' : 'bg-red-500');
+    reqEl.textContent = fill.requested.size;
+    const short = r.target - entered;
+    if (short <= 0) { noteEl.textContent = 'Target met — field is full'; pill.textContent = 'Full'; pill.className = 'pill accent-soft'; }
+    else if (short <= 2) { noteEl.textContent = `${short} short of target · nearly there`; pill.textContent = 'Filling'; pill.className = 'pill bg-amber-50 text-amber-700'; }
+    else { noteEl.textContent = `${short} short of target · request qualifying horses below`; pill.textContent = 'Underfilled'; pill.className = 'pill bg-red-50 text-red-700'; }
+  }
+
+  function renderRaceBuilder() {
+    const wrap = document.getElementById('rb-fits');
+    if (!wrap) return;
+    const r = readRaceSpec();
+    const fits = fitsForRace(r);
+    document.getElementById('rb-eligible-count').textContent = fits.length;
+    wrap.innerHTML = fits.map(({ h, s }) => {
+      const requested = fill.requested.has(h.name);
+      const submitted = fill.submitted.has(h.name);
+      const acceptColor = s.accept >= 75 ? 'accent-soft' : s.accept >= 55 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600';
+      const shipLabel = s.ship.shipMi === 0 ? 'In barn at CD' : `Ship ${s.ship.shipMi} mi from ${h.home}`;
+      const bonusBadge = s.ship.bonus > 0
+        ? `<span class="pill accent-soft"><i data-lucide="truck" class="w-3 h-3"></i>+${fmtMoney(s.ship.bonus)} ship bonus</span>`
+        : (s.ship.shipIn ? `<span class="pill bg-slate-100 text-slate-500">ship-in · below bonus min</span>` : '');
+      const action = submitted
+        ? `<span class="pill accent-soft"><i data-lucide="check" class="w-3 h-3"></i>Entered</span>`
+        : requested
+          ? `<span class="pill bg-slate-100 text-slate-600"><i data-lucide="clock" class="w-3 h-3"></i>Requested</span>`
+          : `<button class="pp-request text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-horse="${h.name}"><i data-lucide="send" class="w-3.5 h-3.5"></i>Request</button>`;
+      return `
+        <div class="px-5 py-3.5 grid grid-cols-12 gap-3 items-center">
+          <div class="col-span-1">
+            <div class="w-10 h-10 rounded-full score-ring flex items-center justify-center" style="--p:${s.fit}; --c:#4f46e5;">
+              <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center"><span class="text-[11px] font-bold accent-text">${s.fit}</span></div>
+            </div>
+          </div>
+          <div class="col-span-3">
+            <div class="font-medium">${h.name}</div>
+            <div class="text-xs text-slate-500">${h.sex} ${h.age}yo · ${h.stable}</div>
+          </div>
+          <div class="col-span-2"><div class="text-xs text-slate-500">Trainer</div><div>${h.trainer}</div></div>
+          <div class="col-span-2"><span class="pill ${acceptColor}">Likely yes · ${s.accept}%</span></div>
+          <div class="col-span-2 text-xs text-slate-500">${shipLabel}<div class="mt-1">${bonusBadge}</div></div>
+          <div class="col-span-2 text-right">${action}</div>
+        </div>`;
+    }).join('') || `<div class="px-5 py-8 text-center text-sm text-slate-500">No eligible horses match these conditions. Loosen the spec to widen the pool.</div>`;
+    updateFillUI();
+    lucide.createIcons();
+  }
+
+  function requestHorse(name) {
+    if (fill.requested.has(name) || fill.submitted.has(name)) return;
+    fill.requested.add(name);
+    renderRaceBuilder();
+    const stat = document.getElementById('wk-requests-stat');
+    if (stat) stat.textContent = 3 + fill.requested.size;
+    toast(`Request sent to ${HORSES.find(h => h.name === name)?.trainer || name}`);
+  }
+
+  function enterHorse(name, raceLabel) {
+    const isR3 = !raceLabel || /Churchill Downs R3/i.test(raceLabel);
+    if (isR3) {
+      if (!fill.submitted.has(name)) { fill.submitted.add(name); fill.requested.delete(name); }
+      renderRaceBuilder();
+      toast(`${name} submitted to Churchill Downs R3 — field now ${fill.entered + fill.submitted.size}/${readRaceSpec().target}`);
+    } else {
+      toast(`${name} submitted to ${raceLabel}`);
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const req = e.target.closest('.pp-request');
+    if (req) { requestHorse(req.dataset.horse); return; }
+    const acc = e.target.closest('.pp-accept-request');
+    if (acc) {
+      acc.outerHTML = '<span class="pill accent-soft px-3 py-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i>Submitted</span>';
+      lucide.createIcons();
+      enterHorse(acc.dataset.horse, acc.dataset.race);
+      return;
+    }
+    const sub = e.target.closest('.pp-submit');
+    if (sub) { enterHorse(sub.dataset.horse, sub.dataset.race); return; }
+  });
+
+  ['rb-recompute'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('click', renderRaceBuilder); });
+  ['rb-type','rb-surface','rb-distance','rb-restrict','rb-target','rb-bonus','rb-bonus-mi'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', renderRaceBuilder);
+  });
+
+  renderRaceBuilder();
+
   /* ---------- Guided tour ---------- */
   const TOUR = [
     { kind: 'modal',
       kicker: 'Investor preview · 90 seconds',
       title: "PostParade, in one minute",
-      body: "Trainers find the right race. Owners approve with context. Racing offices fill the card. Three workspaces, one data backbone, AI-powered eligibility. I'll show one defining moment from each side.",
+      body: "Every race has two sides. Trainers need the right spot for their horse; tracks need to fill the card. PostParade is one recommendation engine that serves both — the trainer submits, the track requests, and the same eligibility-and-fit math connects them. I'll walk one race from both ends.",
       cta: 'Start the tour →' },
 
     { kind: 'spot', ws: 'trainer', route: '#dashboard', target: '[data-tour="trainer-roi"]',
       badge: 'Trainer · Snellgrove Racing',
       title: 'Quantified, every morning',
-      body: "Before we go anywhere — the ROI line. Jack's stable earned $48k more last quarter on PostParade-recommended placements vs his prior 6-month baseline. Placement research time fell 82%.",
-      metric: 'Earnings lift +$48k · time −82%' },
+      body: "Start on the trainer side. The ROI line: Jack's stable earned $48k more last quarter on PostParade-recommended placements vs his prior 6-month baseline. Placement research time fell 82%.",
+      metric: 'Earnings lift +$48k · research time −82%' },
 
     { kind: 'spot', ws: 'trainer', route: '#dashboard', target: '[data-tour="trainer-queue"]',
       badge: 'Trainer · Snellgrove Racing',
@@ -2332,43 +2821,43 @@
     { kind: 'spot', ws: 'trainer', route: '#recs/zengraya', target: '[data-tour="trainer-rec"]',
       badge: 'Trainer · Snellgrove Racing',
       title: "Top pick, with the reasoning shown",
-      body: "Zengraya's best spot Saturday is Churchill R3. Exact surface and distance fit, drops her 45k in class from last out, par speed matches her last figure, Foley G. is clear that day. The 94 isn't a black-box rating — every input is visible.",
-      metric: '11 preference-tier qualifiers caught vs prior tools' },
+      body: "Zengraya's best spot Saturday is Churchill R3. Exact surface and distance fit, drops her 45k in class from last out, par speed matches her last figure. The 94 isn't a black-box rating — every input is visible. From here the trainer submits her to the race.",
+      metric: 'One engine — this is the score from the horse’s side' },
 
     { kind: 'spot', ws: 'trainer', route: '#race/cd-jun6-r3', target: '[data-tour="trainer-eligibility"]',
       badge: 'Trainer · Snellgrove Racing',
       title: "Every condition, validated",
-      body: "The clause about 'preference to horses that have not started for less than $50,000' is exactly the kind of thing other tools miss — and it costs trainers entries they should have gotten. PostParade reads it correctly and flags Zengraya as a preference-tier qualifier.",
+      body: "The clause 'preference to horses that have not started for less than $50,000' is exactly what other tools miss — and it costs trainers entries they should have gotten. PostParade reads it correctly and flags Zengraya as a preference-tier qualifier. Now flip to the other side of this race.",
       metric: 'Auditable: each rule shown next to its pass/fail' },
 
-    { kind: 'spot', ws: 'owner', route: '#owner/dashboard', target: '[data-tour="owner-portfolio"]',
-      badge: 'Owner · Bush Bloodstock',
-      title: "One pane across every trainer",
-      body: "Mike owns Zengraya. He also owns horses at Pletcher and West Coast Thoroughbreds. Nothing today combines a multi-trainer portfolio into one view. PostParade's the single pane — across stables, across tracks, across circuits.",
-      metric: 'Avg owner runs 4.2 horses across 2.7 trainers' },
-
-    { kind: 'spot', ws: 'owner', route: '#owner/approvals', target: '[data-tour="owner-rationale"]',
-      badge: 'Owner · Bush Bloodstock',
-      title: "Approvals with reasoning, not blind sign-offs",
-      body: "Today, most owners approve entries via text from their trainer with a one-line pitch. PostParade brings the conditions, the fit math, the ROI, and the trainer's rationale into one decision moment. Approval time drops from days to minutes.",
-      metric: '+$24k earnings on PostParade-routed entries vs baseline' },
-
-    { kind: 'spot', ws: 'office', route: '#office/card', target: '[data-tour="office-underfilled"]',
-      badge: 'Racing Office · Churchill Downs',
-      title: "Fill the card. Lift the handle.",
-      body: "R3 is underfilled three days before close. PostParade knows 12 horses on the grounds qualify but haven't been entered — because it reads every condition book and every horse in real time. This race is leaving handle on the table.",
+    { kind: 'spot', ws: 'track', route: '#track/weekend', target: '[data-tour="track-weekend"]',
+      badge: 'Track · Churchill Downs',
+      title: "The track builds the weekend",
+      body: "Same platform, the racing office's view. Races are built under racedays, under weekends. Five races this weekend are underfilled three days out — that's handle left on the table, and the secretary can see exactly where.",
       metric: 'Field strength +1 horse / race ≈ +6% handle' },
 
-    { kind: 'spot', ws: 'office', route: '#office/outreach', target: '[data-tour="office-outreach"]',
-      badge: 'Racing Office · Churchill Downs',
-      title: "Personalized outreach to the right trainers",
-      body: "Ranks each qualifying trainer by likelihood-to-accept. Drafts a note citing the specific reason this race fits their horse. Sends via the channels the racing office already uses. Not spam — context-aware nudges to the right people.",
-      metric: '+$340k projected handle this meet' },
+    { kind: 'spot', ws: 'track', route: '#track/race/cd-jun6-r3', target: '[data-tour="track-spec"]',
+      badge: 'Track · Churchill Downs',
+      title: "Spec a race in one form",
+      body: "This is R3 — the very race Zengraya fit. The office sets type, surface, distance, purse, conditions, and a shipping bonus to pull in ship-ins. These are the same structured conditions the trainer's eligibility was checked against — built once, read by everyone.",
+      metric: 'Edit the spec, matches recompute live' },
+
+    { kind: 'spot', ws: 'track', route: '#track/race/cd-jun6-r3', target: '[data-tour="track-fits"]',
+      badge: 'Track · Churchill Downs',
+      title: "The engine, run from the track's side",
+      body: "Same score(horse, race) — now ranking eligible horses by how likely each trainer is to accept. The $1,500 ship-in bonus pulls distant horses up the list, while very long, costly vans still get discounted. The office requests the ones it wants; ineligible horses (a gelding here) never appear.",
+      metric: 'Submit and Request are the same math, two directions' },
+
+    { kind: 'spot', ws: 'trainer', route: '#trainer/requests', target: '[data-tour="trainer-inbound"]',
+      badge: 'Trainer · Snellgrove Racing',
+      title: "The loop closes",
+      body: "Back on the trainer side: the track's request lands here. One click accepts it and submits the entry — with the shipping bonus already attached. The race the trainer wanted and the race the track needed to fill are the same race. PostParade just made the match.",
+      metric: 'Request → accept → entry, in two clicks' },
 
     { kind: 'modal',
       kicker: 'That\'s the loop',
-      title: "Trainer → Owner → Office. One backbone.",
-      body: "Same data, three views, three roles. Trainer finds the spot. Owner approves with full context. Office fills the race. Each side gets value the other two pay for indirectly — and the platform compounds with every additional horse, stable, and track.",
+      title: "Trainer ⇄ Track. One engine.",
+      body: "The trainer finds the spot and submits; the track builds the race and requests; the same eligibility-and-fit engine sits in the middle, with shipping bonuses to fill the hard races. Two paying sides, one data backbone — and it compounds with every horse, stable, and track added.",
       cta: 'Explore the app freely →' },
   ];
 
@@ -2458,9 +2947,9 @@
     $('tourStep').textContent = `${tourIdx} / ${TOUR.length - 2}`;  // exclude welcome + outro from counter
     $('tourBadge').textContent = stop.badge;
     $('tourBadge').className = 'pill ' + (
-      stop.ws === 'owner'  ? 'bg-amber-50 text-amber-800' :
-      stop.ws === 'office' ? 'bg-indigo-50 text-indigo-800' :
-                             'bg-turf-50 text-turf-700'
+      stop.ws === 'track' ? 'bg-indigo-50 text-indigo-800' :
+      stop.ws === 'owner' ? 'bg-amber-50 text-amber-800' :
+                            'bg-turf-50 text-turf-700'
     );
     $('tourTitle').textContent = stop.title;
     $('tourBody').textContent  = stop.body;
