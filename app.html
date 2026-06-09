@@ -230,7 +230,7 @@
 
     <!-- Track nav -->
     <nav data-nav="track" class="p-2 text-sm flex-1">
-      <a href="#track/weekend"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-range" class="w-4 h-4"></i>Weekend</a>
+      <a href="#track/meet"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-range" class="w-4 h-4"></i>Meet</a>
       <a href="#track/raceday"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-days" class="w-4 h-4"></i>Raceday card</a>
       <a href="#track/race/cd-jun6-r3" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="flag-triangle-right" class="w-4 h-4"></i>Race builder</a>
       <a href="#track/requests" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="megaphone" class="w-4 h-4"></i>Fill &amp; request
@@ -1549,24 +1549,24 @@
     </section>
 
     <!-- =========================================================== -->
-    <!-- TRACK · WEEKEND OVERVIEW                                     -->
+    <!-- TRACK · MEET OVERVIEW                                     -->
     <!-- =========================================================== -->
-    <section id="track/weekend" class="screen p-6 space-y-6">
+    <section id="track/meet" class="screen p-6 space-y-6">
       <div class="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div class="text-xs text-slate-500 uppercase tracking-wider">Churchill Downs · Summer meet</div>
-          <h1 class="text-2xl font-semibold tracking-tight">Jun 6–8 weekend</h1>
+          <h1 class="text-2xl font-semibold tracking-tight">Churchill Downs — Summer meet</h1>
           <div class="text-sm text-slate-600">3 racedays · 29 races · <span class="text-red-600 font-medium">5 underfilled</span> · ship-in bonus pool $45k</div>
         </div>
         <div class="flex items-center gap-2">
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i>Weekend ship bonus</button>
+          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i>Meet ship bonus</button>
           <a href="#track/race/cd-jun6-r3" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
         </div>
       </div>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Avg field, weekend</div>
+          <div class="text-xs text-slate-500">Avg field, meet</div>
           <div class="mt-1 text-2xl font-semibold">8.1</div>
           <div class="text-xs text-slate-500">target ≥ 8</div>
         </div>
@@ -1626,7 +1626,7 @@
       <div class="card ring-soft p-5 stripe">
         <div class="flex items-center gap-2 accent-text">
           <i data-lucide="truck" class="w-4 h-4"></i>
-          <div class="font-semibold">Ship-in bonus, weekend-wide</div>
+          <div class="font-semibold">Ship-in bonus, meet-wide</div>
         </div>
         <div class="mt-2 text-sm text-slate-700">
           <span class="font-medium">$1,500</span> to any horse shipping in <span class="font-medium">≥ 150 mi</span> from outside the grounds, applied to underfilled races. Individual races can override.
@@ -1640,7 +1640,7 @@
     <!-- =========================================================== -->
     <section id="track/race/cd-jun6-r3" class="screen p-6 space-y-6">
       <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/weekend" class="hover:text-ink-900">Jun 6–8 weekend</a>
+        <a href="#track/meet" class="hover:text-ink-900">Summer meet</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <a href="#track/raceday" class="hover:text-ink-900">Sat Jun 6</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
@@ -1778,7 +1778,7 @@
     <!-- =========================================================== -->
     <section id="track/raceday" class="screen p-6 space-y-6">
       <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/weekend" class="hover:text-ink-900">Jun 6–8 weekend</a>
+        <a href="#track/meet" class="hover:text-ink-900">Summer meet</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <span class="text-ink-900 font-medium">Saturday Jun 6</span>
       </div>
@@ -2158,6 +2158,10 @@
   </main>
 </div>
 
+<!-- Shared recommendation engine + seed (see docs/plan.md §6) -->
+<script src="app/engine.js"></script>
+<script src="app/data.js"></script>
+
 <script>
   lucide.createIcons();
 
@@ -2178,7 +2182,7 @@
       abbr: 'CD',
       role: 'Track workspace',
       userRole: 'Racing secretary',
-      home: 'track/weekend',
+      home: 'track/meet',
       cta: 'Build a race',
       prefixes: ['track/'],
     },
@@ -2402,26 +2406,9 @@
     renderSample(0);
   }
 
-  /* =====================================================================
-     RECOMMENDATION ENGINE  (see docs/races-and-recommendations.md §5)
-     One score(horse, race) powers both directions:
-       Trainer → Submit a horse to a race
-       Track   → Request a horse for a race
-     ===================================================================== */
-
-  // Seed: horses on the circuit. Ship miles = distance of home track to Churchill.
-  const HORSES = [
-    { name:'Zengraya',     stable:'Snellgrove Racing', trainer:'Beschizza A.', sex:'F', age:3, maiden:true,  under50k:false, surf:['D'], sweet:[1320,1540], classR:121, lastSpeed:82, daysSince:49, home:'CD',  shipMi:0,   trainerPct:0.21 },
-    { name:'Tammy\'s Kiss', stable:'Snellgrove Racing', trainer:'Bauer P.',    sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:114, lastSpeed:0,  daysSince:0,  home:'CD',  shipMi:0,   trainerPct:0.18 },
-    { name:'Island Barbie', stable:'Murphy Racing',     trainer:'Murphy C.',   sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1540], classR:107, lastSpeed:64, daysSince:120,home:'CD',  shipMi:0,   trainerPct:0.11 },
-    { name:'Halcyon Days',  stable:'Cox Thoroughbreds', trainer:'Cox B.',      sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1540,1760], classR:110, lastSpeed:0,  daysSince:0,  home:'CD',  shipMi:0,   trainerPct:0.19 },
-    { name:'Painted Lily',  stable:'Mott Stable',       trainer:'Mott W.',     sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:112, lastSpeed:75, daysSince:35, home:'KEE', shipMi:78,  trainerPct:0.14 },
-    { name:'River Sonata',  stable:'Stewart Racing',    trainer:'Stewart D.',  sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:108, lastSpeed:71, daysSince:28, home:'ELP', shipMi:130, trainerPct:0.13 },
-    { name:'Quiet Storm',   stable:'Asmussen Stable',   trainer:'Asmussen S.', sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1540], classR:111, lastSpeed:80, daysSince:25, home:'OP',  shipMi:560, trainerPct:0.20 },
-    { name:'Cajun Belle',   stable:'Lobo Stable',       trainer:'Lobo P.',     sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1430,1760], classR:105, lastSpeed:73, daysSince:40, home:'FG',  shipMi:700, trainerPct:0.16 },
-    // ineligible examples — exercised by the eligibility gate, never shown as fits:
-    { name:'Battis Grove',  stable:'Walden Racing',     trainer:'Walden W.',   sex:'G', age:4, maiden:false, under50k:false, surf:['D'], sweet:[1320,1540], classR:112, lastSpeed:90, daysSince:30, home:'CD',  shipMi:0,   trainerPct:0.22 },
-  ];
+  /* Recommendation engine + seed live in app/engine.js + app/data.js
+     (loaded above as PPEngine + PPData). The glue below — fill state, render,
+     and the Submit/Request actions — consumes them. */
 
   // In-memory fill state for the R3 demo race.
   const fill = { entered: 5, requested: new Set(), submitted: new Set() };
@@ -2443,57 +2430,7 @@
     };
   }
 
-  function eligibility(h, r) {
-    const reasons = [];
-    const sexOk = r.sexes.includes(h.sex);
-    reasons.push({ pass: sexOk, label: sexOk ? `${h.sex} meets sex restriction` : `${h.sex} fails sex restriction` });
-    const ageOk = h.age >= r.minAge;
-    reasons.push({ pass: ageOk, label: ageOk ? `${h.age}yo eligible` : `${h.age}yo too young` });
-    if (r.maidenOnly) reasons.push({ pass: h.maiden, label: h.maiden ? 'maiden — career 0 wins' : 'not a maiden' });
-    return { eligible: reasons.every(x => x.pass), reasons };
-  }
-
-  function shipping(h, r) {
-    const qualifies = r.bonusAmount > 0 && h.shipMi >= r.bonusMi;
-    return { shipMi: h.shipMi, shipIn: h.shipMi > 0, bonus: qualifies ? r.bonusAmount : 0 };
-  }
-
-  function score(h, r) {
-    const elig = eligibility(h, r);
-    if (!elig.eligible) return { eligible: false, ...elig };
-
-    const within = (v, [lo, hi]) => v >= lo && v <= hi;
-    const distFit  = within(r.distance, h.sweet) ? 100 : Math.max(40, 100 - Math.abs(r.distance - (h.sweet[0]+h.sweet[1])/2) / 12);
-    const surfFit  = h.surf.includes(r.surface) ? 100 : 45;
-    const classFit = Math.max(30, Math.min(100, 50 + (h.classR - 108) * 4));         // higher class rating = better in a maiden
-    const speed    = h.lastSpeed === 0 ? 62 : Math.max(30, Math.min(100, 60 + (h.lastSpeed - r.par) * 2.5)); // first-timers get a neutral-ish prior
-    const fresh    = h.daysSince === 0 ? 70 : (h.daysSince <= 45 ? 100 - Math.abs(h.daysSince - 28) : Math.max(35, 100 - (h.daysSince - 45)));
-    const connect  = Math.min(100, h.trainerPct * 380);
-    const fieldStr = 80;
-
-    const W = { dist:20, surf:15, class:25, speed:15, fresh:10, connect:10, fieldStr:5 };
-    const fit = Math.round(
-      (distFit*W.dist + surfFit*W.surf + classFit*W.class + speed*W.speed + fresh*W.fresh + connect*W.connect + fieldStr*W.fieldStr)
-      / (W.dist+W.surf+W.class+W.speed+W.fresh+W.connect+W.fieldStr)
-    );
-
-    const ship = shipping(h, r);
-    // Acceptance likelihood (Track/Request view): fit, ship feasibility, bonus sweetener, trainer activity.
-    const shipPenalty = ship.shipMi > 400 ? -22 : ship.shipMi > 150 ? -10 : 0;
-    const bonusBoost  = ship.bonus > 0 ? 12 : 0;
-    let accept = Math.round(fit * 0.7 + 22 + bonusBoost + shipPenalty + h.trainerPct * 30);
-    accept = Math.max(30, Math.min(95, accept));
-
-    return { eligible:true, reasons:elig.reasons, fit, accept, ship,
-             components:{distFit, surfFit, classFit, speed, fresh, connect} };
-  }
-
-  // Rank eligible horses for a race (Track → Request side).
-  function fitsForRace(r) {
-    return HORSES.map(h => ({ h, s: score(h, r) }))
-                 .filter(x => x.s.eligible)
-                 .sort((a,b) => b.s.accept - a.s.accept);
-  }
+  // eligibility / shipping / score / fitsForRace now live in app/engine.js (PPEngine).
 
   function toast(msg) {
     let t = document.getElementById('pp-toast');
@@ -2538,7 +2475,7 @@
     const wrap = document.getElementById('rb-fits');
     if (!wrap) return;
     const r = readRaceSpec();
-    const fits = fitsForRace(r);
+    const fits = PPEngine.fitsForRace(PPData.horses, r);
     document.getElementById('rb-eligible-count').textContent = fits.length;
 
     wrap.innerHTML = fits.map(({ h, s }) => {
@@ -2583,7 +2520,7 @@
     renderRaceBuilder();
     const stat = document.getElementById('wk-requests-stat');
     if (stat) stat.textContent = 3 + fill.requested.size;
-    toast(`Request sent to ${HORSES.find(h => h.name === name)?.trainer || name}`);
+    toast(`Request sent to ${PPData.horses.find(h => h.name === name)?.trainer || name}`);
   }
 
   // A horse is committed to a race (trainer Submit, or trainer accepting a Request).

@@ -136,36 +136,36 @@
   .user-pop.open { display: block; }
 
   /* ============ Guided tour ============ */
+  /* Constant dim — always on during the tour, so it never disappears between
+     steps (no white flash). The highlighted element is lifted above it. */
   .tour-backdrop {
     position: fixed; inset: 0;
-    background: rgba(11,18,32,.55);
+    background: rgba(11,18,32,.62);
     z-index: 1000;
     opacity: 0; pointer-events: none;
     transition: opacity .2s ease;
   }
   body.tour-active .tour-backdrop { opacity: 1; pointer-events: auto; }
 
+  /* Lift the spotlighted element above the dim so it reads bright. */
+  .tour-spot { position: relative; z-index: 1001; }
+
   .tour-ring {
     position: fixed;
-    z-index: 1001;
+    z-index: 1002;
     pointer-events: none;
     border-radius: 14px;
     box-shadow:
       0 0 0 3px #10b981,
-      0 0 0 7px rgba(16,185,129,.25),
-      0 0 0 9999px rgba(11,18,32,.55);
-    transition: top .35s cubic-bezier(.2,.7,.2,1),
-                left .35s cubic-bezier(.2,.7,.2,1),
-                width .35s cubic-bezier(.2,.7,.2,1),
-                height .35s cubic-bezier(.2,.7,.2,1),
-                opacity .2s ease;
+      0 0 0 7px rgba(16,185,129,.30);
+    transition: opacity .18s ease;   /* reposition instantly; only fade opacity */
     opacity: 0;
   }
   body.tour-active .tour-ring.show { opacity: 1; }
 
   .tour-pop {
     position: fixed;
-    z-index: 1002;
+    z-index: 1003;
     width: min(360px, 92vw);
     background: #fff;
     border-radius: 14px;
@@ -182,7 +182,7 @@
   /* Welcome / outro modal — centered, no spotlight */
   .tour-modal {
     position: fixed;
-    z-index: 1003;
+    z-index: 1004;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: min(440px, 92vw);
@@ -305,7 +305,7 @@
 
     <!-- Track nav -->
     <nav data-nav="track" class="p-2 text-sm flex-1">
-      <a href="#track/weekend"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-range" class="w-4 h-4"></i>Weekend</a>
+      <a href="#track/meet"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-range" class="w-4 h-4"></i>Meet</a>
       <a href="#track/raceday"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-days" class="w-4 h-4"></i>Raceday card</a>
       <a href="#track/race/cd-jun6-r3" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="flag-triangle-right" class="w-4 h-4"></i>Race builder</a>
       <a href="#track/requests" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="megaphone" class="w-4 h-4"></i>Fill &amp; request
@@ -1672,24 +1672,24 @@
     </section>
 
     <!-- =========================================================== -->
-    <!-- TRACK · WEEKEND OVERVIEW                                     -->
+    <!-- TRACK · MEET OVERVIEW                                     -->
     <!-- =========================================================== -->
-    <section id="track/weekend" class="screen p-6 space-y-6">
+    <section id="track/meet" class="screen p-6 space-y-6">
       <div class="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div class="text-xs text-slate-500 uppercase tracking-wider">Churchill Downs · Summer meet</div>
-          <h1 class="text-2xl font-semibold tracking-tight">Jun 6–8 weekend</h1>
+          <h1 class="text-2xl font-semibold tracking-tight">Churchill Downs — Summer meet</h1>
           <div class="text-sm text-slate-600">3 racedays · 29 races · <span class="text-red-600 font-medium">5 underfilled</span> · ship-in bonus pool $45k</div>
         </div>
         <div class="flex items-center gap-2">
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i>Weekend ship bonus</button>
+          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i>Meet ship bonus</button>
           <a href="#track/race/cd-jun6-r3" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="track-weekend">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="track-meet">
         <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Avg field, weekend</div>
+          <div class="text-xs text-slate-500">Avg field, meet</div>
           <div class="mt-1 text-2xl font-semibold">8.1</div>
           <div class="text-xs text-slate-500">target ≥ 8</div>
         </div>
@@ -1749,7 +1749,7 @@
       <div class="card ring-soft p-5 stripe">
         <div class="flex items-center gap-2 accent-text">
           <i data-lucide="truck" class="w-4 h-4"></i>
-          <div class="font-semibold">Ship-in bonus, weekend-wide</div>
+          <div class="font-semibold">Ship-in bonus, meet-wide</div>
         </div>
         <div class="mt-2 text-sm text-slate-700">
           <span class="font-medium">$1,500</span> to any horse shipping in <span class="font-medium">≥ 150 mi</span> from outside the grounds, applied to underfilled races. Individual races can override.
@@ -1763,7 +1763,7 @@
     <!-- =========================================================== -->
     <section id="track/race/cd-jun6-r3" class="screen p-6 space-y-6">
       <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/weekend" class="hover:text-ink-900">Jun 6–8 weekend</a>
+        <a href="#track/meet" class="hover:text-ink-900">Summer meet</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <a href="#track/raceday" class="hover:text-ink-900">Sat Jun 6</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
@@ -2351,6 +2351,10 @@
   </div>
 </div>
 
+<!-- Shared recommendation engine + seed (see docs/plan.md §6) -->
+<script src="app/engine.js"></script>
+<script src="app/data.js"></script>
+
 <script>
   lucide.createIcons();
 
@@ -2371,7 +2375,7 @@
       abbr: 'CD',
       role: 'Track workspace',
       userRole: 'Racing secretary',
-      home: 'track/weekend',
+      home: 'track/meet',
       cta: 'Build a race',
       prefixes: ['track/'],
     },
@@ -2595,23 +2599,8 @@
     renderSample(0);
   }
 
-  /* =====================================================================
-     RECOMMENDATION ENGINE  (see docs/races-and-recommendations.md §5)
-     One score(horse, race) powers both directions:
-       Trainer → Submit a horse to a race
-       Track   → Request a horse for a race
-     ===================================================================== */
-  const HORSES = [
-    { name:'Zengraya',     stable:'Snellgrove Racing', trainer:'Beschizza A.', sex:'F', age:3, maiden:true,  under50k:false, surf:['D'], sweet:[1320,1540], classR:121, lastSpeed:82, daysSince:49, home:'CD',  shipMi:0,   trainerPct:0.21 },
-    { name:'Tammy\'s Kiss', stable:'Snellgrove Racing', trainer:'Bauer P.',    sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:114, lastSpeed:0,  daysSince:0,  home:'CD',  shipMi:0,   trainerPct:0.18 },
-    { name:'Island Barbie', stable:'Murphy Racing',     trainer:'Murphy C.',   sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1540], classR:107, lastSpeed:64, daysSince:120,home:'CD',  shipMi:0,   trainerPct:0.11 },
-    { name:'Halcyon Days',  stable:'Cox Thoroughbreds', trainer:'Cox B.',      sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1540,1760], classR:110, lastSpeed:0,  daysSince:0,  home:'CD',  shipMi:0,   trainerPct:0.19 },
-    { name:'Painted Lily',  stable:'Mott Stable',       trainer:'Mott W.',     sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:112, lastSpeed:75, daysSince:35, home:'KEE', shipMi:78,  trainerPct:0.14 },
-    { name:'River Sonata',  stable:'Stewart Racing',    trainer:'Stewart D.',  sex:'F', age:3, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1430], classR:108, lastSpeed:71, daysSince:28, home:'ELP', shipMi:130, trainerPct:0.13 },
-    { name:'Quiet Storm',   stable:'Asmussen Stable',   trainer:'Asmussen S.', sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1320,1540], classR:111, lastSpeed:80, daysSince:25, home:'OP',  shipMi:560, trainerPct:0.20 },
-    { name:'Cajun Belle',   stable:'Lobo Stable',       trainer:'Lobo P.',     sex:'F', age:4, maiden:true,  under50k:true,  surf:['D'], sweet:[1430,1760], classR:105, lastSpeed:73, daysSince:40, home:'FG',  shipMi:700, trainerPct:0.16 },
-    { name:'Battis Grove',  stable:'Walden Racing',     trainer:'Walden W.',   sex:'G', age:4, maiden:false, under50k:false, surf:['D'], sweet:[1320,1540], classR:112, lastSpeed:90, daysSince:30, home:'CD',  shipMi:0,   trainerPct:0.22 },
-  ];
+  /* Recommendation engine + seed live in app/engine.js + app/data.js
+     (loaded above as PPEngine + PPData). The glue below consumes them. */
 
   const fill = { entered: 5, requested: new Set(), submitted: new Set() };
 
@@ -2632,50 +2621,7 @@
     };
   }
 
-  function eligibility(h, r) {
-    const reasons = [];
-    const sexOk = r.sexes.includes(h.sex);
-    reasons.push({ pass: sexOk });
-    const ageOk = h.age >= r.minAge;
-    reasons.push({ pass: ageOk });
-    if (r.maidenOnly) reasons.push({ pass: h.maiden });
-    return { eligible: reasons.every(x => x.pass), reasons };
-  }
-
-  function shipping(h, r) {
-    const qualifies = r.bonusAmount > 0 && h.shipMi >= r.bonusMi;
-    return { shipMi: h.shipMi, shipIn: h.shipMi > 0, bonus: qualifies ? r.bonusAmount : 0 };
-  }
-
-  function score(h, r) {
-    const elig = eligibility(h, r);
-    if (!elig.eligible) return { eligible: false, ...elig };
-    const within = (v, [lo, hi]) => v >= lo && v <= hi;
-    const distFit  = within(r.distance, h.sweet) ? 100 : Math.max(40, 100 - Math.abs(r.distance - (h.sweet[0]+h.sweet[1])/2) / 12);
-    const surfFit  = h.surf.includes(r.surface) ? 100 : 45;
-    const classFit = Math.max(30, Math.min(100, 50 + (h.classR - 108) * 4));
-    const speed    = h.lastSpeed === 0 ? 62 : Math.max(30, Math.min(100, 60 + (h.lastSpeed - r.par) * 2.5));
-    const fresh    = h.daysSince === 0 ? 70 : (h.daysSince <= 45 ? 100 - Math.abs(h.daysSince - 28) : Math.max(35, 100 - (h.daysSince - 45)));
-    const connect  = Math.min(100, h.trainerPct * 380);
-    const fieldStr = 80;
-    const W = { dist:20, surf:15, class:25, speed:15, fresh:10, connect:10, fieldStr:5 };
-    const fit = Math.round(
-      (distFit*W.dist + surfFit*W.surf + classFit*W.class + speed*W.speed + fresh*W.fresh + connect*W.connect + fieldStr*W.fieldStr)
-      / (W.dist+W.surf+W.class+W.speed+W.fresh+W.connect+W.fieldStr)
-    );
-    const ship = shipping(h, r);
-    const shipPenalty = ship.shipMi > 400 ? -22 : ship.shipMi > 150 ? -10 : 0;
-    const bonusBoost  = ship.bonus > 0 ? 12 : 0;
-    let accept = Math.round(fit * 0.7 + 22 + bonusBoost + shipPenalty + h.trainerPct * 30);
-    accept = Math.max(30, Math.min(95, accept));
-    return { eligible:true, reasons:elig.reasons, fit, accept, ship };
-  }
-
-  function fitsForRace(r) {
-    return HORSES.map(h => ({ h, s: score(h, r) }))
-                 .filter(x => x.s.eligible)
-                 .sort((a,b) => b.s.accept - a.s.accept);
-  }
+  // eligibility / shipping / score / fitsForRace now live in app/engine.js (PPEngine).
 
   function toast(msg) {
     let t = document.getElementById('pp-toast');
@@ -2720,7 +2666,7 @@
     const wrap = document.getElementById('rb-fits');
     if (!wrap) return;
     const r = readRaceSpec();
-    const fits = fitsForRace(r);
+    const fits = PPEngine.fitsForRace(PPData.horses, r);
     document.getElementById('rb-eligible-count').textContent = fits.length;
     wrap.innerHTML = fits.map(({ h, s }) => {
       const requested = fill.requested.has(h.name);
@@ -2762,7 +2708,7 @@
     renderRaceBuilder();
     const stat = document.getElementById('wk-requests-stat');
     if (stat) stat.textContent = 3 + fill.requested.size;
-    toast(`Request sent to ${HORSES.find(h => h.name === name)?.trainer || name}`);
+    toast(`Request sent to ${PPData.horses.find(h => h.name === name)?.trainer || name}`);
   }
 
   function enterHorse(name, raceLabel) {
@@ -2830,10 +2776,10 @@
       body: "The clause 'preference to horses that have not started for less than $50,000' is exactly what other tools miss — and it costs trainers entries they should have gotten. PostParade reads it correctly and flags Zengraya as a preference-tier qualifier. Now flip to the other side of this race.",
       metric: 'Auditable: each rule shown next to its pass/fail' },
 
-    { kind: 'spot', ws: 'track', route: '#track/weekend', target: '[data-tour="track-weekend"]',
+    { kind: 'spot', ws: 'track', route: '#track/meet', target: '[data-tour="track-meet"]',
       badge: 'Track · Churchill Downs',
-      title: "The track builds the weekend",
-      body: "Same platform, the racing office's view. Races are built under racedays, under weekends. Five races this weekend are underfilled three days out — that's handle left on the table, and the secretary can see exactly where.",
+      title: "The track builds the meet",
+      body: "Same platform, the racing office's view. Races are built under race days, within a meet. Several races this meet are underfilled days out from close — that's handle left on the table, and the secretary can see exactly where.",
       metric: 'Field strength +1 horse / race ≈ +6% handle' },
 
     { kind: 'spot', ws: 'track', route: '#track/race/cd-jun6-r3', target: '[data-tour="track-spec"]',
@@ -2862,6 +2808,7 @@
   ];
 
   let tourIdx = 0;
+  let currentSpotEl = null;   // the element currently lifted above the dim
 
   const $ = (id) => document.getElementById(id);
   const tourRing   = $('tourRing');
@@ -2870,8 +2817,12 @@
   const tourBackdrop = $('tourBackdrop');
 
   function startTour() { tourIdx = 0; document.body.classList.add('tour-active'); renderStop(); }
+  function unlift() {
+    if (currentSpotEl) { currentSpotEl.classList.remove('tour-spot'); currentSpotEl = null; }
+  }
   function endTour()   {
     document.body.classList.remove('tour-active');
+    unlift();
     tourRing.classList.remove('show');
     tourPop.classList.remove('show');
     tourModal.classList.remove('show');
@@ -2879,40 +2830,70 @@
   function nextStop() { if (tourIdx < TOUR.length - 1) { tourIdx++; renderStop(); } else endTour(); }
   function prevStop() { if (tourIdx > 0) { tourIdx--; renderStop(); } }
 
-  function placePop(rect) {
+  // Place the explainer so it doesn't cover the highlighted element. Tries each
+  // side; if the element is too big for any gap, docks to whichever horizontal
+  // band (top/bottom) the element occupies least.
+  function placePop(rect, tall) {
     const pop = tourPop;
     pop.classList.add('show');
-    // Measure
     const pw = pop.offsetWidth || 360;
-    const ph = pop.offsetHeight || 220;
+    const ph = pop.offsetHeight || 240;
     const vw = window.innerWidth, vh = window.innerHeight;
-    const margin = 16;
-    let top  = rect.bottom + 12;
-    let left = rect.left + (rect.width/2) - (pw/2);
-    if (top + ph + margin > vh) top = Math.max(margin, rect.top - ph - 12);
-    if (left + pw + margin > vw) left = vw - pw - margin;
-    if (left < margin) left = margin;
-    pop.style.top  = top  + 'px';
+    const m = 16, gap = 14;
+    const clampX = x => Math.max(m, Math.min(x, vw - pw - m));
+    const clampY = y => Math.max(m, Math.min(y, vh - ph - m));
+    const centerX = clampX(rect.left + rect.width / 2 - pw / 2);
+
+    const fitsRight = rect.right + gap + pw + m <= vw;
+    const fitsLeft  = rect.left - gap - pw - m >= 0;
+    const fitsBelow = rect.bottom + gap + ph + m <= vh;
+    const fitsAbove = rect.top - gap - ph - m >= 0;
+
+    let top, left;
+    if (!tall && fitsRight)      { left = rect.right + gap;        top = clampY(rect.top); }
+    else if (!tall && fitsLeft)  { left = rect.left - gap - pw;    top = clampY(rect.top); }
+    else if (fitsBelow)          { left = centerX; top = rect.bottom + gap; }
+    else if (fitsAbove)          { left = centerX; top = rect.top - gap - ph; }
+    else {
+      // Element fills the viewport — dock to the band it covers least.
+      const inTop = Math.max(0, Math.min(rect.bottom, vh / 2) - Math.max(rect.top, 0));
+      const inBot = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, vh / 2));
+      left = centerX;
+      top = inTop <= inBot ? m : vh - ph - m;
+    }
+    pop.style.top  = clampY(top) + 'px';
     pop.style.left = left + 'px';
+  }
+
+  function positionRing(el, tall) {
+    const rect = el.getBoundingClientRect();
+    const pad = 6;
+    // Reposition instantly (don't slide across the page); only fade opacity.
+    tourRing.style.top    = (rect.top - pad) + 'px';
+    tourRing.style.left   = (rect.left - pad) + 'px';
+    tourRing.style.width  = (rect.width + pad * 2) + 'px';
+    tourRing.style.height = (rect.height + pad * 2) + 'px';
+    tourRing.classList.add('show');
+    placePop(rect, tall);
   }
 
   function spotlight(selector) {
     const el = document.querySelector(selector);
-    if (!el) { tourRing.classList.remove('show'); return null; }
-    el.scrollIntoView({block:'center', behavior:'smooth'});
-    // Wait for scroll to settle before measuring
+    if (!el) { tourRing.classList.remove('show'); return Promise.resolve(); }
+    unlift();
+    currentSpotEl = el;
+    el.classList.add('tour-spot');                       // lift above the dim now
+    const tall = el.getBoundingClientRect().height > window.innerHeight * 0.72;
+    // Tall elements: align their TOP into view (clear of the sticky header) and
+    // dock the pop to the bottom, so the referenced content stays visible.
+    el.scrollIntoView({ block: tall ? 'start' : 'center', behavior: 'auto' });
+    if (tall) window.scrollBy(0, -96);
     return new Promise((resolve) => {
-      setTimeout(() => {
-        const rect = el.getBoundingClientRect();
-        const pad = 6;
-        tourRing.style.top    = (rect.top - pad) + 'px';
-        tourRing.style.left   = (rect.left - pad) + 'px';
-        tourRing.style.width  = (rect.width + pad*2) + 'px';
-        tourRing.style.height = (rect.height + pad*2) + 'px';
-        tourRing.classList.add('show');
-        placePop(rect);
-        resolve(rect);
-      }, 350);
+      // Two frames: one for the screen swap/scroll to apply, one for layout to settle.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        positionRing(el, tall);
+        resolve();
+      }));
     });
   }
 
@@ -2920,6 +2901,7 @@
     const stop = TOUR[tourIdx];
 
     if (stop.kind === 'modal') {
+      unlift();                       // no element lifted on welcome/outro steps
       tourRing.classList.remove('show');
       tourPop.classList.remove('show');
       $('tourModalKicker').textContent = stop.kicker;
@@ -2931,14 +2913,15 @@
     }
 
     tourModal.classList.remove('show');
+    // Hide the previous spotlight immediately so it never lingers over new content.
+    tourRing.classList.remove('show');
+    tourPop.classList.remove('show');
 
-    // Switch workspace + route if needed
+    // Switch route/workspace synchronously — no async hashchange, no fixed wait.
     const wantedHash = stop.route;
-    const currentHash = location.hash || '#dashboard';
-    if (currentHash !== wantedHash) {
-      location.hash = wantedHash;
-      // showScreen handles workspace switching from the route
-      await new Promise(r => setTimeout(r, 250));
+    if ((location.hash || '#dashboard') !== wantedHash) {
+      history.replaceState(null, '', wantedHash);  // update URL without firing hashchange
+      showScreen(wantedHash);                      // swap screen + workspace right now
     } else if (stop.ws && document.body.dataset.ws !== stop.ws) {
       setWorkspace(stop.ws);
     }
