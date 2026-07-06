@@ -144,8 +144,12 @@
     <span class="inline-block w-1.5 h-1.5 rounded-full bg-turf-300 animate-pulse"></span>
     <span class="opacity-90">PostParade — concept prototype · data is illustrative</span>
   </div>
-  <div class="hidden md:flex items-center gap-3 opacity-80">
-    <span>Click the workspace name (top left) to switch between Trainer and Track</span>
+  <div class="flex items-center gap-3 opacity-80">
+    <span class="hidden md:inline">Click the workspace name (top left) to switch between Trainer and Track</span>
+    <a href="features.html" class="hidden sm:inline hover:underline" title="Competitive research behind these features">About this demo</a>
+    <button id="pp-reset-demo" class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-white/25 hover:bg-white/10 transition" title="Clear saved submissions, requests, and race edits">
+      <i data-lucide="rotate-ccw" class="w-3 h-3"></i>Reset demo data
+    </button>
   </div>
 </div>
 
@@ -217,6 +221,7 @@
       <a href="#dashboard"        class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard</a>
       <a href="#horse/zengraya"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="rabbit" class="w-4 h-4"></i>Horses</a>
       <a href="#recs/zengraya"    class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="target" class="w-4 h-4"></i>Recommendations</a>
+      <a href="#trainer/alerts"   class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="bell-ring" class="w-4 h-4"></i>Spot alerts</a>
       <a href="#trainer/requests" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="inbox" class="w-4 h-4"></i>Requests
         <span class="ml-auto pill bg-indigo-500 text-white">2</span>
       </a>
@@ -324,705 +329,28 @@
     <!-- SCREEN 1: DASHBOARD                                          -->
     <!-- =========================================================== -->
     <section id="dashboard" class="screen p-6 space-y-6">
-
-      <div class="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <div class="text-xs text-slate-500 uppercase tracking-wider">Saturday, May 30, 2026</div>
-          <h1 class="text-2xl font-semibold tracking-tight">Good morning, Jack.</h1>
-          <div class="text-sm text-slate-600">6 horses need a spot in the next 14 days · $480k purse exposure</div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">This week</button>
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Last 30 days</button>
-        </div>
-      </div>
-
-      <!-- Stat row -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Active horses</div>
-          <div class="mt-1 flex items-baseline gap-2">
-            <div class="text-2xl font-semibold">14</div>
-            <div class="text-xs text-turf-700">+2 this month</div>
-          </div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Need placement</div>
-          <div class="mt-1 flex items-baseline gap-2">
-            <div class="text-2xl font-semibold">6</div>
-            <div class="text-xs text-silk-500">3 closing today</div>
-          </div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Entries pending</div>
-          <div class="mt-1 flex items-baseline gap-2">
-            <div class="text-2xl font-semibold">3</div>
-            <div class="text-xs text-slate-500">awaiting owner ok</div>
-          </div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Win rate, 30d</div>
-          <div class="mt-1 flex items-baseline gap-2">
-            <div class="text-2xl font-semibold">18%</div>
-            <div class="text-xs text-turf-700">vs 14% circuit avg</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid lg:grid-cols-3 gap-4">
-
-        <!-- Needs placement -->
-        <div class="card ring-soft lg:col-span-2">
-          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-            <div>
-              <div class="font-semibold">Needs placement</div>
-              <div class="text-xs text-slate-500">Sorted by days since last start</div>
-            </div>
-            <a href="#" class="text-sm text-turf-700 hover:underline">See all 14</a>
-          </div>
-          <div class="divide-y divide-slate-100 text-sm">
-
-            <a href="#recs/zengraya" class="row-hover flex items-center gap-4 px-5 py-3.5">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center font-semibold text-slate-700">Z</div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <div class="font-medium">Zengraya</div>
-                  <span class="pill bg-turf-50 text-turf-700">Maiden · 3yo F</span>
-                </div>
-                <div class="text-xs text-slate-500">Last out Apr 11 · CD 4th of 11 · prefers 6f–7f dirt</div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-slate-500">Top match</div>
-                <div class="font-semibold text-turf-700">94</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-            </a>
-
-            <a href="#recs/zengraya" class="row-hover flex items-center gap-4 px-5 py-3.5">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center font-semibold text-slate-700">B</div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <div class="font-medium">Battis Grove</div>
-                  <span class="pill bg-slate-100 text-slate-700">Allowance · 4yo G</span>
-                </div>
-                <div class="text-xs text-slate-500">Last out May 1 · Pim 2nd of 8 · high-percent trainer</div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-slate-500">Top match</div>
-                <div class="font-semibold text-turf-700">88</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-            </a>
-
-            <a href="#recs/zengraya" class="row-hover flex items-center gap-4 px-5 py-3.5">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center font-semibold text-slate-700">T</div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <div class="font-medium">Tammy's Kiss</div>
-                  <span class="pill bg-turf-50 text-turf-700">Maiden · 3yo F</span>
-                </div>
-                <div class="text-xs text-slate-500">First start · switches to hot jockey, 2nd career race</div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-slate-500">Top match</div>
-                <div class="font-semibold text-turf-700">82</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-            </a>
-
-            <a href="#recs/zengraya" class="row-hover flex items-center gap-4 px-5 py-3.5">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center font-semibold text-slate-700">I</div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <div class="font-medium">Island Barbie</div>
-                  <span class="pill bg-turf-50 text-turf-700">Maiden · 4yo F</span>
-                </div>
-                <div class="text-xs text-slate-500">Returning from layoff · prev. trained by Walsh</div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-slate-500">Top match</div>
-                <div class="font-semibold text-silk-500">71</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-            </a>
-
-            <a href="#recs/zengraya" class="row-hover flex items-center gap-4 px-5 py-3.5">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center font-semibold text-slate-700">C</div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <div class="font-medium">Cue Pixie Dust</div>
-                  <span class="pill bg-turf-50 text-turf-700">Maiden · 3yo F</span>
-                </div>
-                <div class="text-xs text-slate-500">First start · dam has 2 winners from 3 starters</div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-slate-500">Top match</div>
-                <div class="font-semibold text-silk-500">68</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-            </a>
-
-            <a href="#recs/zengraya" class="row-hover flex items-center gap-4 px-5 py-3.5">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center font-semibold text-slate-700">B</div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <div class="font-medium">Belle Amour</div>
-                  <span class="pill bg-turf-50 text-turf-700">Maiden · 3yo F</span>
-                </div>
-                <div class="text-xs text-slate-500">First start · well-bred, scattered workouts</div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-slate-500">Top match</div>
-                <div class="font-semibold text-slate-400">52</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-            </a>
-
-          </div>
-        </div>
-
-        <!-- Entries closing -->
-        <div class="space-y-4">
-          <div class="card ring-soft">
-            <div class="px-5 py-4 border-b border-slate-100">
-              <div class="font-semibold">Entries closing soon</div>
-              <div class="text-xs text-slate-500">Auto-filed by stable preferences</div>
-            </div>
-            <div class="divide-y divide-slate-100 text-sm">
-              <div class="px-5 py-3">
-                <div class="flex items-center justify-between">
-                  <div class="font-medium">Churchill Downs · R1</div>
-                  <span class="pill bg-red-50 text-red-700">6h 22m</span>
-                </div>
-                <div class="text-xs text-slate-500">Mdn 120k · 6½f · $120k</div>
-              </div>
-              <div class="px-5 py-3">
-                <div class="flex items-center justify-between">
-                  <div class="font-medium">Belmont Park · R4</div>
-                  <span class="pill bg-amber-50 text-amber-700">1d 4h</span>
-                </div>
-                <div class="text-xs text-slate-500">Alw 1m · $90k</div>
-              </div>
-              <div class="px-5 py-3">
-                <div class="flex items-center justify-between">
-                  <div class="font-medium">Keeneland · R6</div>
-                  <span class="pill bg-slate-100 text-slate-700">2d 9h</span>
-                </div>
-                <div class="text-xs text-slate-500">Stakes 7f · $200k</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card ring-soft stripe">
-            <div class="px-5 py-4">
-              <div class="flex items-center gap-2 text-turf-700">
-                <i data-lucide="sparkles" class="w-4 h-4"></i>
-                <div class="font-semibold">Suggested ship</div>
-              </div>
-              <div class="mt-2 text-sm text-slate-700">
-                <span class="font-medium">Zengraya</span> + <span class="font-medium">Tammy's Kiss</span> can share a van to Churchill Jun 5.
-                Saves <span class="font-semibold">$420</span>.
-              </div>
-              <button class="mt-3 text-sm px-3 py-1.5 rounded-lg bg-ink-900 text-white">Review plan</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
     <!-- SCREEN 2: HORSE PROFILE                                      -->
     <!-- =========================================================== -->
-    <section id="horse/zengraya" class="screen p-6 space-y-6">
-
-      <!-- Breadcrumb -->
-      <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#dashboard" class="hover:text-ink-900">Stable</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span>Horses</span>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span class="text-ink-900 font-medium">Zengraya</span>
-      </div>
-
-      <!-- Header card -->
-      <div class="card ring-soft p-6">
-        <div class="flex items-start gap-5 flex-wrap">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-2xl font-semibold">Z</div>
-          <div class="flex-1 min-w-[240px]">
-            <div class="flex items-center gap-2 flex-wrap">
-              <h1 class="text-2xl font-semibold tracking-tight">Zengraya</h1>
-              <span class="pill bg-turf-50 text-turf-700">Active</span>
-              <span class="pill bg-slate-100 text-slate-700">Maiden</span>
-            </div>
-            <div class="text-sm text-slate-600 mt-1">Gr/ro. F. 3yo (Mar) · by <span class="text-ink-900">Cairo Prince</span> out of <span class="text-ink-900">Trio of Mischief</span></div>
-            <div class="text-sm text-slate-500 mt-2 flex flex-wrap gap-x-5 gap-y-1">
-              <span><i data-lucide="user-round" class="inline w-3.5 h-3.5 mr-1 -mt-0.5"></i>Owner: Michael Bush</span>
-              <span><i data-lucide="users" class="inline w-3.5 h-3.5 mr-1 -mt-0.5"></i>Trainer: Beschizza A.</span>
-              <span><i data-lucide="medal" class="inline w-3.5 h-3.5 mr-1 -mt-0.5"></i>Jockey pref: Foley G.</span>
-            </div>
-          </div>
-          <a href="#recs/zengraya" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-turf-600 hover:bg-turf-700 text-white text-sm">
-            <i data-lucide="target" class="w-4 h-4"></i>Find next start
-          </a>
-        </div>
-
-        <!-- Quick stats -->
-        <div class="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-          <div>
-            <div class="text-xs text-slate-500">Career</div>
-            <div class="font-semibold">3 · 0-0-1</div>
-          </div>
-          <div>
-            <div class="text-xs text-slate-500">Earnings</div>
-            <div class="font-semibold">$6,000</div>
-          </div>
-          <div>
-            <div class="text-xs text-slate-500">Last start</div>
-            <div class="font-semibold">Apr 11 · CD 4th</div>
-          </div>
-          <div>
-            <div class="text-xs text-slate-500">Best speed</div>
-            <div class="font-semibold">82 <span class="text-xs text-slate-500">at 6f</span></div>
-          </div>
-          <div>
-            <div class="text-xs text-slate-500">Days since last</div>
-            <div class="font-semibold">49</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Fit profile + Find spots -->
-      <div class="grid lg:grid-cols-3 gap-4">
-
-        <div class="card ring-soft lg:col-span-2 p-6">
-          <div class="font-semibold">Fit profile</div>
-          <div class="text-xs text-slate-500">Learned from past performances + similar-horse cohort</div>
-
-          <div class="mt-4 space-y-3 text-sm">
-            <div class="flex items-center gap-3">
-              <div class="w-32 text-slate-500">Surface</div>
-              <div class="flex-1">
-                <div class="flex items-center gap-1">
-                  <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star dim">★</span>
-                  <span class="ml-2 text-slate-700">Dirt</span>
-                </div>
-              </div>
-              <div class="text-xs text-slate-500">2 of 3 starts</div>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-32 text-slate-500">Distance</div>
-              <div class="flex-1">
-                <div class="flex items-center gap-1">
-                  <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-                  <span class="ml-2 text-slate-700">6f–7f sweet spot</span>
-                </div>
-              </div>
-              <div class="text-xs text-slate-500">avg fin 3.2</div>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-32 text-slate-500">Class</div>
-              <div class="flex-1">
-                <div class="flex items-center gap-1">
-                  <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star dim">★</span><span class="star dim">★</span>
-                  <span class="ml-2 text-slate-700">Mdn 75k–100k ideal · 120k tested</span>
-                </div>
-              </div>
-              <div class="text-xs text-slate-500">par 86 vs your 82</div>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-32 text-slate-500">Pace style</div>
-              <div class="flex-1">
-                <div class="flex items-center gap-1">
-                  <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star dim">★</span>
-                  <span class="ml-2 text-slate-700">E/P · prefers rail-biased tracks</span>
-                </div>
-              </div>
-              <div class="text-xs text-slate-500">rail post 19%</div>
-            </div>
-          </div>
-
-          <div class="mt-5 pt-5 border-t border-slate-100">
-            <div class="text-xs text-slate-500 mb-2">Recent past performances</div>
-            <div class="overflow-x-auto scrollbar-thin">
-              <table class="w-full text-xs">
-                <thead class="text-slate-500">
-                  <tr class="text-left">
-                    <th class="py-1.5 pr-3 font-medium">Date</th>
-                    <th class="py-1.5 pr-3 font-medium">Track</th>
-                    <th class="py-1.5 pr-3 font-medium">Race</th>
-                    <th class="py-1.5 pr-3 font-medium">Dist</th>
-                    <th class="py-1.5 pr-3 font-medium">Surf</th>
-                    <th class="py-1.5 pr-3 font-medium">Fin</th>
-                    <th class="py-1.5 pr-3 font-medium">Spd</th>
-                    <th class="py-1.5 pr-3 font-medium">Jockey</th>
-                  </tr>
-                </thead>
-                <tbody class="text-slate-700">
-                  <tr class="border-t border-slate-100"><td class="py-1.5 pr-3">Apr 11</td><td>CD</td><td>Mdn 100k</td><td>7f</td><td>Dirt</td><td>4/11</td><td>82</td><td>Beschizza</td></tr>
-                  <tr class="border-t border-slate-100"><td class="py-1.5 pr-3">Mar 26</td><td>TP</td><td>Mdn 100k</td><td>6f</td><td>Dirt</td><td>3/9</td><td>75</td><td>Morales</td></tr>
-                  <tr class="border-t border-slate-100"><td class="py-1.5 pr-3">Feb 26</td><td>TP</td><td>Mdn 100k</td><td>5½f</td><td>Dirt</td><td>5/10</td><td>67</td><td>Morales</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Find next start -->
-        <div class="card ring-soft p-6 bg-gradient-to-br from-white to-turf-50">
-          <div class="flex items-center gap-2">
-            <i data-lucide="target" class="w-4 h-4 text-turf-700"></i>
-            <div class="font-semibold">Find next start</div>
-          </div>
-          <div class="text-xs text-slate-500 mt-1">We'll scan condition books on your circuit and rank the best spots.</div>
-
-          <div class="mt-4 space-y-3 text-sm">
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Window</div>
-              <select class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white"><option>Next 14 days</option><option>Next 30 days</option></select>
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Circuit</div>
-              <div class="flex flex-wrap gap-1.5">
-                <span class="pill bg-turf-100 text-turf-800">Kentucky</span>
-                <span class="pill bg-turf-100 text-turf-800">New York</span>
-                <span class="pill bg-slate-100 text-slate-500">+ SoCal</span>
-                <span class="pill bg-slate-100 text-slate-500">+ Florida</span>
-              </div>
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Max ship</div>
-              <select class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white"><option>400 mi</option><option>800 mi</option></select>
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Min purse</div>
-              <select class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white"><option>$50,000</option><option>$75,000</option></select>
-            </label>
-          </div>
-
-          <a href="#recs/zengraya" class="mt-5 inline-flex w-full items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-turf-600 hover:bg-turf-700 text-white text-sm">
-            Show recommendations <i data-lucide="arrow-right" class="w-4 h-4"></i>
-          </a>
-        </div>
-      </div>
+    <section id="scr-horse" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
     <!-- SCREEN 3: RECOMMENDATIONS                                    -->
     <!-- =========================================================== -->
-    <section id="recs/zengraya" class="screen p-6 space-y-6">
-
-      <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#horse/zengraya" class="hover:text-ink-900">Zengraya</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span class="text-ink-900 font-medium">Recommendations</span>
-      </div>
-
-      <div class="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Top spots for Zengraya</h1>
-          <div class="text-sm text-slate-600">Next 14 days · KY + NY · ≤400 mi · ≥$50k</div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>Filters</button>
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Sort: Fit ▾</button>
-        </div>
-      </div>
-
-      <!-- Match summary -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-        <div class="card ring-soft p-3 flex items-center gap-3">
-          <i data-lucide="check-circle-2" class="w-5 h-5 text-turf-600"></i>
-          <div><div class="font-semibold">5 strong matches</div><div class="text-xs text-slate-500">score ≥ 70</div></div>
-        </div>
-        <div class="card ring-soft p-3 flex items-center gap-3">
-          <i data-lucide="x-circle" class="w-5 h-5 text-slate-400"></i>
-          <div><div class="font-semibold">14 filtered out</div><div class="text-xs text-slate-500">ineligible or poor fit</div></div>
-        </div>
-        <div class="card ring-soft p-3 flex items-center gap-3">
-          <i data-lucide="dollar-sign" class="w-5 h-5 text-silk-500"></i>
-          <div><div class="font-semibold">$420k</div><div class="text-xs text-slate-500">total purse exposure</div></div>
-        </div>
-        <div class="card ring-soft p-3 flex items-center gap-3">
-          <i data-lucide="zap" class="w-5 h-5 text-amber-500"></i>
-          <div><div class="font-semibold">Updated 2m ago</div><div class="text-xs text-slate-500">condition books fresh</div></div>
-        </div>
-      </div>
-
-      <!-- Race cards -->
-      <div class="space-y-4">
-
-        <!-- Race 1: top recommendation -->
-        <a href="#race/cd-jun6-r3" class="card ring-soft block p-5 hover:border-turf-300 transition">
-          <div class="flex items-start gap-5 flex-wrap">
-
-            <div class="flex items-center gap-3">
-              <div class="relative w-14 h-14 rounded-full score-ring flex items-center justify-center" style="--p:94; --c:#10b981;">
-                <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center">
-                  <div class="text-center leading-none">
-                    <div class="text-base font-bold text-turf-700">94</div>
-                    <div class="text-[9px] text-slate-500">FIT</div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <div class="font-semibold">Churchill Downs · R3</div>
-                  <span class="pill bg-turf-50 text-turf-700">Top pick</span>
-                </div>
-                <div class="text-xs text-slate-500">Sat Jun 6 · Post 2:14 CT · Closes Wed Jun 3 10am</div>
-              </div>
-            </div>
-
-            <div class="flex-1 min-w-[240px] grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-              <div>
-                <div class="text-xs text-slate-500">Condition</div>
-                <div class="font-medium">Mdn 75k</div>
-              </div>
-              <div>
-                <div class="text-xs text-slate-500">Distance · Surface</div>
-                <div class="font-medium">6f · Dirt</div>
-              </div>
-              <div>
-                <div class="text-xs text-slate-500">Purse</div>
-                <div class="font-medium">$85,000</div>
-              </div>
-              <div>
-                <div class="text-xs text-slate-500">Projected field</div>
-                <div class="font-medium">9 · par 84</div>
-              </div>
-            </div>
-
-            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
-          </div>
-
-          <div class="mt-4 grid md:grid-cols-3 gap-3 text-sm">
-            <div class="flex items-start gap-2">
-              <i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>
-              <div><div class="font-medium">Eligible</div><div class="text-xs text-slate-500">qualifies for preference tier</div></div>
-            </div>
-            <div class="flex items-start gap-2">
-              <i data-lucide="user-round" class="w-4 h-4 text-turf-600 mt-0.5"></i>
-              <div><div class="font-medium">Foley G. available</div><div class="text-xs text-slate-500">no mount conflicts that card</div></div>
-            </div>
-            <div class="flex items-start gap-2">
-              <i data-lucide="truck" class="w-4 h-4 text-turf-600 mt-0.5"></i>
-              <div><div class="font-medium">Ship 0 mi</div><div class="text-xs text-slate-500">stabled at CD</div></div>
-            </div>
-          </div>
-
-          <div class="mt-4 px-3 py-2 rounded-lg bg-turf-50 text-turf-800 text-xs flex items-start gap-2">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 mt-0.5"></i>
-            <span><span class="font-semibold">Why this fits:</span> drops 45k in class from last out, exact surface/distance match for her sweet spot, and projected par speed is right at her last figure.</span>
-          </div>
-        </a>
-
-        <!-- Race 2 -->
-        <div class="card ring-soft p-5">
-          <div class="flex items-start gap-5 flex-wrap">
-            <div class="flex items-center gap-3">
-              <div class="relative w-14 h-14 rounded-full score-ring flex items-center justify-center" style="--p:88; --c:#10b981;">
-                <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center">
-                  <div class="text-center leading-none">
-                    <div class="text-base font-bold text-turf-700">88</div>
-                    <div class="text-[9px] text-slate-500">FIT</div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="font-semibold">Keeneland · R2</div>
-                <div class="text-xs text-slate-500">Wed Jun 10 · Post 1:05 ET</div>
-              </div>
-            </div>
-
-            <div class="flex-1 min-w-[240px] grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-              <div><div class="text-xs text-slate-500">Condition</div><div class="font-medium">Mdn 50k</div></div>
-              <div><div class="text-xs text-slate-500">Distance · Surface</div><div class="font-medium">6½f · Dirt</div></div>
-              <div><div class="text-xs text-slate-500">Purse</div><div class="font-medium">$62,000</div></div>
-              <div><div class="text-xs text-slate-500">Projected field</div><div class="font-medium">7 · par 79</div></div>
-            </div>
-          </div>
-
-          <div class="mt-4 grid md:grid-cols-3 gap-3 text-sm">
-            <div class="flex items-start gap-2">
-              <i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i>
-              <div><div class="font-medium">Eligible</div></div>
-            </div>
-            <div class="flex items-start gap-2">
-              <i data-lucide="x" class="w-4 h-4 text-red-500 mt-0.5"></i>
-              <div><div class="font-medium">Foley G. unavailable</div><div class="text-xs text-slate-500">riding Belmont Stakes day</div></div>
-            </div>
-            <div class="flex items-start gap-2">
-              <i data-lucide="truck" class="w-4 h-4 text-slate-400 mt-0.5"></i>
-              <div><div class="font-medium">Ship 87 mi</div><div class="text-xs text-slate-500">share van w/ Tammy's Kiss</div></div>
-            </div>
-          </div>
-
-          <div class="mt-4 px-3 py-2 rounded-lg bg-amber-50 text-amber-800 text-xs flex items-start gap-2">
-            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 mt-0.5"></i>
-            <span><span class="font-semibold">Why this fits:</span> softest field of the window — but you'd need a new rider. Suggested: Castellano J. (open).</span>
-          </div>
-        </div>
-
-        <!-- Race 3 -->
-        <div class="card ring-soft p-5">
-          <div class="flex items-start gap-5 flex-wrap">
-            <div class="flex items-center gap-3">
-              <div class="relative w-14 h-14 rounded-full score-ring flex items-center justify-center" style="--p:71; --c:#f59e0b;">
-                <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center">
-                  <div class="text-center leading-none">
-                    <div class="text-base font-bold text-silk-500">71</div>
-                    <div class="text-[9px] text-slate-500">FIT</div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="font-semibold">Churchill Downs · R7</div>
-                <div class="text-xs text-slate-500">Thu Jun 11 · Post 4:48 CT</div>
-              </div>
-            </div>
-
-            <div class="flex-1 min-w-[240px] grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-              <div><div class="text-xs text-slate-500">Condition</div><div class="font-medium">Mdn 100k</div></div>
-              <div><div class="text-xs text-slate-500">Distance · Surface</div><div class="font-medium">7f · Dirt</div></div>
-              <div><div class="text-xs text-slate-500">Purse</div><div class="font-medium">$110,000</div></div>
-              <div><div class="text-xs text-slate-500">Projected field</div><div class="font-medium">11 · par 89</div></div>
-            </div>
-          </div>
-
-          <div class="mt-4 px-3 py-2 rounded-lg bg-slate-50 text-slate-700 text-xs flex items-start gap-2">
-            <i data-lucide="info" class="w-3.5 h-3.5 mt-0.5"></i>
-            <span><span class="font-semibold">Why this fits:</span> short ship + Foley available, but par speed is 7 points above her last — class jump risk.</span>
-          </div>
-        </div>
-
-        <!-- Show more -->
-        <button class="w-full py-3 text-sm text-slate-600 hover:text-ink-900 hover:bg-slate-50 rounded-lg border border-dashed border-slate-200">
-          Show 2 more matches
-        </button>
-      </div>
+    <section id="scr-recs" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
     <!-- SCREEN 4: RACE DETAIL                                        -->
     <!-- =========================================================== -->
-    <section id="race/cd-jun6-r3" class="screen p-6 space-y-6">
-
-      <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#recs/zengraya" class="hover:text-ink-900">Recommendations</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span class="text-ink-900 font-medium">Churchill Downs · R3 · Jun 6</span>
-      </div>
-
-      <!-- Header -->
-      <div class="card ring-soft p-6">
-        <div class="flex items-start gap-5 flex-wrap">
-          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-turf-600 to-turf-800 flex items-center justify-center text-white">
-            <i data-lucide="flag-triangle-right" class="w-6 h-6"></i>
-          </div>
-          <div class="flex-1 min-w-[240px]">
-            <h1 class="text-2xl font-semibold tracking-tight">Churchill Downs · R3</h1>
-            <div class="text-sm text-slate-600 mt-1">Saturday, June 6 · Post 2:14 CT · 6f Dirt</div>
-            <div class="text-sm text-slate-500 mt-2 flex flex-wrap gap-x-5 gap-y-1">
-              <span><span class="text-ink-900 font-medium">Mdn 75k</span> · F&M 3yo+</span>
-              <span class="text-silk-500 font-medium">Purse $85,000</span>
-              <span>9 likely entries</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="mail" class="w-3.5 h-3.5"></i>Email owner</button>
-            <button class="pp-submit text-sm px-3 py-1.5 rounded-lg bg-turf-600 hover:bg-turf-700 text-white inline-flex items-center gap-1.5" data-horse="Zengraya" data-race="Churchill Downs R3"><i data-lucide="send" class="w-3.5 h-3.5"></i>Submit to race</button>
-          </div>
-        </div>
-
-        <!-- Close timer -->
-        <div class="mt-5 px-4 py-3 rounded-lg bg-red-50 text-red-800 text-sm flex items-center gap-3">
-          <i data-lucide="alarm-clock" class="w-4 h-4"></i>
-          <div>Entries close <span class="font-semibold">Wed Jun 3, 10:00 AM CT</span> — 3 days 21 hours.</div>
-        </div>
-      </div>
-
-      <div class="grid lg:grid-cols-3 gap-4">
-
-        <!-- Eligibility -->
-        <div class="card ring-soft p-5 lg:col-span-2">
-          <div class="flex items-center gap-2">
-            <i data-lucide="badge-check" class="w-4 h-4 text-turf-600"></i>
-            <div class="font-semibold">Eligibility check · Zengraya</div>
-          </div>
-          <div class="text-xs text-slate-500 mt-1">Auto-validated against the parsed condition</div>
-
-          <ul class="mt-4 space-y-2 text-sm">
-            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i><span>3yo &amp; up fillies and mares <span class="text-xs text-slate-500">— Zengraya is 3yo F</span></span></li>
-            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i><span>Maidens <span class="text-xs text-slate-500">— career 0 wins</span></span></li>
-            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i><span>Has not started for less than $50,000 <span class="text-xs text-slate-500">— all 3 starts at $100k</span></span></li>
-            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-turf-600 mt-0.5"></i><span>Weight assignment: 118 lbs</span></li>
-            <li class="flex items-start gap-2 pt-1 border-t border-slate-100 mt-2">
-              <i data-lucide="sparkles" class="w-4 h-4 text-silk-500 mt-0.5"></i>
-              <span class="text-turf-800"><span class="font-medium">Qualifies for preference tier</span> — entry priority over horses that started for &lt; $50k.</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Jockey -->
-        <div class="card ring-soft p-5">
-          <div class="flex items-center gap-2">
-            <i data-lucide="user-round" class="w-4 h-4 text-turf-600"></i>
-            <div class="font-semibold">Jockey</div>
-          </div>
-          <div class="mt-4 space-y-3 text-sm">
-            <div class="flex items-center gap-3 p-3 rounded-lg bg-turf-50 border border-turf-100">
-              <div class="w-8 h-8 rounded-full bg-turf-600 text-white flex items-center justify-center text-xs font-semibold">FG</div>
-              <div class="flex-1">
-                <div class="font-medium">Foley G.</div>
-                <div class="text-xs text-slate-500">Preferred · 21% w/ this trainer</div>
-              </div>
-              <span class="pill bg-turf-600 text-white">Available</span>
-            </div>
-            <div class="flex items-center gap-3 p-3 rounded-lg border border-slate-100">
-              <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-semibold">VR</div>
-              <div class="flex-1">
-                <div class="font-medium">Velazquez J.</div>
-                <div class="text-xs text-slate-500">Backup</div>
-              </div>
-              <span class="pill bg-red-50 text-red-700">Conflict</span>
-            </div>
-            <div class="text-xs text-slate-500 px-1">Velazquez riding Belmont R5 — same post time window.</div>
-          </div>
-        </div>
-
-        <!-- Projected field -->
-        <div class="card ring-soft p-5 lg:col-span-3">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="font-semibold">Projected field</div>
-              <div class="text-xs text-slate-500">Based on similar conditions + recent activity — 9 likely entries</div>
-            </div>
-            <div class="text-xs text-slate-500">You'd rank: <span class="text-turf-700 font-semibold">3rd by class · 4th by speed</span></div>
-          </div>
-
-          <div class="mt-4 overflow-x-auto scrollbar-thin">
-            <table class="w-full text-sm">
-              <thead class="text-slate-500 text-xs">
-                <tr class="text-left border-b border-slate-100">
-                  <th class="py-2 pr-3 font-medium">Horse</th>
-                  <th class="py-2 pr-3 font-medium">Trainer</th>
-                  <th class="py-2 pr-3 font-medium">Last spd</th>
-                  <th class="py-2 pr-3 font-medium">Class rating</th>
-                  <th class="py-2 pr-3 font-medium">Notes</th>
-                </tr>
-              </thead>
-              <tbody class="text-slate-700">
-                <tr class="border-b border-slate-100"><td class="py-2 pr-3 font-medium">Battis Grove</td><td>Walden W.</td><td>90</td><td>112.4</td><td class="text-xs text-slate-500">2nd career, sharp 4f workout</td></tr>
-                <tr class="border-b border-slate-100"><td class="py-2 pr-3 font-medium">Butterfly Jasmine</td><td>Hernandez J.</td><td>77</td><td>110.6</td><td class="text-xs text-slate-500">Drops in class from M100k</td></tr>
-                <tr class="border-b border-slate-100 bg-turf-50/40"><td class="py-2 pr-3 font-medium text-turf-700">Zengraya <span class="pill bg-turf-100 text-turf-800 ml-1">you</span></td><td>Beschizza A.</td><td>82</td><td>121.3</td><td class="text-xs text-slate-500">Highest class rating in the field</td></tr>
-                <tr class="border-b border-slate-100"><td class="py-2 pr-3 font-medium">Tammy's Kiss</td><td>Bauer P.</td><td>—</td><td>113.9</td><td class="text-xs text-slate-500">First start, hot jockey switch</td></tr>
-                <tr class="border-b border-slate-100"><td class="py-2 pr-3 font-medium">Island Barbie</td><td>Murphy C.</td><td>64</td><td>106.7</td><td class="text-xs text-slate-500">Returns from layoff</td></tr>
-                <tr><td class="py-2 pr-3 text-slate-500 text-xs" colspan="5">+ 4 more likely entries</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    <section id="scr-race" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
@@ -1135,72 +463,12 @@
     <!-- TRAINER · INBOUND REQUESTS                                   -->
     <!-- =========================================================== -->
     <section id="trainer/requests" class="screen p-6 space-y-6">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight">Requests from tracks</h1>
-        <div class="text-sm text-slate-600">Racing offices asking for one of your horses. Accept to submit the entry, or pass.</div>
-      </div>
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
+    </section>
 
-      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Open requests</div><div class="mt-1 text-2xl font-semibold">2</div></div>
-        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">With ship bonus</div><div class="mt-1 text-2xl font-semibold accent-text">2</div><div class="text-xs text-slate-500">$3,000 total</div></div>
-        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Closing in 48h</div><div class="mt-1 text-2xl font-semibold text-red-600">1</div></div>
-      </div>
-
-      <!-- Request 1 -->
-      <div class="card ring-soft p-6">
-        <div class="flex items-start gap-5 flex-wrap">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white"><i data-lucide="flag-triangle-right" class="w-5 h-5"></i></div>
-          <div class="flex-1 min-w-[240px]">
-            <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="font-semibold">Churchill Downs R3</h2>
-              <span class="pill bg-indigo-50 text-indigo-700">wants Zengraya</span>
-            </div>
-            <div class="text-sm text-slate-500 mt-1">Mdn 75k · 6f Dirt · F&amp;M 3yo+ · $85,000 · Sat Jun 6, post 2:14 CT</div>
-            <div class="text-xs text-slate-500 mt-2">Requested by <span class="text-ink-900 font-medium">CD Racing Office</span> · fit score 94 · qualifies preference tier</div>
-          </div>
-          <div class="text-right">
-            <div class="text-xs text-slate-500">Entries close</div>
-            <div class="text-sm font-semibold">Wed Jun 3, 10am</div>
-            <div class="text-xs text-red-600">3d 21h</div>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg accent-soft text-sm">
-          <i data-lucide="truck" class="w-4 h-4"></i><span><span class="font-semibold">Ship-in bonus: $1,500</span> — Zengraya is stabled at CD, so no ship needed, but the bonus still applies to this fill.</span>
-        </div>
-        <div class="mt-4 flex items-center gap-2">
-          <button class="pp-accept-request text-sm px-4 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-horse="Zengraya" data-race="Churchill Downs R3"><i data-lucide="check" class="w-4 h-4"></i>Accept &amp; submit</button>
-          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="message-square" class="w-4 h-4"></i>Reply</button>
-          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600">Pass</button>
-        </div>
-      </div>
-
-      <!-- Request 2 -->
-      <div class="card ring-soft p-6">
-        <div class="flex items-start gap-5 flex-wrap">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white"><i data-lucide="flag-triangle-right" class="w-5 h-5"></i></div>
-          <div class="flex-1 min-w-[240px]">
-            <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="font-semibold">Keeneland R5</h2>
-              <span class="pill bg-indigo-50 text-indigo-700">wants Battis Grove</span>
-            </div>
-            <div class="text-sm text-slate-500 mt-1">Alw 1m · 4yo+ · $95,000 · Sun Jun 8, post 3:40 ET</div>
-            <div class="text-xs text-slate-500 mt-2">Requested by <span class="text-ink-900 font-medium">Keeneland Racing Office</span> · fit score 86 · soft field, good spot</div>
-          </div>
-          <div class="text-right">
-            <div class="text-xs text-slate-500">Entries close</div>
-            <div class="text-sm font-semibold">Fri Jun 6, 12pm</div>
-            <div class="text-xs text-amber-600">6d</div>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg accent-soft text-sm">
-          <i data-lucide="truck" class="w-4 h-4"></i><span><span class="font-semibold">Ship-in bonus: $1,500</span> — covers most of the 78-mi van from CD. Ship-share available with a Keeneland-bound stablemate.</span>
-        </div>
-        <div class="mt-4 flex items-center gap-2">
-          <button class="pp-accept-request text-sm px-4 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-horse="Battis Grove" data-race="Keeneland R5"><i data-lucide="check" class="w-4 h-4"></i>Accept &amp; submit</button>
-          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="message-square" class="w-4 h-4"></i>Reply</button>
-          <button class="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600">Pass</button>
-        </div>
-      </div>
+    <!-- Spot alerts (research pick: condition-centric standing watches) -->
+    <section id="trainer/alerts" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-trainer.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
@@ -1552,553 +820,35 @@
     <!-- TRACK · MEET OVERVIEW                                     -->
     <!-- =========================================================== -->
     <section id="track/meet" class="screen p-6 space-y-6">
-      <div class="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <div class="text-xs text-slate-500 uppercase tracking-wider">Churchill Downs · Summer meet</div>
-          <h1 class="text-2xl font-semibold tracking-tight">Churchill Downs — Summer meet</h1>
-          <div class="text-sm text-slate-600">3 racedays · 29 races · <span class="text-red-600 font-medium">5 underfilled</span> · ship-in bonus pool $45k</div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i>Meet ship bonus</button>
-          <a href="#track/race/cd-jun6-r3" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Avg field, meet</div>
-          <div class="mt-1 text-2xl font-semibold">8.1</div>
-          <div class="text-xs text-slate-500">target ≥ 8</div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Underfilled races</div>
-          <div class="mt-1 text-2xl font-semibold text-red-600">5</div>
-          <div class="text-xs text-slate-500">need horses</div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Ship-in bonus pool</div>
-          <div class="mt-1 text-2xl font-semibold">$45k</div>
-          <div class="text-xs accent-text">$12k committed</div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Requests out</div>
-          <div class="mt-1 text-2xl font-semibold" id="wk-requests-stat">3</div>
-          <div class="text-xs text-slate-500">awaiting trainers</div>
-        </div>
-      </div>
-
-      <div class="grid lg:grid-cols-3 gap-4">
-        <a href="#track/raceday" class="card ring-soft p-5 hover:border-indigo-300 transition block">
-          <div class="flex items-center justify-between">
-            <div class="font-semibold">Friday Jun 6</div>
-            <span class="pill bg-amber-100 text-amber-800">2 soft</span>
-          </div>
-          <div class="text-xs text-slate-500 mt-1">9 races · published</div>
-          <div class="mt-3 flex items-center gap-2 text-xs">
-            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-500" style="width:78%"></div></div>
-            <span class="text-slate-500">avg 7.8</span>
-          </div>
-        </a>
-        <a href="#track/raceday" class="card ring-soft p-5 hover:border-indigo-300 transition block ring-2 ring-indigo-100">
-          <div class="flex items-center justify-between">
-            <div class="font-semibold">Saturday Jun 6</div>
-            <span class="pill bg-red-100 text-red-700">3 underfilled</span>
-          </div>
-          <div class="text-xs text-slate-500 mt-1">10 races · published · headline G3</div>
-          <div class="mt-3 flex items-center gap-2 text-xs">
-            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-500" style="width:84%"></div></div>
-            <span class="text-slate-500">avg 8.4</span>
-          </div>
-        </a>
-        <a href="#track/raceday" class="card ring-soft p-5 hover:border-indigo-300 transition block">
-          <div class="flex items-center justify-between">
-            <div class="font-semibold">Sunday Jun 8</div>
-            <span class="pill accent-soft">healthy</span>
-          </div>
-          <div class="text-xs text-slate-500 mt-1">10 races · draft</div>
-          <div class="mt-3 flex items-center gap-2 text-xs">
-            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full accent-bg" style="width:90%"></div></div>
-            <span class="text-slate-500">avg 9.0</span>
-          </div>
-        </a>
-      </div>
-
-      <div class="card ring-soft p-5 stripe">
-        <div class="flex items-center gap-2 accent-text">
-          <i data-lucide="truck" class="w-4 h-4"></i>
-          <div class="font-semibold">Ship-in bonus, meet-wide</div>
-        </div>
-        <div class="mt-2 text-sm text-slate-700">
-          <span class="font-medium">$1,500</span> to any horse shipping in <span class="font-medium">≥ 150 mi</span> from outside the grounds, applied to underfilled races. Individual races can override.
-          <span class="text-slate-500">Pool $45,000 · $12,000 committed across 8 horses.</span>
-        </div>
-      </div>
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
     <!-- TRACK · RACE BUILDER / DETAIL                                -->
     <!-- =========================================================== -->
-    <section id="track/race/cd-jun6-r3" class="screen p-6 space-y-6">
-      <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/meet" class="hover:text-ink-900">Summer meet</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <a href="#track/raceday" class="hover:text-ink-900">Sat Jun 6</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span class="text-ink-900 font-medium">R3 · build</span>
-      </div>
-
-      <div class="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Build Race 3 — Sat Jun 6</h1>
-          <div class="text-sm text-slate-600">Spec the conditions, then PostParade ranks who fits and lets you request them.</div>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="pill bg-red-50 text-red-700" id="rb-status-pill">Underfilled</span>
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Save draft</button>
-          <button class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i>Publish</button>
-        </div>
-      </div>
-
-      <div class="grid lg:grid-cols-3 gap-4">
-        <!-- Spec form -->
-        <div class="card ring-soft p-5 lg:col-span-2">
-          <div class="font-semibold">Race spec</div>
-          <div class="text-xs text-slate-500">Edit any field — matches recompute on the right.</div>
-
-          <div class="mt-4 grid sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Race type</div>
-              <select id="rb-type" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-                <option value="S">Maiden Special Weight</option>
-                <option value="M">Maiden Claiming</option>
-                <option value="A">Allowance</option>
-                <option value="C">Claiming</option>
-                <option value="AO">Allowance Optional Claiming</option>
-                <option value="N">Stakes</option>
-              </select>
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Surface</div>
-              <select id="rb-surface" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-                <option value="D">Dirt</option>
-                <option value="T">Turf</option>
-                <option value="A">All-weather</option>
-              </select>
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Distance</div>
-              <select id="rb-distance" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-                <option value="1100">5½ furlongs</option>
-                <option value="1320" selected>6 furlongs</option>
-                <option value="1430">6½ furlongs</option>
-                <option value="1540">7 furlongs</option>
-                <option value="1760">1 mile</option>
-              </select>
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Purse</div>
-              <input id="rb-purse" type="text" value="$85,000" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Age / sex restriction</div>
-              <select id="rb-restrict" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-                <option value="FM3U" selected>F&amp;M 3yo and up</option>
-                <option value="3U">3yo and up (open)</option>
-                <option value="F3">Fillies 3yo</option>
-                <option value="2U">2yo and up</option>
-              </select>
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-500 mb-1">Field target</div>
-              <select id="rb-target" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-                <option value="8">8</option>
-                <option value="10" selected>10</option>
-                <option value="12">12</option>
-              </select>
-            </label>
-            <label class="block sm:col-span-2">
-              <div class="text-xs text-slate-500 mb-1">Condition text</div>
-              <textarea id="rb-conditions" rows="3" class="w-full font-mono text-xs leading-relaxed p-3 rounded-lg bg-slate-50 border border-slate-200">FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD. Three Year Olds, 118 lbs.; Older, 124 lbs. (Preference To Horses That Have Not Started For Less Than $50,000).</textarea>
-            </label>
-          </div>
-
-          <div class="mt-4 pt-4 border-t border-slate-100">
-            <div class="flex items-center gap-2 accent-text">
-              <i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold text-ink-900">Shipping bonus</div>
-            </div>
-            <div class="mt-3 grid sm:grid-cols-3 gap-x-4 gap-y-3 text-sm items-end">
-              <label class="block">
-                <div class="text-xs text-slate-500 mb-1">Bonus amount</div>
-                <input id="rb-bonus" type="number" value="1500" step="250" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-              </label>
-              <label class="block">
-                <div class="text-xs text-slate-500 mb-1">Min ship distance (mi)</div>
-                <input id="rb-bonus-mi" type="number" value="150" step="25" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">
-              </label>
-              <button id="rb-recompute" class="px-3 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center justify-center gap-1.5"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Recompute matches</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Fill status -->
-        <div class="card ring-soft p-5">
-          <div class="font-semibold">Fill status</div>
-          <div class="mt-3 flex items-center gap-2">
-            <div class="text-3xl font-semibold" id="rb-fill-count">5</div>
-            <div class="text-slate-500">/ <span id="rb-fill-target">10</span> entered</div>
-          </div>
-          <div class="mt-2 h-2 rounded bg-slate-100 overflow-hidden">
-            <div id="rb-fill-bar" class="h-full bg-red-500" style="width:50%"></div>
-          </div>
-          <div class="mt-2 text-xs text-slate-500" id="rb-fill-note">5 short of target · request qualifying horses below</div>
-
-          <div class="mt-4 pt-4 border-t border-slate-100 text-sm space-y-2">
-            <div class="flex items-center justify-between"><span class="text-slate-500">Entries close</span><span class="font-medium">Wed Jun 3, 10am</span></div>
-            <div class="flex items-center justify-between"><span class="text-slate-500">Eligible, not entered</span><span class="font-medium" id="rb-eligible-count">—</span></div>
-            <div class="flex items-center justify-between"><span class="text-slate-500">Requests sent</span><span class="font-medium" id="rb-requests-count">0</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Who fits — engine output (Track → Request side) -->
-      <div class="card ring-soft">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <div class="font-semibold">Horses that fit this race</div>
-            <div class="text-xs text-slate-500">Eligible horses across stables on the circuit · ranked by fit + likelihood to accept</div>
-          </div>
-          <div class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5"></i>PostParade recommendation engine</div>
-        </div>
-        <div id="rb-fits" class="divide-y divide-slate-100 text-sm"><!-- engine fills this --></div>
-      </div>
+    <section id="scr-track-race" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
     <!-- TRACK · RACEDAY CARD                                         -->
     <!-- =========================================================== -->
-    <section id="track/raceday" class="screen p-6 space-y-6">
-      <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/meet" class="hover:text-ink-900">Summer meet</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span class="text-ink-900 font-medium">Saturday Jun 6</span>
-      </div>
-      <div class="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <div class="text-xs text-slate-500 uppercase tracking-wider">Churchill Downs · Summer meet</div>
-          <h1 class="text-2xl font-semibold tracking-tight">Raceday card — Sat Jun 6</h1>
-          <div class="text-sm text-slate-600">10 races · 6 closing in 48 hours · 3 underfilled</div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">‹ Jun 5</button>
-          <button class="text-sm px-3 py-1.5 rounded-lg accent-bg text-white">Sat Jun 6</button>
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Jun 7 ›</button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Avg field size</div>
-          <div class="mt-1 text-2xl font-semibold">8.4</div>
-          <div class="text-xs text-slate-500">target ≥ 8</div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Underfilled races</div>
-          <div class="mt-1 text-2xl font-semibold text-red-600">3</div>
-          <div class="text-xs text-slate-500">need outreach</div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Handle est.</div>
-          <div class="mt-1 text-2xl font-semibold">$11.4M</div>
-        </div>
-        <div class="card ring-soft p-4">
-          <div class="text-xs text-slate-500">Stakes purse</div>
-          <div class="mt-1 text-2xl font-semibold">$1.2M</div>
-        </div>
-      </div>
-
-      <div class="card ring-soft">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <div class="font-semibold">Saturday card</div>
-            <div class="text-xs text-slate-500">Entries projected from condition match + recent stable activity</div>
-          </div>
-          <div class="text-xs text-slate-500">Updated 2m ago</div>
-        </div>
-
-        <div class="divide-y divide-slate-100 text-sm">
-
-          <div class="px-5 py-4 grid grid-cols-12 gap-3 items-center">
-            <div class="col-span-1 font-mono text-slate-500">R1</div>
-            <div class="col-span-4">
-              <div class="font-medium">Mdn 120k</div>
-              <div class="text-xs text-slate-500">6½f · F&amp;M 3yo+ · $120k</div>
-            </div>
-            <div class="col-span-3">
-              <div class="text-xs text-slate-500">Projected entries</div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <div class="font-medium">8</div>
-                <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden">
-                  <div class="h-full accent-bg" style="width:80%"></div>
-                </div>
-                <div class="text-xs text-slate-500">/ 10</div>
-              </div>
-            </div>
-            <div class="col-span-3 text-xs text-slate-500">3 likely scratches · 2 also-eligibles</div>
-            <div class="col-span-1 text-right"><span class="pill accent-soft">OK</span></div>
-          </div>
-
-          <div class="px-5 py-4 grid grid-cols-12 gap-3 items-center bg-red-50/40">
-            <div class="col-span-1 font-mono text-slate-500">R3</div>
-            <div class="col-span-4">
-              <div class="font-medium">Mdn 75k</div>
-              <div class="text-xs text-slate-500">6f Dirt · F&amp;M 3yo+ · $85k</div>
-            </div>
-            <div class="col-span-3">
-              <div class="text-xs text-slate-500">Projected entries</div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <div class="font-medium text-red-700">5</div>
-                <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden">
-                  <div class="h-full bg-red-500" style="width:50%"></div>
-                </div>
-                <div class="text-xs text-slate-500">/ 10</div>
-              </div>
-            </div>
-            <div class="col-span-3 text-xs text-red-700">Underfilled · 12 horses qualify but unentered</div>
-            <div class="col-span-1 text-right">
-              <a href="#track/requests" class="pill bg-red-600 text-white">Outreach</a>
-            </div>
-          </div>
-
-          <div class="px-5 py-4 grid grid-cols-12 gap-3 items-center">
-            <div class="col-span-1 font-mono text-slate-500">R4</div>
-            <div class="col-span-4">
-              <div class="font-medium">Alw 1m</div>
-              <div class="text-xs text-slate-500">1m Turf · 4yo+ · $95k</div>
-            </div>
-            <div class="col-span-3">
-              <div class="text-xs text-slate-500">Projected entries</div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <div class="font-medium">12</div>
-                <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden">
-                  <div class="h-full accent-bg" style="width:100%"></div>
-                </div>
-                <div class="text-xs text-slate-500">/ 12</div>
-              </div>
-            </div>
-            <div class="col-span-3 text-xs text-slate-500">Full · 4 also-eligibles</div>
-            <div class="col-span-1 text-right"><span class="pill accent-soft">Full</span></div>
-          </div>
-
-          <div class="px-5 py-4 grid grid-cols-12 gap-3 items-center bg-amber-50/40">
-            <div class="col-span-1 font-mono text-slate-500">R5</div>
-            <div class="col-span-4">
-              <div class="font-medium">Clm 25k</div>
-              <div class="text-xs text-slate-500">5½f · 3yo+ · $32k</div>
-            </div>
-            <div class="col-span-3">
-              <div class="text-xs text-slate-500">Projected entries</div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <div class="font-medium text-amber-700">7</div>
-                <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden">
-                  <div class="h-full bg-amber-500" style="width:70%"></div>
-                </div>
-                <div class="text-xs text-slate-500">/ 10</div>
-              </div>
-            </div>
-            <div class="col-span-3 text-xs text-amber-700">Soft · 6 horses qualify but unentered</div>
-            <div class="col-span-1 text-right">
-              <a href="#track/requests" class="pill bg-amber-500 text-white">Outreach</a>
-            </div>
-          </div>
-
-          <div class="px-5 py-4 grid grid-cols-12 gap-3 items-center">
-            <div class="col-span-1 font-mono text-slate-500">R7</div>
-            <div class="col-span-4">
-              <div class="font-medium">Stakes — Roxelana</div>
-              <div class="text-xs text-slate-500">7f · 3yo F · $400k (G3)</div>
-            </div>
-            <div class="col-span-3">
-              <div class="text-xs text-slate-500">Projected entries</div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <div class="font-medium">9</div>
-                <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden">
-                  <div class="h-full accent-bg" style="width:90%"></div>
-                </div>
-                <div class="text-xs text-slate-500">/ 10</div>
-              </div>
-            </div>
-            <div class="col-span-3 text-xs text-slate-500">Headline race — strong field</div>
-            <div class="col-span-1 text-right"><span class="pill accent-soft">OK</span></div>
-          </div>
-
-          <div class="px-5 py-4 grid grid-cols-12 gap-3 items-center bg-red-50/40">
-            <div class="col-span-1 font-mono text-slate-500">R9</div>
-            <div class="col-span-4">
-              <div class="font-medium">Mdn Clm 30k</div>
-              <div class="text-xs text-slate-500">1 1/16m Turf · 3yo+ · $28k</div>
-            </div>
-            <div class="col-span-3">
-              <div class="text-xs text-slate-500">Projected entries</div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <div class="font-medium text-red-700">4</div>
-                <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden">
-                  <div class="h-full bg-red-500" style="width:40%"></div>
-                </div>
-                <div class="text-xs text-slate-500">/ 10</div>
-              </div>
-            </div>
-            <div class="col-span-3 text-xs text-red-700">Likely off-the-turf · consider swap to dirt condition</div>
-            <div class="col-span-1 text-right">
-              <a href="#track/requests" class="pill bg-red-600 text-white">Outreach</a>
-            </div>
-          </div>
-
-          <div class="px-5 py-4 text-xs text-slate-500 text-center">+ 4 more races</div>
-        </div>
-      </div>
+    <section id="scr-track-raceday" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
     <!-- TRACK · FILL & REQUEST (outreach)                           -->
     <!-- =========================================================== -->
     <section id="track/requests" class="screen p-6 space-y-6">
-
-      <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/raceday" class="hover:text-ink-900">Raceday card</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span class="text-ink-900 font-medium">Outreach · R3 Sat Jun 6</span>
-      </div>
-
-      <div class="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Fill Race 3 — Mdn 75k</h1>
-          <div class="text-sm text-slate-600">12 horses on the grounds qualify but haven't entered. Reach out to their trainers.</div>
-        </div>
-      </div>
-
-      <div class="card ring-soft p-5 bg-slate-50/40">
-        <div class="text-xs text-slate-500 mb-2">Race conditions</div>
-        <div class="text-sm text-slate-700">
-          <span class="font-medium">Mdn 75k</span> · 6f Dirt · F&amp;M 3yo+ · 118 / 124 lbs · Preference to horses that have not started for &lt; $50,000.
-          <span class="text-slate-500">Purse $85,000. Closes Wed Jun 3 10am CT.</span>
-        </div>
-      </div>
-
-      <div class="card ring-soft">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <div class="font-semibold">Qualifying horses, not entered</div>
-            <div class="text-xs text-slate-500">Sorted by likelihood the trainer accepts</div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Select all</button>
-            <button class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="send" class="w-3.5 h-3.5"></i>Send 12 messages</button>
-          </div>
-        </div>
-
-        <div class="divide-y divide-slate-100 text-sm">
-          <div class="px-5 py-3 grid grid-cols-12 gap-3 items-center">
-            <input type="checkbox" class="col-span-1 accent-indigo-600" checked>
-            <div class="col-span-3"><div class="font-medium">Zengraya</div><div class="text-xs text-slate-500">3yo F · last out 4/11 CD</div></div>
-            <div class="col-span-3"><div>Beschizza A.</div><div class="text-xs text-slate-500">in barn at CD</div></div>
-            <div class="col-span-2"><span class="pill accent-soft">Likely yes · 88%</span></div>
-            <div class="col-span-3 text-xs text-slate-500">Exact fit on surface/distance · drop in class</div>
-          </div>
-          <div class="px-5 py-3 grid grid-cols-12 gap-3 items-center">
-            <input type="checkbox" class="col-span-1 accent-indigo-600" checked>
-            <div class="col-span-3"><div class="font-medium">Painted Lily</div><div class="text-xs text-slate-500">3yo F · last out 5/2 KEE</div></div>
-            <div class="col-span-3"><div>Mott W.</div><div class="text-xs text-slate-500">van from Belmont</div></div>
-            <div class="col-span-2"><span class="pill accent-soft">Likely yes · 76%</span></div>
-            <div class="col-span-3 text-xs text-slate-500">Mott runs 14% at distance · ship feasible</div>
-          </div>
-          <div class="px-5 py-3 grid grid-cols-12 gap-3 items-center">
-            <input type="checkbox" class="col-span-1 accent-indigo-600" checked>
-            <div class="col-span-3"><div class="font-medium">Quiet Storm</div><div class="text-xs text-slate-500">4yo F · last out 5/12 OP</div></div>
-            <div class="col-span-3"><div>Asmussen S.</div><div class="text-xs text-slate-500">stalled at CD</div></div>
-            <div class="col-span-2"><span class="pill bg-amber-100 text-amber-800">Maybe · 54%</span></div>
-            <div class="col-span-3 text-xs text-slate-500">Class fit, but Asmussen 8% off short rest</div>
-          </div>
-          <div class="px-5 py-3 grid grid-cols-12 gap-3 items-center">
-            <input type="checkbox" class="col-span-1 accent-indigo-600">
-            <div class="col-span-3"><div class="font-medium">Halcyon Days</div><div class="text-xs text-slate-500">3yo F · 1st start</div></div>
-            <div class="col-span-3"><div>Cox B.</div><div class="text-xs text-slate-500">in barn at CD</div></div>
-            <div class="col-span-2"><span class="pill bg-amber-100 text-amber-800">Maybe · 48%</span></div>
-            <div class="col-span-3 text-xs text-slate-500">Cox prefers route races for first start</div>
-          </div>
-          <div class="px-5 py-3 text-center text-xs text-slate-500">+ 8 more</div>
-        </div>
-      </div>
-
-      <div class="card ring-soft p-5">
-        <div class="flex items-center gap-2">
-          <i data-lucide="mail" class="w-4 h-4 accent-text"></i>
-          <div class="font-semibold">Message template</div>
-        </div>
-        <div class="text-xs text-slate-500">Personalized per trainer · sends via your existing email + SMS</div>
-        <div class="mt-3 p-4 rounded-lg border border-slate-100 bg-slate-50 text-sm text-slate-700 leading-relaxed">
-          <div>Adam,</div>
-          <div class="mt-2">Wanted to flag <span class="font-medium">R3 Saturday</span> for <span class="font-medium">Zengraya</span>. Mdn 75k at 6f — a clean drop from her M120k start and a 9-horse projected field. You'd qualify for our preference tier.</div>
-          <div class="mt-2">Entries close Wed at 10am. Happy to walk through the projected field if useful.</div>
-          <div class="mt-2 text-slate-500">— Churchill Downs Racing Office</div>
-        </div>
-        <div class="mt-3 flex items-center gap-2">
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Edit template</button>
-          <button class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Preview each</button>
-        </div>
-      </div>
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
     <!-- TRACK · FIELD STRENGTH                                       -->
     <!-- =========================================================== -->
     <section id="track/strength" class="screen p-6 space-y-6">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight">Field strength — next 14 days</h1>
-        <div class="text-sm text-slate-600">Spot weak cards and short conditions before they cost handle.</div>
-      </div>
-
-      <div class="card ring-soft p-5">
-        <div class="grid grid-cols-7 gap-2">
-          <div class="text-center text-xs text-slate-500">Wed 4</div>
-          <div class="text-center text-xs text-slate-500">Thu 5</div>
-          <div class="text-center text-xs text-slate-500">Fri 6</div>
-          <div class="text-center text-xs text-slate-500">Sat 6</div>
-          <div class="text-center text-xs text-slate-500">Sun 7</div>
-          <div class="text-center text-xs text-slate-500">Mon 8</div>
-          <div class="text-center text-xs text-slate-500">Tue 9</div>
-
-          <div class="rounded-lg p-3 bg-amber-100 text-amber-900 text-center"><div class="text-xs">9 races</div><div class="font-semibold">7.8</div></div>
-          <div class="rounded-lg p-3 bg-amber-100 text-amber-900 text-center"><div class="text-xs">9 races</div><div class="font-semibold">7.2</div></div>
-          <div class="rounded-lg p-3 accent-soft text-center"><div class="text-xs">10 races</div><div class="font-semibold">8.6</div></div>
-          <div class="rounded-lg p-3 accent-soft text-center"><div class="text-xs">10 races</div><div class="font-semibold">8.4</div></div>
-          <div class="rounded-lg p-3 accent-soft text-center"><div class="text-xs">10 races</div><div class="font-semibold">8.9</div></div>
-          <div class="rounded-lg p-3 bg-slate-100 text-slate-400 text-center"><div class="text-xs">dark</div><div class="font-semibold">—</div></div>
-          <div class="rounded-lg p-3 bg-red-100 text-red-800 text-center"><div class="text-xs">9 races</div><div class="font-semibold">6.4</div></div>
-        </div>
-        <div class="mt-3 text-xs text-slate-500">Average projected field size per day. Red &lt; 7, amber 7–8, green &gt; 8.</div>
-      </div>
-
-      <div class="grid lg:grid-cols-2 gap-4">
-        <div class="card ring-soft p-5">
-          <div class="font-semibold">Conditions running soft</div>
-          <div class="text-xs text-slate-500 mb-3">These have offered weak fields 3+ times — consider rewriting.</div>
-          <ul class="text-sm space-y-2">
-            <li class="flex items-start gap-2"><i data-lucide="trending-down" class="w-4 h-4 text-red-600 mt-0.5"></i><span><span class="font-medium">Mdn Clm 30k Turf 1 1/16m, 3yo+</span> — avg 5.4 starters over 4 offerings</span></li>
-            <li class="flex items-start gap-2"><i data-lucide="trending-down" class="w-4 h-4 text-red-600 mt-0.5"></i><span><span class="font-medium">Alw N1X Synth 5½f</span> — avg 6.0 starters over 3 offerings</span></li>
-            <li class="flex items-start gap-2"><i data-lucide="trending-down" class="w-4 h-4 text-amber-600 mt-0.5"></i><span><span class="font-medium">Clm 8k Dirt 6f, F&amp;M 4yo+</span> — declining over the meet</span></li>
-          </ul>
-        </div>
-        <div class="card ring-soft p-5">
-          <div class="font-semibold">Trainer activity, last 14 days</div>
-          <div class="text-xs text-slate-500 mb-3">Active stables on the grounds + their race-type preferences.</div>
-          <div class="space-y-2 text-sm">
-            <div class="flex items-center justify-between"><div>Asmussen S.</div><div class="text-xs text-slate-500">22 horses · prefers 6–7f sprints</div></div>
-            <div class="flex items-center justify-between"><div>Cox B.</div><div class="text-xs text-slate-500">18 horses · routes &amp; allowance</div></div>
-            <div class="flex items-center justify-between"><div>Walden W.</div><div class="text-xs text-slate-500">14 horses · maiden specialty</div></div>
-            <div class="flex items-center justify-between"><div>Beschizza A.</div><div class="text-xs text-slate-500">9 horses · sprints</div></div>
-          </div>
-        </div>
-      </div>
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
     <!-- =========================================================== -->
@@ -2158,9 +908,13 @@
   </main>
 </div>
 
-<!-- Shared recommendation engine + seed (see docs/plan.md §6) -->
+<!-- Shared recommendation engine + seed + persistence (see plan.md §6) -->
 <script src="app/engine.js"></script>
 <script src="app/data.js"></script>
+<script src="app/store.js"></script>
+<script src="app/render.js"></script>
+<script src="app/screens-trainer.js"></script>
+<script src="app/screens-track.js"></script>
 
 <script>
   lucide.createIcons();
@@ -2225,15 +979,36 @@
   }
 
   /* ---------- Routing ---------- */
+  // Parameterized routes: #horse/<id>, #track/race/<id>, … resolve to one
+  // shared section; the renderer (PPRenderers, app/render.js) gets the param.
+  const paramRoutes = [                                // longest prefix first
+    { prefix: 'track/race/',    section: 'scr-track-race' },
+    { prefix: 'track/raceday/', section: 'scr-track-raceday' },
+    { prefix: 'horse/',         section: 'scr-horse' },
+    { prefix: 'recs/',          section: 'scr-recs' },
+    { prefix: 'race/',          section: 'scr-race' },
+  ];
+  function resolveRoute(id) {
+    if (id === 'track/raceday') return { section: 'scr-track-raceday', param: null };
+    const r = paramRoutes.find(r => id.startsWith(r.prefix));
+    return r ? { section: r.section, param: id.slice(r.prefix.length) }
+             : { section: id, param: null };
+  }
+
   function showScreen(hash) {
     const id = (hash || '#dashboard').slice(1) || 'dashboard';
+    const route = resolveRoute(id);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const el = document.getElementById(id) || document.getElementById('dashboard');
+    const el = document.getElementById(route.section) || document.getElementById('dashboard');
     el.classList.add('active');
 
     // Update workspace based on route (parser-playground keeps current ws)
     const wsKey = workspaceForHash(id);
     if (wsKey) setWorkspace(wsKey);
+
+    // Re-render the screen from live data on every visit (registry in render.js)
+    const render = window.PPRenderers && PPRenderers[route.section];
+    if (render) { render(route.param); lucide.createIcons(); }
 
     document.querySelectorAll('.nav-item').forEach(a => {
       const h = (a.getAttribute('href')||'').slice(1);
@@ -2406,162 +1181,15 @@
     renderSample(0);
   }
 
-  /* Recommendation engine + seed live in app/engine.js + app/data.js
-     (loaded above as PPEngine + PPData). The glue below — fill state, render,
-     and the Submit/Request actions — consumes them. */
+  /* Screen renderers live in app/screens-trainer.js + app/screens-track.js
+     (registered on PPRenderers, invoked by the router). PPStore persists
+     Submissions/Requests/race edits; window.rerender() refreshes the active
+     screen after any mutation. */
+  window.rerender = () => showScreen(location.hash);
 
-  // In-memory fill state for the R3 demo race.
-  const fill = { entered: 5, requested: new Set(), submitted: new Set() };
-
-  function readRaceSpec() {
-    const restrict = document.getElementById('rb-restrict').value;       // FM3U | 3U | F3 | 2U
-    const type = document.getElementById('rb-type').value;               // S | M | A | C | AO | N
-    return {
-      type,
-      surface: document.getElementById('rb-surface').value,
-      distance: +document.getElementById('rb-distance').value,
-      target: +document.getElementById('rb-target').value,
-      par: 84,
-      sexes: restrict.startsWith('FM') || restrict.startsWith('F') ? ['F','M'] : ['F','M','G','C','H','R'],
-      minAge: restrict.includes('2') ? 2 : 3,
-      maidenOnly: (type === 'S' || type === 'M'),
-      bonusAmount: +document.getElementById('rb-bonus').value || 0,
-      bonusMi: +document.getElementById('rb-bonus-mi').value || 0,
-    };
-  }
-
-  // eligibility / shipping / score / fitsForRace now live in app/engine.js (PPEngine).
-
-  function toast(msg) {
-    let t = document.getElementById('pp-toast');
-    if (!t) {
-      t = document.createElement('div');
-      t.id = 'pp-toast';
-      t.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-lg bg-ink-900 text-white text-sm shadow-lg flex items-center gap-2 transition-opacity duration-300';
-      document.body.appendChild(t);
-    }
-    t.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-turf-300"></i><span>${msg}</span>`;
-    t.style.opacity = '1';
-    lucide.createIcons();
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2600);
-  }
-
-  function fmtMoney(n) { return '$' + n.toLocaleString(); }
-
-  function updateFillUI() {
-    const r = readRaceSpec();
-    const countEl = document.getElementById('rb-fill-count');
-    const targetEl = document.getElementById('rb-fill-target');
-    const barEl = document.getElementById('rb-fill-bar');
-    const noteEl = document.getElementById('rb-fill-note');
-    const reqEl = document.getElementById('rb-requests-count');
-    const pill = document.getElementById('rb-status-pill');
-    if (!countEl) return;
-    const entered = fill.entered + fill.submitted.size;
-    const pct = Math.min(100, Math.round(entered / r.target * 100));
-    countEl.textContent = entered;
-    targetEl.textContent = r.target;
-    barEl.style.width = pct + '%';
-    barEl.className = 'h-full ' + (entered >= r.target ? 'accent-bg' : entered >= r.target - 2 ? 'bg-amber-500' : 'bg-red-500');
-    reqEl.textContent = fill.requested.size;
-    const short = r.target - entered;
-    if (short <= 0) { noteEl.textContent = 'Target met — field is full'; pill.textContent = 'Full'; pill.className = 'pill accent-soft'; }
-    else if (short <= 2) { noteEl.textContent = `${short} short of target · nearly there`; pill.textContent = 'Filling'; pill.className = 'pill bg-amber-50 text-amber-700'; }
-    else { noteEl.textContent = `${short} short of target · request qualifying horses below`; pill.textContent = 'Underfilled'; pill.className = 'pill bg-red-50 text-red-700'; }
-  }
-
-  function renderRaceBuilder() {
-    const wrap = document.getElementById('rb-fits');
-    if (!wrap) return;
-    const r = readRaceSpec();
-    const fits = PPEngine.fitsForRace(PPData.horses, r);
-    document.getElementById('rb-eligible-count').textContent = fits.length;
-
-    wrap.innerHTML = fits.map(({ h, s }) => {
-      const requested = fill.requested.has(h.name);
-      const submitted = fill.submitted.has(h.name);
-      const acceptColor = s.accept >= 75 ? 'accent-soft' : s.accept >= 55 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600';
-      const shipLabel = s.ship.shipMi === 0 ? 'In barn at CD' : `Ship ${s.ship.shipMi} mi from ${h.home}`;
-      const bonusBadge = s.ship.bonus > 0
-        ? `<span class="pill accent-soft"><i data-lucide="truck" class="w-3 h-3"></i>+${fmtMoney(s.ship.bonus)} ship bonus</span>`
-        : (s.ship.shipIn ? `<span class="pill bg-slate-100 text-slate-500">ship-in · below bonus min</span>` : '');
-      const action = submitted
-        ? `<span class="pill accent-soft"><i data-lucide="check" class="w-3 h-3"></i>Entered</span>`
-        : requested
-          ? `<span class="pill bg-slate-100 text-slate-600"><i data-lucide="clock" class="w-3 h-3"></i>Requested</span>`
-          : `<button class="pp-request text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-horse="${h.name}"><i data-lucide="send" class="w-3.5 h-3.5"></i>Request</button>`;
-      return `
-        <div class="px-5 py-3.5 grid grid-cols-12 gap-3 items-center">
-          <div class="col-span-1">
-            <div class="w-10 h-10 rounded-full score-ring flex items-center justify-center" style="--p:${s.fit}; --c:#4f46e5;">
-              <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center"><span class="text-[11px] font-bold accent-text">${s.fit}</span></div>
-            </div>
-          </div>
-          <div class="col-span-3">
-            <div class="font-medium">${h.name}</div>
-            <div class="text-xs text-slate-500">${h.sex} ${h.age}yo · ${h.stable}</div>
-          </div>
-          <div class="col-span-2"><div class="text-xs text-slate-500">Trainer</div><div>${h.trainer}</div></div>
-          <div class="col-span-2"><span class="pill ${acceptColor}">Likely yes · ${s.accept}%</span></div>
-          <div class="col-span-2 text-xs text-slate-500">${shipLabel}<div class="mt-1">${bonusBadge}</div></div>
-          <div class="col-span-2 text-right">${action}</div>
-        </div>`;
-    }).join('') || `<div class="px-5 py-8 text-center text-sm text-slate-500">No eligible horses match these conditions. Loosen the spec to widen the pool.</div>`;
-
-    updateFillUI();
-    lucide.createIcons();
-  }
-
-  // Track requests a horse for the race.
-  function requestHorse(name) {
-    if (fill.requested.has(name) || fill.submitted.has(name)) return;
-    fill.requested.add(name);
-    renderRaceBuilder();
-    const stat = document.getElementById('wk-requests-stat');
-    if (stat) stat.textContent = 3 + fill.requested.size;
-    toast(`Request sent to ${PPData.horses.find(h => h.name === name)?.trainer || name}`);
-  }
-
-  // A horse is committed to a race (trainer Submit, or trainer accepting a Request).
-  // Only the demo R3 race has live fill state; other races just confirm.
-  function enterHorse(name, raceLabel) {
-    const isR3 = !raceLabel || /Churchill Downs R3/i.test(raceLabel);
-    if (isR3) {
-      if (!fill.submitted.has(name)) { fill.submitted.add(name); fill.requested.delete(name); }
-      renderRaceBuilder();
-      toast(`${name} submitted to Churchill Downs R3 — field now ${fill.entered + fill.submitted.size}/${readRaceSpec().target}`);
-    } else {
-      toast(`${name} submitted to ${raceLabel}`);
-    }
-  }
-
-  // Delegated handlers (rows are re-rendered, so listen on document).
-  document.addEventListener('click', (e) => {
-    const req = e.target.closest('.pp-request');
-    if (req) { requestHorse(req.dataset.horse); return; }
-    const acc = e.target.closest('.pp-accept-request');
-    if (acc) {
-      acc.outerHTML = '<span class="pill accent-soft px-3 py-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i>Submitted</span>';
-      lucide.createIcons();
-      enterHorse(acc.dataset.horse, acc.dataset.race);
-      return;
-    }
-    const sub = e.target.closest('.pp-submit');
-    if (sub) { enterHorse(sub.dataset.horse, sub.dataset.race); return; }
-  });
-
-  // Recompute matches when the Track edits the spec.
-  ['rb-recompute'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('click', renderRaceBuilder);
-  });
-  ['rb-type','rb-surface','rb-distance','rb-restrict','rb-target','rb-bonus','rb-bonus-mi'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('change', renderRaceBuilder);
-  });
-
-  renderRaceBuilder();
+  /* ---------- Reset demo data ---------- */
+  const resetBtn = document.getElementById('pp-reset-demo');
+  if (resetBtn && window.PPStore) resetBtn.addEventListener('click', () => PPStore.reset());
 
   /* ---------- Boot ---------- */
   showScreen(location.hash);
