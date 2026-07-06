@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PostParade — Enterprise Architecture</title>
+<meta name="description" content="How PostParade is built and staged: from a client-side demo to an enterprise, multi-tenant matching layer beside Equibase and InCompass." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Design tokens ---------- */
+  :root{
+    --bg:#fbfaf7;
+    --card:#ffffff;
+    --border:#eef0f4;
+    --ink-900:#0b1220;
+    --ink-700:#1a2336;
+    --ink-600:#2a3447;
+    --ink-500:#475569;
+    --ink-400:#94a3b8;
+    --turf-50:#ecfdf5;
+    --turf-100:#d1fae5;
+    --turf-300:#6ee7b7;
+    --turf-500:#10b981;
+    --turf-600:#059669;
+    --turf-700:#047857;
+    --turf-800:#065f46;
+    --silk-50:#fffbeb;
+    --silk-100:#fef3c7;
+    --silk-400:#f59e0b;
+    --silk-500:#d97706;
+    --silk-700:#b45309;
+    --indigo-50:#eef2ff;
+    --indigo-100:#e0e7ff;
+    --indigo-500:#6366f1;
+    --indigo-600:#4f46e5;
+    --indigo-700:#4338ca;
+    --shadow:0 8px 24px -12px rgba(15,23,42,.08);
+    --shadow-soft:0 1px 0 rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.08);
+    --radius:14px;
+  }
+
+  /* ---------- Reset-ish ---------- */
+  *{box-sizing:border-box;}
+  html,body{background:var(--bg);margin:0;padding:0;}
+  body{
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    color:var(--ink-900);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,h4{margin:0;letter-spacing:-0.01em;line-height:1.15;}
+  p{margin:0;}
+  a{color:inherit;}
+  code,.mono{font-family:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;}
+
+  /* ---------- Layout ---------- */
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+  section{padding:44px 0;}
+  .section-head{margin-bottom:22px;}
+  .eyebrow{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--turf-700);}
+  .eyebrow.ind{color:var(--indigo-600);}
+  .eyebrow.amb{color:var(--silk-500);}
+  h2.title{font-size:1.7rem;font-weight:700;margin-top:6px;}
+  .lead{color:var(--ink-500);margin-top:10px;max-width:70ch;font-size:.98rem;}
+
+  /* ---------- Card ---------- */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-soft);}
+
+  /* ---------- Pills ---------- */
+  .pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:600;padding:.18rem .55rem;border-radius:9999px;letter-spacing:.01em;line-height:1.2;}
+  .pill.turf{background:var(--turf-50);color:var(--turf-700);}
+  .pill.ind{background:var(--indigo-50);color:var(--indigo-700);}
+  .pill.amb{background:var(--silk-50);color:var(--silk-700);}
+  .pill.ink{background:#eef0f4;color:var(--ink-600);}
+  .pill.dark{background:var(--ink-900);color:#fff;}
+  .dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;}
+
+  /* ---------- Header ---------- */
+  header.top{position:sticky;top:0;z-index:30;background:rgba(251,250,247,.82);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+  .top-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;max-width:1100px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .logo{width:32px;height:32px;border-radius:9px;background:var(--ink-900);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .wordmark{font-weight:700;letter-spacing:-.02em;font-size:1.02rem;}
+  .sublabel{font-size:.7rem;color:var(--ink-400);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-left:2px;}
+  .top-links{display:flex;align-items:center;gap:18px;font-size:.85rem;color:var(--ink-500);}
+  .top-links a{text-decoration:none;}
+  .top-links a:hover{color:var(--ink-900);}
+
+  /* ---------- Hero framing ---------- */
+  .hero{padding-top:40px;padding-bottom:8px;}
+  .hero h1{font-size:2.1rem;font-weight:800;letter-spacing:-.02em;line-height:1.08;}
+  .hero .lead{font-size:1.05rem;margin-top:14px;max-width:74ch;}
+  .beside{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+  .beside .card{padding:12px 14px;flex:1 1 220px;min-width:0;}
+  .beside .card .role{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-400);}
+  .beside .card .name{font-weight:700;margin-top:3px;}
+  .beside .card .desc{font-size:.82rem;color:var(--ink-500);margin-top:3px;}
+  .beside .card.us{border-color:var(--turf-300);background:linear-gradient(180deg,#fff, var(--turf-50));}
+
+  /* ---------- Legend ---------- */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.76rem;color:var(--ink-600);margin-top:20px;padding:12px 14px;}
+  .legend .item{display:inline-flex;align-items:center;gap:7px;}
+  .swatch{width:14px;height:14px;border-radius:4px;border:1px solid transparent;flex:0 0 auto;}
+  .sw-trainer{background:var(--turf-50);border-color:var(--turf-300);}
+  .sw-track{background:var(--indigo-50);border-color:#c7d2fe;}
+  .sw-shared{background:#0b1220;}
+  .sw-saas{background:var(--silk-50);border-color:var(--silk-400);}
+  .sw-ext{background:repeating-linear-gradient(45deg,#fff,#fff 3px,#e2e8f0 3px,#e2e8f0 6px);border:1px dashed var(--ink-400);}
+
+  /* ---------- Diagram scroll container ---------- */
+  .scroll-x{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding-bottom:6px;}
+  .scroll-x::-webkit-scrollbar{height:8px;}
+  .scroll-x::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:9999px;}
+
+  /* ---------- Diagram nodes ---------- */
+  .node{
+    border:1px solid var(--border);border-radius:11px;background:#fff;
+    padding:10px 12px;font-size:.82rem;line-height:1.35;
+  }
+  .node .nt{font-weight:700;font-size:.83rem;display:flex;align-items:center;gap:6px;}
+  .node .nd{color:var(--ink-500);font-size:.74rem;margin-top:3px;}
+  .node.trainer{background:var(--turf-50);border-color:var(--turf-300);}
+  .node.trainer .nt{color:var(--turf-800);}
+  .node.track{background:var(--indigo-50);border-color:#c7d2fe;}
+  .node.track .nt{color:var(--indigo-700);}
+  .node.shared{background:var(--ink-900);border-color:var(--ink-900);color:#e5e7eb;}
+  .node.shared .nt{color:#fff;}
+  .node.shared .nd{color:var(--ink-400);}
+  .node.saas{background:var(--silk-50);border-color:var(--silk-400);}
+  .node.saas .nt{color:var(--silk-700);}
+  .node.ext{background:repeating-linear-gradient(45deg,#fff,#fff 6px,#fafbfc 6px,#fafbfc 12px);border:1px dashed var(--ink-400);}
+  .node.ext .nt{color:var(--ink-600);}
+  .node.plain{background:#fff;}
+
+  /* group band */
+  .band{border:1px solid var(--border);border-radius:12px;padding:12px;background:#fdfdfc;}
+  .band-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-400);margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+  .band.ext-band{background:repeating-linear-gradient(45deg,#fff,#fff 8px,#fafbfc 8px,#fafbfc 16px);border-style:dashed;border-color:var(--ink-400);}
+  .band.saas-band{background:var(--silk-50);border-color:var(--silk-400);}
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .row > *{flex:1 1 0;min-width:150px;}
+  .stack{display:flex;flex-direction:column;gap:10px;}
+
+  /* vertical arrow between bands */
+  .vconn{display:flex;justify-content:center;align-items:center;gap:8px;color:var(--ink-400);font-size:.7rem;padding:4px 0;}
+  .vconn .line{width:1px;height:16px;background:var(--ink-400);}
+  .arrow-down{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--ink-400);}
+  .arrow-up{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:6px solid var(--ink-400);}
+  .bidir{display:flex;flex-direction:column;align-items:center;gap:2px;}
+
+  /* ---------- Evolution strip ---------- */
+  .evo{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:stretch;}
+  .evo-card{padding:16px;border-radius:12px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-soft);}
+  .evo-card.current{border-color:var(--turf-500);background:linear-gradient(180deg,#fff,var(--turf-50));}
+  .evo-card h4{font-size:1rem;font-weight:700;}
+  .evo-stage{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-400);}
+  .evo-card ul{margin:12px 0 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px;}
+  .evo-card li{font-size:.8rem;color:var(--ink-600);display:flex;align-items:flex-start;gap:7px;}
+  .evo-card li .mono{font-size:.72rem;color:var(--ink-500);}
+  .evo-tick{color:var(--turf-600);font-weight:700;flex:0 0 auto;}
+  .evo-arrow{display:flex;align-items:center;justify-content:center;padding:0 8px;color:var(--ink-400);font-size:1.3rem;}
+  @media(max-width:820px){
+    .evo{grid-template-columns:1fr;gap:10px;}
+    .evo-arrow{transform:rotate(90deg);padding:2px 0;}
+  }
+
+  /* ---------- Tenancy cards ---------- */
+  .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media(max-width:760px){.tgrid{grid-template-columns:1fr;}}
+  .tgrid .card{padding:14px;}
+  .tgrid .card h4{font-size:.92rem;font-weight:700;display:flex;align-items:center;gap:7px;}
+  .tgrid .card p{font-size:.82rem;color:var(--ink-500);margin-top:7px;}
+
+  /* ---------- Sequencing table ---------- */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-soft);}
+  table{border-collapse:collapse;width:100%;min-width:620px;font-size:.83rem;background:#fff;}
+  thead th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-400);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--border);background:#fdfdfc;}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink-700);}
+  tbody tr:last-child td{border-bottom:none;}
+  td .stage-tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:6px;white-space:nowrap;}
+  .st-1{background:var(--turf-50);color:var(--turf-700);}
+  .st-2{background:var(--silk-50);color:var(--silk-700);}
+  .st-3{background:var(--indigo-50);color:var(--indigo-700);}
+  td.comp{color:var(--ink-900);font-weight:600;}
+
+  /* ---------- Callout ---------- */
+  .callout{border-left:3px solid var(--turf-500);background:var(--turf-50);border-radius:0 10px 10px 0;padding:13px 16px;font-size:.88rem;color:var(--turf-800);}
+  .callout.ind{border-left-color:var(--indigo-600);background:var(--indigo-50);color:var(--indigo-700);}
+  .callout .k{font-weight:700;}
+
+  /* ---------- Footer ---------- */
+  footer{border-top:1px solid var(--border);background:#fff;margin-top:24px;}
+  .foot{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;padding:24px;max-width:1100px;margin:0 auto;font-size:.85rem;color:var(--ink-500);}
+  .foot-links{display:flex;flex-wrap:wrap;gap:16px;}
+  .foot-links a{text-decoration:none;}
+  .foot-links a:hover{color:var(--ink-900);}
+
+  .note-mini{font-size:.74rem;color:var(--ink-400);margin-top:6px;}
+  .divider{height:1px;background:var(--border);border:none;margin:0;}
+
+  /* small helpers */
+  .mt6{margin-top:6px;}.mt10{margin-top:10px;}.mt14{margin-top:14px;}.mt18{margin-top:18px;}
+  .muted{color:var(--ink-500);}
+  .flag-svg{width:16px;height:16px;display:block;}
+</style>
+</head>
+<body>
+
+<!-- ===================== Header ===================== -->
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">
+        <svg class="flag-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 3v18" stroke="#6ee7b7" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M6 4.2c3.2-1.6 5.8 1.2 9 -.2v7.4c-3.2 1.4-5.8-1.4-9 .2z" fill="#6ee7b7"/>
+        </svg>
+      </span>
+      <span>
+        <span class="wordmark">PostParade</span>
+        <span class="sublabel">Architecture</span>
+      </span>
+    </a>
+    <nav class="top-links">
+      <a href="#evolution">Evolution</a>
+      <a href="#enterprise">Enterprise</a>
+      <a href="#control-plane">Control plane</a>
+      <a href="#sequencing">Sequencing</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== Hero / framing ===================== -->
+<section class="hero">
+  <div class="wrap">
+    <span class="pill turf"><span class="dot" style="background:var(--turf-500)"></span>Internal architecture brief</span>
+    <h1 class="mt10">The matching layer for the racing industry.</h1>
+    <p class="lead">
+      PostParade is a two-sided SaaS: trainers find the right race for each horse, and racing offices fill their cards —
+      one recommendation engine scoring both directions. Architecturally we sit <strong>beside</strong> the incumbents rather than replacing them:
+      <strong>Equibase</strong> stays the data of record (charts, past performances, codes) and <strong>InCompass</strong> stays the racing-office
+      system of record. PostParade is the placement and matching layer stitched across them.
+    </p>
+
+    <div class="beside">
+      <div class="card">
+        <div class="role">Data of record</div>
+        <div class="name">Equibase</div>
+        <div class="desc">Charts, PPs, horseman's page, official codes — we import its shape.</div>
+      </div>
+      <div class="card">
+        <div class="role">Racing-office system</div>
+        <div class="name">InCompass</div>
+        <div class="desc">Track Manager / racing office of record — we interoperate, don't replace.</div>
+      </div>
+      <div class="card us">
+        <div class="role">The gap between them</div>
+        <div class="name">PostParade</div>
+        <div class="desc">Matching &amp; placement: score(horse,&nbsp;race) in both directions, submit ⇄ request.</div>
+      </div>
+    </div>
+
+    <div class="legend card">
+      <span class="item"><span class="swatch sw-trainer"></span>Trainer-side</span>
+      <span class="item"><span class="swatch sw-track"></span>Track / racing-office side</span>
+      <span class="item"><span class="swatch sw-shared"></span>Shared platform</span>
+      <span class="item"><span class="swatch sw-saas"></span>SaaS provider control plane</span>
+      <span class="item"><span class="swatch sw-ext"></span>External / third-party (dashed)</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===================== Evolution strip ===================== -->
+<section id="evolution">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">How it's staged</div>
+      <h2 class="title">One engine, three stages of infrastructure.</h2>
+      <p class="lead">The engine is written once and travels forward unchanged; only the plumbing around it grows. We add a backend precisely when two real parties need to share state — not before.</p>
+    </div>
+
+    <div class="scroll-x">
+      <div class="evo" style="min-width:720px;">
+        <!-- Stage 1 -->
+        <div class="evo-card current">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="evo-stage">Stage 1 · Today</span>
+            <span class="pill turf">✅ Current</span>
+          </div>
+          <h4 class="mt6">Client-side demo</h4>
+          <ul>
+            <li><span class="evo-tick">›</span><span>Static <span class="mono">GitHub&nbsp;Pages</span> single-page app</span></li>
+            <li><span class="evo-tick">›</span><span>Submit / Request persisted to <span class="mono">localStorage</span></span></li>
+            <li><span class="evo-tick">›</span><span>Shared <span class="mono">engine.js</span> — <span class="mono">score(horse,race)</span></span></li>
+            <li><span class="evo-tick">›</span><span><span class="mono">data.js</span> seed shaped as the future API</span></li>
+            <li><span class="evo-tick">›</span><span>Zero infra — proves UX + engine end-to-end</span></li>
+          </ul>
+        </div>
+
+        <div class="evo-arrow">▸</div>
+
+        <!-- Stage 2 -->
+        <div class="evo-card">
+          <span class="evo-stage">Stage 2 · First customers</span>
+          <h4 class="mt6">Thin full-stack</h4>
+          <ul>
+            <li><span class="evo-tick">›</span><span><span class="mono">Bun</span> + <span class="mono">Hono</span> thin JSON API</span></li>
+            <li><span class="evo-tick">›</span><span><span class="mono">bun:sqlite</span> — one file, zero-ops</span></li>
+            <li><span class="evo-tick">›</span><span><em>Same</em> engine, now authoritative server-side</span></li>
+            <li><span class="evo-tick">›</span><span>Magic-link auth for the two roles</span></li>
+            <li><span class="evo-tick">›</span><span>Small always-on host (Fly / Railway / Render)</span></li>
+          </ul>
+        </div>
+
+        <div class="evo-arrow">▸</div>
+
+        <!-- Stage 3 -->
+        <div class="evo-card">
+          <span class="evo-stage">Stage 3 · Enterprise</span>
+          <h4 class="mt6">Multi-tenant platform</h4>
+          <ul>
+            <li><span class="evo-tick">›</span><span>Org-scoped tenancy: stable orgs &amp; track orgs</span></li>
+            <li><span class="evo-tick">›</span><span>Postgres + replicas, cache, object store</span></li>
+            <li><span class="evo-tick">›</span><span>Split services, event bus, audit log</span></li>
+            <li><span class="evo-tick">›</span><span>Equibase / InCompass ingestion pipelines</span></li>
+            <li><span class="evo-tick">›</span><span>Vendor control plane (billing, rollout, ops)</span></li>
+          </ul>
+          <div class="note-mini">Detailed below ↓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===================== Enterprise architecture ===================== -->
+<section id="enterprise">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Stage 3 · the centerpiece</div>
+      <h2 class="title">Enterprise application architecture.</h2>
+      <p class="lead">The multi-tenant product itself — clients at the top, the matching engine and its supporting services in the middle, an org-scoped data layer beneath, and dashed third-party feeds at the edges. Green boxes serve trainers, indigo serve tracks, ink boxes are shared platform.</p>
+    </div>
+
+    <div class="scroll-x">
+      <div class="stack" style="min-width:860px;">
+
+        <!-- Clients -->
+        <div class="band">
+          <div class="band-label">Clients</div>
+          <div class="row">
+            <div class="node trainer"><div class="nt">Trainer web app</div><div class="nd">Stable, horses needing a spot, submit</div></div>
+            <div class="node track"><div class="nt">Track / racing-office web app</div><div class="nd">Race builder, card fill, request</div></div>
+            <div class="node shared"><div class="nt">Mobile PWA + notifications</div><div class="nd">Entries closing, inbound requests</div></div>
+            <div class="node ext"><div class="nt">Owner guest views</div><div class="nd">Future · read-only portfolio</div></div>
+            <div class="node ext"><div class="nt">Jockey-agent view</div><div class="nd">Future · mount availability</div></div>
+          </div>
+        </div>
+
+        <div class="vconn"><div class="bidir"><div class="arrow-up"></div><div class="line"></div><div class="arrow-down"></div></div><span>HTTPS · JSON</span></div>
+
+        <!-- Edge / API -->
+        <div class="band">
+          <div class="band-label">Edge &amp; API</div>
+          <div class="row">
+            <div class="node shared"><div class="nt">API gateway</div><div class="nd">Routing, TLS, request shaping</div></div>
+            <div class="node shared"><div class="nt">AuthN / AuthZ</div><div class="nd">Org-scoped roles: stable orgs vs track orgs</div></div>
+            <div class="node shared"><div class="nt">Rate limiting</div><div class="nd">Per-tenant quotas, abuse guard</div></div>
+          </div>
+        </div>
+
+        <div class="vconn"><div class="bidir"><div class="arrow-up"></div><div class="line"></div><div class="arrow-down"></div></div><span>internal RPC</span></div>
+
+        <!-- Core services -->
+        <div class="band">
+          <div class="band-label">Core services</div>
+          <div class="stack">
+            <div class="node shared" style="border:1px solid var(--turf-500);">
+              <div class="nt" style="color:var(--turf-300)">★ Matching / Recommendation service</div>
+              <div class="nd">The shared engine — <span class="mono">score(horse,race)</span>, eligibility gates, fit 0–100, ship &amp; incentives, draw-in probability, acceptance likelihood. Runs both directions.</div>
+            </div>
+            <div class="row">
+              <div class="node shared"><div class="nt">Race / Card service</div><div class="nd">Meets → race days → races; condition specs, class ladder, preference system</div></div>
+              <div class="node shared"><div class="nt">Stable service</div><div class="nd">Horses, records, vet's-list &amp; medication status, equipment</div></div>
+            </div>
+            <div class="row">
+              <div class="node shared"><div class="nt">Entry workflow service</div><div class="nd">Submissions / requests / entries — state machines, AE &amp; MTO backups</div></div>
+              <div class="node shared"><div class="nt">Incentive service</div><div class="nd">Ship &amp; Win / supplement programs, eligibility &amp; caps</div></div>
+              <div class="node shared"><div class="nt">Notification service</div><div class="nd">Email / SMS / push: entries closing, requests, overnight published</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vconn"><div class="bidir"><div class="arrow-up"></div><div class="line"></div><div class="arrow-down"></div></div><span>reads / writes</span></div>
+
+        <!-- Data layer -->
+        <div class="band">
+          <div class="band-label">Data layer</div>
+          <div class="row">
+            <div class="node shared"><div class="nt">Primary Postgres</div><div class="nd">Multi-tenant, every row org-scoped (RLS)</div></div>
+            <div class="node plain"><div class="nt">Read replicas</div><div class="nd">Dashboards, field-strength trends</div></div>
+            <div class="node plain"><div class="nt">Object store</div><div class="nd">Condition-book PDFs, chart files</div></div>
+            <div class="node plain"><div class="nt">Cache</div><div class="nd">Hot scores, session, rate counters</div></div>
+          </div>
+        </div>
+
+        <div class="vconn"><div class="bidir"><div class="arrow-up"></div><div class="line"></div><div class="arrow-down"></div></div><span>ingest · adapters map raw rows → PostParade entities</span></div>
+
+        <!-- Ingestion / integrations -->
+        <div class="band ext-band">
+          <div class="band-label" style="color:var(--ink-500)">Ingestion &amp; integrations · external / third-party</div>
+          <div class="row">
+            <div class="node ext"><div class="nt">Equibase adapter</div><div class="nd">Charts, PPs, entries → entities</div></div>
+            <div class="node ext"><div class="nt">Condition-book PDF parser</div><div class="nd">LLM pipeline → ~45 structured fields</div></div>
+            <div class="node ext"><div class="nt">InCompass interop</div><div class="nd">Racing-office system exchange</div></div>
+            <div class="node ext"><div class="nt">HISA / state feeds</div><div class="nd">Commission &amp; medication rules</div></div>
+            <div class="node ext"><div class="nt">Twilio / SendGrid</div><div class="nd">SMS &amp; email delivery</div></div>
+            <div class="node ext"><div class="nt">Stripe</div><div class="nd">Billing &amp; metering</div></div>
+          </div>
+        </div>
+
+        <div class="vconn"><span>all services emit →</span></div>
+
+        <!-- Cross-cutting bus -->
+        <div class="band" style="border-color:var(--ink-600);background:#0b1220;">
+          <div class="band-label" style="color:var(--ink-400)">Cross-cutting · event bus &amp; audit log</div>
+          <div class="row">
+            <div class="node plain" style="background:#11192b;border-color:#2a3447;color:#e5e7eb;"><div class="nt" style="color:#fff">Event bus / audit log</div><div class="nd" style="color:var(--ink-400)">Every state change, append-only</div></div>
+            <div class="node plain" style="background:#11192b;border-color:#2a3447;color:#e5e7eb;"><div class="nt" style="color:#fff">Product analytics</div><div class="nd" style="color:var(--ink-400)">Fill health, funnel, engine tuning</div></div>
+            <div class="node saas"><div class="nt">→ feeds the control plane</div><div class="nd">Metering, observability, support (below)</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <p class="note-mini">Dashed boxes are systems we integrate with, not systems we own. The starred matching service is the same engine that ships in Stage 1 — everything else is plumbing that grows around it.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===================== Control plane ===================== -->
+<section id="control-plane">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow amb">What we run as the vendor</div>
+      <h2 class="title">SaaS provider control plane.</h2>
+      <p class="lead">The application above is what customers touch. This is what we operate behind it — provisioning, entitlements, billing, staged rollout, observability, support, and the config store that absorbs jurisdictional variance. Amber = vendor control surface.</p>
+    </div>
+
+    <div class="scroll-x">
+      <div class="band saas-band" style="min-width:820px;">
+        <div class="band-label" style="color:var(--silk-700)">Control plane · operated by PostParade</div>
+        <div class="stack">
+          <div class="row">
+            <div class="node saas"><div class="nt">Tenant provisioning &amp; onboarding</div><div class="nd">Create track org / stable org, seed meet templates</div></div>
+            <div class="node saas"><div class="nt">Plan &amp; entitlement management</div><div class="nd">Trainer tiers, per-meet track contracts</div></div>
+            <div class="node saas"><div class="nt">Billing / metering</div><div class="nd">Stripe — usage capture, invoicing</div></div>
+          </div>
+          <div class="row">
+            <div class="node saas"><div class="nt">Feature flags &amp; staged rollout</div><div class="nd">Per-track rollouts — the track is the natural rollout unit</div></div>
+            <div class="node saas"><div class="nt">Observability</div><div class="nd">Logs / metrics / traces, SLOs, on-call</div></div>
+            <div class="node saas"><div class="nt">Support tooling</div><div class="nd">Impersonation with audit, data fixes</div></div>
+          </div>
+          <div class="row">
+            <div class="node saas"><div class="nt">Data-pipeline operations</div><div class="nd">Equibase feed health; parser QA review queue — human-in-the-loop</div></div>
+            <div class="node saas"><div class="nt">Compliance &amp; audit</div><div class="nd">HISA-adjacent data handling, per-state rules</div></div>
+            <div class="node saas"><div class="nt">Deploy / release</div><div class="nd">CI/CD, migrations, per-track config registry</div></div>
+          </div>
+          <div class="node saas" style="border-width:2px;">
+            <div class="nt">★ Per-track config registry — the jurisdictional-variance store</div>
+            <div class="nd">Entry-close hours · preference system · scratch times · state funds · Lasix rules · coupled-entry policy — configurable per track, never hard-coded. This registry is what lets one codebase serve every jurisdiction.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===================== Tenancy & rollout ===================== -->
+<section id="tenancy">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow ind">Tenancy &amp; rollout</div>
+      <h2 class="title">The track is the anchor tenant.</h2>
+      <p class="lead">A track org is the tenant we sell to and the unit we roll out. Activating a meet lights up the marketplace for that circuit's trainers, and the per-track config registry absorbs the jurisdictional differences that would otherwise fork the codebase. That registry is the enterprise moat.</p>
+    </div>
+
+    <div class="tgrid">
+      <div class="card">
+        <h4><span class="pill ind">Anchor</span>Track org = tenant</h4>
+        <p>Each track (and its racing office) is a tenant. Stable orgs attach to the circuits they run on. Every row is org-scoped, so tenancy is enforced at the data layer, not just the UI.</p>
+      </div>
+      <div class="card">
+        <h4><span class="pill turf">Trigger</span>A meet activates the market</h4>
+        <p>Publishing a meet opens the two-sided marketplace for that circuit's trainers — races become submittable, and the track can request eligible horses. No meet, no marketplace.</p>
+      </div>
+      <div class="card">
+        <h4><span class="pill amb">Moat</span>Config registry = variance</h4>
+        <p>Entry-close hours, preference systems, scratch times, state funds and medication rules all live in the per-track registry. Onboarding a new jurisdiction is configuration, not engineering.</p>
+      </div>
+    </div>
+
+    <div class="callout ind mt18">
+      <span class="k">Why tracks first:</span> rolling out per-track means each go-live is contained, the config registry captures that jurisdiction's rules once, and the meet activation pulls its trainers onto the platform behind it. The rollout unit and the sales unit are the same object.
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===================== Sequencing table ===================== -->
+<section id="sequencing">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Roadmap, not fantasy</div>
+      <h2 class="title">Build-out sequencing.</h2>
+      <p class="lead">Every box in the enterprise diagram maps to a stage in the plan, so the picture reads as a roadmap. Much of the engine already exists in the demo; the rest is staged behind real customer need.</p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:26%">Architecture box</th>
+            <th style="width:14%">First appears</th>
+            <th>What exists / what's added</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="comp">Matching / recommendation engine</td>
+            <td><span class="stage-tag st-1">Stage 1</span></td>
+            <td>Eligibility gates + fit + ship + acceptance already implemented client-side; v1 adds vet/medication gates and draw-in probability.</td>
+          </tr>
+          <tr>
+            <td class="comp">Trainer &amp; track web apps</td>
+            <td><span class="stage-tag st-1">Stage 1</span></td>
+            <td>Both workspaces run today on static Pages with a seed data module and localStorage submit/request.</td>
+          </tr>
+          <tr>
+            <td class="comp">Race/Card, Stable, Entry, Incentive services</td>
+            <td><span class="stage-tag st-2">Stage 2</span></td>
+            <td>Extracted from the seed module into a thin Bun + Hono API over <span class="mono">bun:sqlite</span> when two roles must share state.</td>
+          </tr>
+          <tr>
+            <td class="comp">Magic-link auth (single-tenant)</td>
+            <td><span class="stage-tag st-2">Stage 2</span></td>
+            <td>Two-role login; org-scoped AuthN/AuthZ generalizes it in Stage 3.</td>
+          </tr>
+          <tr>
+            <td class="comp">Notification service</td>
+            <td><span class="stage-tag st-2">Stage 2</span></td>
+            <td>Email first (requests + close times); SMS/push via Twilio in Stage 3.</td>
+          </tr>
+          <tr>
+            <td class="comp">Postgres + replicas, object store, cache</td>
+            <td><span class="stage-tag st-3">Stage 3</span></td>
+            <td>Multi-tenant data layer replaces the single SQLite file when scale and tenancy demand it.</td>
+          </tr>
+          <tr>
+            <td class="comp">API gateway, org-scoped roles, rate limiting</td>
+            <td><span class="stage-tag st-3">Stage 3</span></td>
+            <td>Edge tier introduced with true multi-tenancy (stable orgs vs track orgs).</td>
+          </tr>
+          <tr>
+            <td class="comp">Equibase adapter · condition-book parser</td>
+            <td><span class="stage-tag st-3">Stage 3</span></td>
+            <td>Parser prototyped early as a shared playground; productionized as a pipeline with a human QA queue when the Equibase feed lands.</td>
+          </tr>
+          <tr>
+            <td class="comp">InCompass interop · HISA / state feeds</td>
+            <td><span class="stage-tag st-3">Stage 3</span></td>
+            <td>Interop layer once tracks transact on-platform; per-state rules flow into the config registry.</td>
+          </tr>
+          <tr>
+            <td class="comp">Control plane (billing, rollout, config registry)</td>
+            <td><span class="stage-tag st-3">Stage 3</span></td>
+            <td>Stood up as we onboard paying track orgs; Stripe billing, per-track feature flags, jurisdictional config store.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout mt18">
+      <span class="k">Read this way:</span> the demo is not a throwaway. Its engine and data shape are the Stage 3 matching service and API contract — later stages swap the plumbing beneath them, not the core.
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Footer ===================== -->
+<footer>
+  <div class="foot">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <svg class="flag-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 3v18" stroke="#6ee7b7" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M6 4.2c3.2-1.6 5.8 1.2 9 -.2v7.4c-3.2 1.4-5.8-1.4-9 .2z" fill="#6ee7b7"/>
+        </svg>
+      </span>
+      <span>
+        <span class="wordmark" style="font-size:.95rem">PostParade</span>
+        <span class="muted" style="font-size:.8rem"> — internal architecture brief · 2026</span>
+      </span>
+    </div>
+    <div class="foot-links">
+      <a href="./index.html">Home</a>
+      <a href="./app.html">Live demo</a>
+      <a href="./features.html">Feature recommendations</a>
+      <a href="./pitch.html">Pitch deck</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

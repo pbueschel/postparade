@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PostParade — Pre-seed</title>
+<meta name="description" content="PostParade pre-seed deck — the placement layer for horse racing: every horse in the right race, every race filled." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Design tokens (shared with architecture.html) ---------- */
+  :root{
+    --bg:#fbfaf7;
+    --card:#ffffff;
+    --border:#eef0f4;
+    --ink-900:#0b1220;
+    --ink-700:#1a2336;
+    --ink-600:#2a3447;
+    --ink-500:#475569;
+    --ink-400:#94a3b8;
+    --turf-50:#ecfdf5;
+    --turf-100:#d1fae5;
+    --turf-300:#6ee7b7;
+    --turf-500:#10b981;
+    --turf-600:#059669;
+    --turf-700:#047857;
+    --turf-800:#065f46;
+    --silk-50:#fffbeb;
+    --silk-100:#fef3c7;
+    --silk-400:#f59e0b;
+    --silk-500:#d97706;
+    --silk-700:#b45309;
+    --indigo-50:#eef2ff;
+    --indigo-100:#e0e7ff;
+    --indigo-500:#6366f1;
+    --indigo-600:#4f46e5;
+    --indigo-700:#4338ca;
+    --red-50:#fef2f2;
+    --red-500:#ef4444;
+    --red-700:#b91c1c;
+    --shadow:0 8px 24px -12px rgba(15,23,42,.08);
+    --shadow-soft:0 1px 0 rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.08);
+    --radius:14px;
+  }
+
+  /* ---------- Reset-ish ---------- */
+  *{box-sizing:border-box;}
+  html{scroll-snap-type:y mandatory; scroll-behavior:smooth;}
+  body{
+    margin:0;padding:0;background:var(--bg);
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    color:var(--ink-900);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,h4{margin:0;letter-spacing:-0.02em;line-height:1.12;}
+  p{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  ul{margin:0;padding:0;list-style:none;}
+  code,.mono{font-family:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;}
+
+  /* ---------- Slides ---------- */
+  .slide{
+    min-height:100dvh;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    display:flex;flex-direction:column;
+    justify-content:safe center;
+    padding:78px 26px 92px;
+    position:relative;
+    border-bottom:1px solid var(--border);
+  }
+  .inner{width:100%;max-width:1060px;margin:0 auto;}
+  .slide.dark{background:var(--ink-900);color:#e5e7eb;border-bottom:none;}
+  .slide.hero{
+    background:
+      radial-gradient(1200px 640px at 82% -12%, rgba(16,185,129,.16), transparent 60%),
+      radial-gradient(820px 520px at -10% 25%, rgba(245,158,11,.10), transparent 60%),
+      linear-gradient(180deg,#fbfaf7 0%, #f4f7f4 100%);
+  }
+
+  /* ---------- Typography helpers ---------- */
+  .eyebrow{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--turf-700);}
+  .eyebrow.ind{color:var(--indigo-600);}
+  .eyebrow.amb{color:var(--silk-500);}
+  .eyebrow.mut{color:var(--ink-400);}
+  .stitle{font-size:2rem;font-weight:800;margin-top:10px;letter-spacing:-.025em;line-height:1.1;}
+  .stitle.sm{font-size:1.62rem;}
+  .lead{color:var(--ink-500);margin-top:14px;max-width:64ch;font-size:1.02rem;}
+  .slide.dark .lead{color:var(--ink-400);}
+  .muted{color:var(--ink-500);}
+  .em{color:var(--turf-700);font-weight:700;}
+  .em.ind{color:var(--indigo-600);}
+
+  /* ---------- Card ---------- */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-soft);padding:18px 20px;}
+  .card h3{font-size:1rem;font-weight:700;}
+  .card h4{font-size:.9rem;font-weight:700;}
+  .card p{font-size:.86rem;color:var(--ink-500);margin-top:7px;}
+  .card.pad-sm{padding:14px 16px;}
+  .card.turf-tint{border-color:var(--turf-300);background:linear-gradient(180deg,#fff,var(--turf-50));}
+  .card.ind-tint{border-color:#c7d2fe;background:linear-gradient(180deg,#fff,var(--indigo-50));}
+  .card.amb-tint{border-color:var(--silk-400);background:linear-gradient(180deg,#fff,var(--silk-50));}
+  .card .num{font-size:.7rem;font-weight:700;color:var(--ink-400);letter-spacing:.06em;}
+
+  /* ---------- Pills / chips ---------- */
+  .pill{display:inline-flex;align-items:center;gap:.35rem;font-size:.7rem;font-weight:600;padding:.2rem .58rem;border-radius:9999px;letter-spacing:.01em;line-height:1.2;}
+  .pill.turf{background:var(--turf-50);color:var(--turf-700);}
+  .pill.ind{background:var(--indigo-50);color:var(--indigo-700);}
+  .pill.amb{background:var(--silk-50);color:var(--silk-700);}
+  .pill.red{background:var(--red-50);color:var(--red-700);}
+  .pill.ink{background:#eef0f4;color:var(--ink-600);}
+  .pill.dark{background:var(--ink-900);color:#fff;}
+  .dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;}
+
+  /* [EDIT] placeholder chip — every unverified figure carries one */
+  .edit{display:inline-flex;align-items:center;gap:.25rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:600;
+    padding:.1rem .4rem;border-radius:6px;background:var(--silk-50);color:var(--silk-700);border:1px dashed var(--silk-400);white-space:nowrap;vertical-align:middle;}
+
+  /* ---------- Grids ---------- */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .mt{margin-top:26px;}
+  .mt-sm{margin-top:16px;}
+  @media(max-width:880px){
+    .g2,.g3,.g4{grid-template-columns:1fr;}
+    .stitle{font-size:1.6rem;}
+    .stitle.sm{font-size:1.4rem;}
+  }
+
+  /* ---------- Bullet list ---------- */
+  .checks li{display:flex;align-items:flex-start;gap:9px;font-size:.9rem;color:var(--ink-700);padding:5px 0;}
+  .checks li svg{flex:0 0 auto;margin-top:2px;}
+  .x-list li{display:flex;align-items:flex-start;gap:9px;font-size:.9rem;color:var(--ink-700);padding:5px 0;}
+  .x-list li .xm{color:var(--red-500);font-weight:800;flex:0 0 auto;line-height:1.3;}
+
+  /* ---------- Stat ---------- */
+  .stat{display:flex;flex-direction:column;gap:3px;}
+  .stat .big{font-size:1.8rem;font-weight:800;letter-spacing:-.02em;}
+  .stat .lbl{font-size:.76rem;color:var(--ink-500);}
+
+  /* ---------- Insight diagram ---------- */
+  .layer-row{display:flex;gap:12px;align-items:stretch;min-width:640px;}
+  .layer{flex:1 1 0;border-radius:12px;padding:14px 16px;border:1px solid var(--border);background:#fff;}
+  .layer .lk{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-400);}
+  .layer .ln{font-weight:700;margin-top:4px;font-size:1rem;}
+  .layer .ld{font-size:.8rem;color:var(--ink-500);margin-top:6px;}
+  .layer.ext{background:repeating-linear-gradient(45deg,#fff,#fff 7px,#fafbfc 7px,#fafbfc 14px);border-style:dashed;border-color:var(--ink-400);}
+  .layer.us{border:2px solid var(--turf-500);background:linear-gradient(180deg,#fff,var(--turf-50));box-shadow:var(--shadow-soft);}
+  .layer.us .lk{color:var(--turf-700);}
+  .loop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:.9rem;}
+  .loop .node{font-weight:700;padding:.4rem .8rem;border-radius:9px;}
+  .loop .node.tr{background:var(--turf-50);color:var(--turf-800);border:1px solid var(--turf-300);}
+  .loop .node.tk{background:var(--indigo-50);color:var(--indigo-700);border:1px solid #c7d2fe;}
+  .loop .eng{font-family:'JetBrains Mono',monospace;font-size:.82rem;background:var(--ink-900);color:#fff;padding:.4rem .7rem;border-radius:9px;}
+  .loop .arr{color:var(--ink-400);font-weight:700;}
+
+  /* ---------- Draw-in chip trio ---------- */
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media(max-width:720px){.trio{grid-template-columns:1fr;}}
+  .drawchip{border-radius:12px;padding:16px;border:1px solid var(--border);background:#fff;}
+  .drawchip .st{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:.92rem;}
+  .drawchip .why{font-size:.8rem;color:var(--ink-500);margin-top:9px;}
+  .drawchip.in{border-color:var(--turf-300);background:linear-gradient(180deg,#fff,var(--turf-50));}
+  .drawchip.in .st{color:var(--turf-700);}
+  .drawchip.ae{border-color:var(--silk-400);background:linear-gradient(180deg,#fff,var(--silk-50));}
+  .drawchip.ae .st{color:var(--silk-700);}
+  .drawchip.no{border-color:#e2e8f0;background:#fbfbfa;}
+  .drawchip.no .st{color:var(--ink-500);}
+
+  /* ---------- Table ---------- */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-soft);}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:.86rem;background:#fff;}
+  thead th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-400);font-weight:700;padding:12px 16px;border-bottom:1px solid var(--border);background:#fdfdfc;}
+  tbody td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink-600);}
+  tbody tr:last-child td{border-bottom:none;}
+  td.player{color:var(--ink-900);font-weight:700;white-space:nowrap;}
+  tr.us-row{background:var(--turf-50);}
+  tr.us-row td{color:var(--turf-800);}
+  tr.us-row td.player{color:var(--turf-800);}
+
+  /* ---------- Pricing ---------- */
+  .price .amt{font-size:1.9rem;font-weight:800;letter-spacing:-.02em;}
+  .price .per{font-size:.8rem;color:var(--ink-500);font-weight:500;}
+  .price .who{font-size:.8rem;color:var(--ink-500);}
+  .card.featured{border:2px solid var(--turf-500);position:relative;}
+  .tag-top{position:absolute;top:-11px;left:18px;}
+
+  /* ---------- Roadmap ---------- */
+  .road{display:grid;grid-template-columns:repeat(4,1fr);gap:0;align-items:stretch;}
+  .rcol{padding:16px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-soft);border-radius:12px;margin-right:-1px;position:relative;}
+  .rcol.now{border-color:var(--turf-500);background:linear-gradient(180deg,#fff,var(--turf-50));}
+  .rcol .phase{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-400);}
+  .rcol h4{margin-top:5px;font-size:1rem;}
+  .rcol ul{margin-top:11px;display:flex;flex-direction:column;gap:7px;}
+  .rcol li{font-size:.8rem;color:var(--ink-600);display:flex;gap:7px;align-items:flex-start;}
+  .rcol li .b{color:var(--turf-600);font-weight:800;flex:0 0 auto;}
+  @media(max-width:880px){.road{grid-template-columns:1fr;gap:10px;}}
+
+  /* ---------- Use-of-funds bars ---------- */
+  .bars{display:flex;flex-direction:column;gap:14px;}
+  .barrow .top{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.86rem;margin-bottom:6px;}
+  .barrow .top .nm{font-weight:600;color:var(--ink-700);display:flex;align-items:center;gap:8px;}
+  .barrow .track{height:12px;border-radius:9999px;background:#eef0f4;overflow:hidden;}
+  .barrow .fill{height:100%;border-radius:9999px;}
+  .fill.a{background:linear-gradient(90deg,var(--turf-500),var(--turf-600));}
+  .fill.b{background:linear-gradient(90deg,var(--indigo-500),var(--indigo-600));}
+  .fill.c{background:linear-gradient(90deg,var(--silk-400),var(--silk-500));}
+
+  /* ---------- Fixed brand + nav ---------- */
+  .brandmark{position:fixed;top:20px;left:24px;z-index:40;display:flex;align-items:center;gap:10px;}
+  .logo{width:32px;height:32px;border-radius:9px;background:var(--ink-900);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .flag-svg{width:16px;height:16px;display:block;}
+  .wordmark{font-weight:700;letter-spacing:-.02em;font-size:1rem;}
+  .sublabel{font-size:.66rem;color:var(--ink-400);font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-left:2px;}
+  .slide.dark ~ .brandmark .wordmark{color:var(--ink-900);}
+
+  .deck-nav{position:fixed;right:22px;bottom:22px;z-index:40;display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.86);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:9999px;padding:5px 8px;box-shadow:var(--shadow-soft);}
+  .deck-nav button{width:30px;height:30px;border-radius:9999px;border:1px solid var(--border);background:#fff;color:var(--ink-600);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+  .deck-nav button:hover:not(:disabled){background:var(--ink-900);color:#fff;border-color:var(--ink-900);}
+  .deck-nav button:disabled{opacity:.35;cursor:default;}
+  .deck-nav #counter{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--ink-600);min-width:52px;text-align:center;font-weight:500;}
+
+  .hint{position:fixed;bottom:26px;left:24px;z-index:40;font-size:.72rem;color:var(--ink-400);display:flex;align-items:center;gap:6px;}
+  .hint .kbd{font-family:'JetBrains Mono',monospace;font-size:.66rem;padding:.08rem .3rem;border:1px solid var(--border);border-radius:5px;background:#fff;color:var(--ink-500);}
+  @media(max-width:640px){.hint{display:none;}}
+
+  /* ---------- Footer strip (slide 12) ---------- */
+  .footstrip{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:26px;padding-top:18px;border-top:1px solid rgba(148,163,184,.3);font-size:.85rem;}
+  .footstrip a{color:var(--ink-400);display:inline-flex;align-items:center;gap:6px;}
+  .footstrip a:hover{color:#fff;}
+  .contact{font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--turf-300);}
+
+  .kicker-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+</style>
+</head>
+<body>
+
+<!-- ===== Fixed brand ===== -->
+<div class="brandmark">
+  <span class="logo" aria-hidden="true">
+    <svg class="flag-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 3v18" stroke="#6ee7b7" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M6 4.2c3.2-1.6 5.8 1.2 9 -.2v7.4c-3.2 1.4-5.8-1.4-9 .2z" fill="#6ee7b7"/>
+    </svg>
+  </span>
+  <span class="wordmark">PostParade<span class="sublabel">Pre-seed</span></span>
+</div>
+
+<!-- =========================================================== -->
+<!-- SLIDE 1 — Title -->
+<!-- =========================================================== -->
+<section class="slide hero" id="s1">
+  <div class="inner" style="text-align:center;">
+    <div style="display:flex;justify-content:center;margin-bottom:22px;">
+      <span class="logo" style="width:56px;height:56px;border-radius:15px;" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;">
+          <path d="M6 3v18" stroke="#6ee7b7" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M6 4.2c3.2-1.6 5.8 1.2 9 -.2v7.4c-3.2 1.4-5.8-1.4-9 .2z" fill="#6ee7b7"/>
+        </svg>
+      </span>
+    </div>
+    <div class="pill turf" style="display:inline-flex;margin-bottom:16px;"><span class="dot" style="background:var(--turf-500);"></span>Pre-seed · 2026</div>
+    <h1 style="font-size:3rem;font-weight:800;letter-spacing:-.03em;line-height:1.02;">PostParade</h1>
+    <p class="lead" style="margin:18px auto 0;font-size:1.22rem;color:var(--ink-600);max-width:40ch;">
+      The placement layer for horse racing — <span class="em">every horse in the right race, every race filled.</span>
+    </p>
+    <div style="margin-top:34px;font-size:.95rem;color:var(--ink-500);">
+      <span style="font-weight:700;color:var(--ink-900);">Phil Bueschel</span> · Founder
+      <span style="color:var(--ink-400);"> &nbsp;·&nbsp; </span> phillip.bueschel@gmail.com
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 2 — Problem (trainer side) -->
+<!-- =========================================================== -->
+<section class="slide" id="s2">
+  <div class="inner">
+    <div class="eyebrow">The problem · Trainer side</div>
+    <h2 class="stitle">Placing one horse is a manual afternoon.</h2>
+    <p class="lead">A trainer's core weekly job — finding the right race for each horse — still runs on static PDFs, hand-done eligibility math, and morning phone calls.</p>
+
+    <div class="g2 mt">
+      <div class="card">
+        <ul class="x-list">
+          <li><span class="xm">✕</span><span>Condition books arrive as <strong>static PDFs</strong> on a rolling 2–3 week cycle — nothing matches <em>your</em> horses to them.</span></li>
+          <li><span class="xm">✕</span><span>Eligibility is <strong>error-prone math</strong>: non-winners ladders (which wins count for N1X vs N2X), state-bred restrictions, preference dates, vet's-list status.</span></li>
+          <li><span class="xm">✕</span><span>Placing a single horse well can take <strong>the better part of an afternoon</strong>.</span></li>
+          <li><span class="xm">✕</span><span>Recruiting a mount or a spot is <strong>phone and text</strong>, in a narrow morning window.</span></li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;justify-content:center;">
+        <div class="card turf-tint">
+          <div class="stat"><div class="big">~3 hrs</div><div class="lbl">per horse, per week — reading books, cross-checking eligibility, comparing purse value</div></div>
+        </div>
+        <div class="card">
+          <div class="stat"><div class="big">1 missed tier</div><div class="lbl">A single overlooked preference date and the entry doesn't draw in — the work is wasted</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 3 — Problem (track side) -->
+<!-- =========================================================== -->
+<section class="slide" id="s3">
+  <div class="inner">
+    <div class="eyebrow ind">The problem · Track side</div>
+    <h2 class="stitle">The racing office lives or dies by field size.</h2>
+    <p class="lead">A racing secretary's job is to <em>fill the card</em>. Field size drives handle, handle drives the whole business — and the tools to fill are a phone and a spreadsheet.</p>
+
+    <div class="g2 mt">
+      <div class="card ind-tint">
+        <ul class="checks">
+          <li><span aria-hidden="true">▸</span><span><strong>Field size drives handle</strong> — more runners means more bet combinations, so average field size is the office's primary KPI.</span></li>
+          <li><span aria-hidden="true">▸</span><span><strong>Short fields get cancelled.</strong> A race that doesn't fill (min ~6–8) is dropped, and the day loses a betting opportunity.</span></li>
+          <li><span aria-hidden="true">▸</span><span><strong>Recruitment is a liaison making calls</strong> — a recruiter dialing trainers and agents to coax entries into slow races.</span></li>
+          <li><span aria-hidden="true">▸</span><span><strong>Incentives run on paper.</strong> Ship &amp; Win checks are administered by spreadsheet and word of mouth.</span></li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;justify-content:center;">
+        <div class="card">
+          <div class="stat"><div class="big" style="color:var(--indigo-600);">Handle ∝ field</div><div class="lbl">Every empty stall in a race is lost wagering revenue for the meet</div></div>
+        </div>
+        <div class="card ind-tint">
+          <div class="stat"><div class="big">$$$ checks</div><div class="lbl">Tracks already pay real money — Ship &amp; Win appearance checks — just to get horses to show up</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 4 — The insight -->
+<!-- =========================================================== -->
+<section class="slide" id="s4">
+  <div class="inner">
+    <div class="eyebrow">The insight</div>
+    <h2 class="stitle">One matching problem, seen from two sides.</h2>
+    <p class="lead">The trainer asking "where does this horse fit?" and the office asking "who fits this race?" are the same computation. One <code>score(horse, race)</code> engine powers both directions.</p>
+
+    <div class="loop">
+      <span class="node tr">Trainer · Submit</span>
+      <span class="arr">⇄</span>
+      <span class="eng">score(horse, race)</span>
+      <span class="arr">⇄</span>
+      <span class="node tk">Track · Request</span>
+    </div>
+
+    <div class="mt" style="font-size:.82rem;color:var(--ink-500);margin-bottom:10px;font-weight:600;">
+      Nobody owns the middle layer:
+    </div>
+    <div class="tbl-wrap" style="border:none;box-shadow:none;overflow-x:auto;">
+      <div class="layer-row">
+        <div class="layer ext">
+          <div class="lk">Data of record</div>
+          <div class="ln">Equibase</div>
+          <div class="ld">Charts, past performances, codes. The official data layer — no workflow.</div>
+        </div>
+        <div class="layer ext">
+          <div class="lk">The racing office</div>
+          <div class="ln">InCompass</div>
+          <div class="ld">Track Manager / racing-office system of record. Runs the office — no matching.</div>
+        </div>
+        <div class="layer us">
+          <div class="lk">The matching layer</div>
+          <div class="ln">PostParade</div>
+          <div class="ld">Eligibility + fit + draw-in, both directions. The empty seat between data and office.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:18px;border-left:3px solid var(--turf-500);background:var(--turf-50);border-radius:0 10px 10px 0;padding:13px 16px;font-size:.9rem;color:var(--turf-800);">
+      We <span style="font-weight:700;">sit beside</span> Equibase and InCompass — importing their data, not replacing the office of record. The matching layer is greenfield.
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 5 — The product -->
+<!-- =========================================================== -->
+<section class="slide" id="s5">
+  <div class="inner">
+    <div class="kicker-row">
+      <div class="eyebrow">The product</div>
+      <span class="pill turf">Live demo today</span>
+    </div>
+    <h2 class="stitle">A working demo, not slideware.</h2>
+    <p class="lead">The engine, data model, and both workspaces already run end-to-end on realistic Churchill Downs sample data.</p>
+
+    <div class="g2 mt">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Race builder + who-fits ranking</h3>
+        <p>The office builds a race from real conditions; the engine instantly ranks eligible, not-yet-entered horses by fit and acceptance likelihood.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Trainer recs with "why this fits"</h3>
+        <p>For each horse, ranked open races with a plain-language rationale — class drop, surface/distance match, speed vs. par.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>The Submit ⇄ Request loop</h3>
+        <p>Trainer submits a horse to a race; office requests a horse for a race. The two-party handshake the morning phone calls do today.</p>
+      </div>
+      <div class="card">
+        <div class="num">04</div>
+        <h3>Ship &amp; Win as real eligibility</h3>
+        <p>Modeled as a stackable supplement program with true predicates (ship distance, out-of-state, stakes excluded) — not a cosmetic badge.</p>
+      </div>
+    </div>
+
+    <div class="mt-sm" style="margin-top:22px;">
+      <a href="./app.html" class="pill dark" style="font-size:.86rem;padding:.6rem 1rem;">Open the live demo →</a>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 6 — The differentiator -->
+<!-- =========================================================== -->
+<section class="slide" id="s6">
+  <div class="inner">
+    <div class="eyebrow amb">The differentiator</div>
+    <h2 class="stitle">Draw-in probability.</h2>
+    <p class="lead">A trainer's real anxiety isn't "is there a race" — it's <span class="em">"will my horse actually draw in?"</span> Getting into an oversubscribed race is preference-ranked, not first-come. Nobody computes this for them.</p>
+
+    <p class="muted" style="font-size:.85rem;margin-top:20px;margin-bottom:10px;font-weight:600;">
+      We model the preference system (date / stars) + field cap + also-eligibles → a straight answer:
+    </p>
+    <div class="trio">
+      <div class="drawchip in">
+        <div class="st"><span class="dot" style="background:var(--turf-500);"></span>Likely draws in</div>
+        <div class="why">Recent-enough preference date, field projected under the cap. Enter with confidence.</div>
+      </div>
+      <div class="drawchip ae">
+        <div class="st"><span class="dot" style="background:var(--silk-400);"></span>Likely also-eligible</div>
+        <div class="why">On the bubble — projected over the cap. Enter as an AE and wait on scratches, or find a softer spot.</div>
+      </div>
+      <div class="drawchip no">
+        <div class="st"><span class="dot" style="background:var(--ink-400);"></span>Unlikely</div>
+        <div class="why">Stale preference date against a full field. Don't waste the entry — the engine points to a better race.</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:20px;border-left:3px solid var(--silk-500);background:var(--silk-50);border-radius:0 10px 10px 0;padding:13px 16px;font-size:.9rem;color:var(--silk-700);">
+      Eligibility answers <em>can</em> this horse enter. Draw-in probability answers <em>will</em> it — the question every trainer actually asks, and the signal no existing tool provides.
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 7 — Why now -->
+<!-- =========================================================== -->
+<section class="slide" id="s7">
+  <div class="inner">
+    <div class="eyebrow">Why now</div>
+    <h2 class="stitle">Racing is still phone + PDF while every adjacent market got a marketplace.</h2>
+    <p class="lead">Four forces are converging to make placement worth automating right now.</p>
+
+    <div class="g4 mt">
+      <div class="card pad-sm">
+        <div class="pill amb" style="margin-bottom:9px;">Regulation</div>
+        <h4>HISA-era admin</h4>
+        <p>Federalized medication + vet-list rules add compliance weight to every entry — more to check, more to get wrong.</p>
+      </div>
+      <div class="card pad-sm">
+        <div class="pill turf" style="margin-bottom:9px;">Supply</div>
+        <h4>Shrinking foal crop</h4>
+        <p>Fewer horses in training means every single entry matters more — to trainers filling a calendar and offices filling a card.</p>
+      </div>
+      <div class="card pad-sm">
+        <div class="pill red" style="margin-bottom:9px;">Pain</div>
+        <h4>Short-field crisis</h4>
+        <p>Underfilled and cancelled races are a running theme in industry press — the office's core problem is getting louder.</p>
+      </div>
+      <div class="card pad-sm">
+        <div class="pill ind" style="margin-bottom:9px;">Budget</div>
+        <h4>Tracks pay to fill</h4>
+        <p>Ship &amp; Win checks prove tracks already spend real money to attract starters — there's a live budget for solving this.</p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:.85rem;margin-top:22px;">Meanwhile UK/AUS racing is already digital-first — validation that the workflow can move online, not a competitor in our market.</p>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 8 — Market -->
+<!-- =========================================================== -->
+<section class="slide" id="s8">
+  <div class="inner">
+    <div class="kicker-row">
+      <div class="eyebrow">Market</div>
+      <span class="edit">All figures [EDIT — verify]</span>
+    </div>
+    <h2 class="stitle">A two-sided market nobody has wired up.</h2>
+    <p class="lead">Sizing is placeholder pending diligence — the shape is a trainer-subscription business layered on per-meet track SaaS.</p>
+
+    <div class="g3 mt">
+      <div class="card">
+        <div class="num">Supply of races</div>
+        <div class="stat" style="margin-top:6px;"><div class="big">~N tracks <span class="edit">EDIT</span></div><div class="lbl">US Thoroughbred tracks running <strong>~40k+ races/yr</strong> <span class="edit">EDIT — verify</span></div></div>
+      </div>
+      <div class="card">
+        <div class="num">Demand side</div>
+        <div class="stat" style="margin-top:6px;"><div class="big">~X trainers <span class="edit">EDIT</span></div><div class="lbl">Licensed US trainers actively placing horses <span class="edit">EDIT — verify</span></div></div>
+      </div>
+      <div class="card turf-tint">
+        <div class="num">SAM</div>
+        <div class="stat" style="margin-top:6px;"><div class="big">$ <span class="edit">EDIT</span></div><div class="lbl">Trainer subscriptions + per-meet track SaaS <span class="edit">EDIT — verify</span></div></div>
+      </div>
+    </div>
+
+    <div class="card mt" style="margin-top:20px;">
+      <h4>Expansion paths</h4>
+      <div class="g3" style="margin-top:12px;gap:12px;">
+        <div style="font-size:.85rem;color:var(--ink-600);"><strong>Owners</strong> — guest access across their trainers; portfolio &amp; approvals. <span class="edit">EDIT</span></div>
+        <div style="font-size:.85rem;color:var(--ink-600);"><strong>Jockey agents</strong> — the third party in every placement call. <span class="edit">EDIT</span></div>
+        <div style="font-size:.85rem;color:var(--ink-600);"><strong>International</strong> — UK/AUS already digital = a proven pattern, not competition. <span class="edit">EDIT</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 9 — Competitive landscape -->
+<!-- =========================================================== -->
+<section class="slide" id="s9">
+  <div class="inner">
+    <div class="eyebrow">Competitive landscape</div>
+    <h2 class="stitle">The matching layer is empty.</h2>
+    <p class="lead">Every adjacent tool owns data, the office, or the barn — none does two-sided placement. Phone + text is the real incumbent.</p>
+
+    <div class="tbl-wrap mt">
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>What they own</th>
+            <th>The gap</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- R1-PATCH: competitor rows — patched from the July 2026 13-agent competitive research sweep (docs/research-competitive.md) -->
+          <tr>
+            <td class="player">InCompass <span style="opacity:.6">(The Jockey Club)</span></td>
+            <td>Racing-office system of record at ~90 tracks (Track Manager/RTO) + per-track trainer portal (IRO)</td>
+            <td>Legacy office UI; entry filter shows no "why"; no cross-track view, no draw-in, no recruitment tooling</td>
+          </tr>
+          <tr>
+            <td class="player">Equibase <span style="opacity:.6">(TJC)</span></td>
+            <td>Data of record + free Virtual Stable alerts; distributes condition books as PDFs for ~65 tracks</td>
+            <td>Alerts say "your horse worked," never "a race your horse fits appeared" — data, not decisions</td>
+          </tr>
+          <tr>
+            <td class="player">Trainer race-search tools <span style="opacity:.6">(TLore — acquired by InCompass 7/2024, Race Trackr, equineline)</span></td>
+            <td>Filter-based condition-book search, $10–125/mo</td>
+            <td>Zero of them compute per-horse eligibility or draw-in — the trainer still does the math by hand</td>
+          </tr>
+          <tr>
+            <td class="player">UK &amp; Australia national systems</td>
+            <td>Fully digital entries/declarations (BHA since 2018; Stable Assist used by 75%+ of AU trainers)</td>
+            <td>Purely transactional — they prove the workflow digitizes, and that race <em>finding</em> is unowned worldwide</td>
+          </tr>
+          <tr>
+            <td class="player">Phone &amp; text</td>
+            <td>The actual incumbent: the office board, the backside PA, and 24 hours of calls to fill a card</td>
+            <td>Ship &amp; Win-class money ($5k checks + 50% bonuses) spent via press release and phone tree</td>
+          </tr>
+          <!-- /R1-PATCH: competitor rows -->
+          <tr class="us-row">
+            <td class="player">PostParade</td>
+            <td>Two-sided matching: eligibility + fit + draw-in, Submit ⇄ Request</td>
+            <td>— the empty layer, filled</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="font-size:.8rem;margin-top:14px;">Fact-checked July 2026 across 13 research passes — full matrix and sources: <a href="./features.html" style="color:inherit">features.html</a> &amp; docs/research-competitive.md. Strategic note: TJC now owns the office, the data, <em>and</em> trainer stable management (TLore) — the independent matching layer's window is now.</p>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 10 — Business model -->
+<!-- =========================================================== -->
+<section class="slide" id="s10">
+  <div class="inner">
+    <div class="eyebrow">Business model</div>
+    <h2 class="stitle">Land one track, activate its circuit.</h2>
+    <p class="lead">Trainer subscriptions scale with stable size; the racing office pays per meet. One anchor track pulls in its circuit's trainers — a two-sided network that compounds per meet.</p>
+
+    <div class="g3 mt">
+      <div class="card price">
+        <div class="who">Independent trainer</div>
+        <div style="margin-top:6px;"><span class="amt">$200</span> <span class="per">/ month</span></div>
+        <div class="who" style="margin-top:2px;">Up to 15 horses · one circuit</div>
+        <ul class="checks" style="margin-top:12px;">
+          <li><span aria-hidden="true" style="color:var(--turf-600);font-weight:800;">✓</span><span>All trainer features</span></li>
+          <li><span aria-hidden="true" style="color:var(--turf-600);font-weight:800;">✓</span><span>Ranked spots + draw-in odds</span></li>
+        </ul>
+      </div>
+      <div class="card price featured">
+        <span class="pill turf tag-top">Most popular</span>
+        <div class="who">Mid-size stable</div>
+        <div style="margin-top:6px;"><span class="amt">$600</span> <span class="per">/ month</span></div>
+        <div class="who" style="margin-top:2px;">Up to 60 horses · multi-circuit</div>
+        <ul class="checks" style="margin-top:12px;">
+          <li><span aria-hidden="true" style="color:var(--turf-600);font-weight:800;">✓</span><span>Everything in Trainer</span></li>
+          <li><span aria-hidden="true" style="color:var(--turf-600);font-weight:800;">✓</span><span>Owner workspace + alerts</span></li>
+        </ul>
+      </div>
+      <div class="card price ind-tint">
+        <div class="who">Racing office</div>
+        <div style="margin-top:6px;"><span class="amt">Custom</span> <span class="per">/ meet</span></div>
+        <div class="who" style="margin-top:2px;">The anchor that lights up the circuit</div>
+        <ul class="checks" style="margin-top:12px;">
+          <li><span aria-hidden="true" style="color:var(--indigo-600);font-weight:800;">✓</span><span>Card-fill dashboard + outreach</span></li>
+          <li><span aria-hidden="true" style="color:var(--indigo-600);font-weight:800;">✓</span><span>Ship &amp; Win administration</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:22px;border-left:3px solid var(--indigo-600);background:var(--indigo-50);border-radius:0 10px 10px 0;padding:13px 16px;font-size:.9rem;color:var(--indigo-700);">
+      <span style="font-weight:700;">Land-and-expand:</span> sign one racing office, and every trainer who ships to that meet has a reason to be on the platform. The network is two-sided <em>per meet</em>.
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 11 — Roadmap -->
+<!-- =========================================================== -->
+<section class="slide" id="s11">
+  <div class="inner">
+    <div class="eyebrow">Roadmap</div>
+    <h2 class="stitle">From demo to platform.</h2>
+    <p class="lead">A staged path — client-side proof today, one live pilot meet next, then the circuit, then the platform.</p>
+
+    <div class="road mt">
+      <div class="rcol now">
+        <div class="phase">Now</div>
+        <h4>Client demo</h4>
+        <ul>
+          <li><span class="b">›</span>Engine + data model live</li>
+          <li><span class="b">›</span>Both workspaces, Submit ⇄ Request</li>
+          <li><span class="b">›</span>Ship &amp; Win + draw-in modeled</li>
+        </ul>
+      </div>
+      <div class="rcol">
+        <div class="phase">Next</div>
+        <h4>Pilot meet</h4>
+        <ul>
+          <li><span class="b">›</span>Lightweight backend (shared state)</li>
+          <li><span class="b">›</span>1 anchor track + its trainers</li>
+          <li><span class="b">›</span>Real condition books, real entries</li>
+        </ul>
+      </div>
+      <div class="rcol">
+        <div class="phase">Then</div>
+        <h4>Circuit</h4>
+        <ul>
+          <li><span class="b">›</span>Multi-track circuit navigation</li>
+          <li><span class="b">›</span>Equibase data ingestion</li>
+          <li><span class="b">›</span>Notifications (entry-close, requests)</li>
+        </ul>
+      </div>
+      <div class="rcol">
+        <div class="phase">Platform</div>
+        <h4>Expand</h4>
+        <ul>
+          <li><span class="b">›</span>Owner guest access</li>
+          <li><span class="b">›</span>Jockey agents</li>
+          <li><span class="b">›</span>InCompass interop</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== -->
+<!-- SLIDE 12 — The ask -->
+<!-- =========================================================== -->
+<section class="slide dark" id="s12">
+  <div class="inner">
+    <div class="kicker-row">
+      <div class="eyebrow mut">The ask</div>
+      <span class="edit">All figures [EDIT — verify]</span>
+    </div>
+    <h2 class="stitle" style="color:#fff;">Raising <span style="color:var(--turf-300);">$500k pre-seed</span> <span class="edit">EDIT</span></h2>
+    <p class="lead">To take the demo to one live pilot meet, license real data, and prove a fill-rate lift.</p>
+
+    <div class="g2 mt" style="align-items:start;">
+      <div>
+        <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-400);margin-bottom:14px;">Use of funds <span class="edit">EDIT — placeholder %</span></div>
+        <div class="bars">
+          <div class="barrow">
+            <div class="top"><span class="nm">Product &amp; pilot build</span><span class="mono" style="color:var(--turf-300);font-size:.8rem;">50% <span class="edit">EDIT</span></span></div>
+            <div class="track"><div class="fill a" style="width:50%;"></div></div>
+          </div>
+          <div class="barrow">
+            <div class="top"><span class="nm">Data licensing (Equibase / condition feeds)</span><span class="mono" style="color:#a5b4fc;font-size:.8rem;">30% <span class="edit">EDIT</span></span></div>
+            <div class="track"><div class="fill b" style="width:30%;"></div></div>
+          </div>
+          <div class="barrow">
+            <div class="top"><span class="nm">Ops &amp; runway</span><span class="mono" style="color:var(--silk-400);font-size:.8rem;">20% <span class="edit">EDIT</span></span></div>
+            <div class="track"><div class="fill c" style="width:20%;"></div></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-400);margin-bottom:14px;">Milestones to seed</div>
+        <ul class="checks">
+          <li><span aria-hidden="true" style="color:var(--turf-300);font-weight:800;">✓</span><span style="color:#e5e7eb;">1 pilot meet live — anchor track + its circuit's trainers</span></li>
+          <li><span aria-hidden="true" style="color:var(--turf-300);font-weight:800;">✓</span><span style="color:#e5e7eb;"><span class="edit">EDIT N</span> trainers weekly-active</span></li>
+          <li><span aria-hidden="true" style="color:var(--turf-300);font-weight:800;">✓</span><span style="color:#e5e7eb;">Measurable <span class="edit">EDIT</span> fill-rate lift at the pilot track</span></li>
+          <li><span aria-hidden="true" style="color:var(--turf-300);font-weight:800;">✓</span><span style="color:#e5e7eb;">Engine validated against real condition books</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:26px;font-size:1rem;">
+      <span style="color:var(--ink-400);">Let's talk —</span> <a class="contact" href="mailto:phillip.bueschel@gmail.com">phillip.bueschel@gmail.com</a>
+    </div>
+
+    <div class="footstrip">
+      <a href="./index.html">Home</a>
+      <a href="./app.html">Live demo</a>
+      <a href="./architecture.html">Architecture</a>
+      <a href="./features.html">Features</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Fixed nav ===== -->
+<div class="hint"><span class="kbd">↑</span><span class="kbd">↓</span> or <span class="kbd">Space</span> to navigate</div>
+<nav class="deck-nav" aria-label="Slide navigation">
+  <button id="prev" aria-label="Previous slide">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
+  <span id="counter">1 / 12</span>
+  <button id="next" aria-label="Next slide">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+</nav>
+
+<script>
+  (function () {
+    'use strict';
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var total = slides.length;
+    var counter = document.getElementById('counter');
+    var prev = document.getElementById('prev');
+    var next = document.getElementById('next');
+    var current = 0;
+
+    function setCurrent(i) {
+      current = i;
+      counter.textContent = (i + 1) + ' / ' + total;
+      prev.disabled = (i === 0);
+      next.disabled = (i === total - 1);
+    }
+    function go(i) {
+      i = Math.max(0, Math.min(total - 1, i));
+      slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Track the visible slide to keep the counter + button states in sync.
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            var i = slides.indexOf(e.target);
+            if (i >= 0) setCurrent(i);
+          }
+        });
+      }, { threshold: 0.55 });
+      slides.forEach(function (s) { io.observe(s); });
+    }
+
+    prev.addEventListener('click', function () { go(current - 1); });
+    next.addEventListener('click', function () { go(current + 1); });
+
+    window.addEventListener('keydown', function (e) {
+      var k = e.key;
+      if (k === 'ArrowDown' || k === 'PageDown' || k === ' ' || k === 'Spacebar') {
+        e.preventDefault(); go(current + 1);
+      } else if (k === 'ArrowUp' || k === 'PageUp') {
+        e.preventDefault(); go(current - 1);
+      } else if (k === 'Home') {
+        e.preventDefault(); go(0);
+      } else if (k === 'End') {
+        e.preventDefault(); go(total - 1);
+      }
+    });
+
+    setCurrent(0);
+  })();
+</script>
+</body>
+</html>

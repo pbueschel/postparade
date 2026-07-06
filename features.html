@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PostParade — Competitive Feature Recommendations</title>
+<meta name="description" content="What every adjacent racing software product does, what none of them do, and the features that make PostParade the preferred platform for trainers and tracks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink-900:#0b1220; --ink-600:#2a3447; --ink-500:#475569; --ink-400:#94a3b8;
+    --turf-700:#047857; --turf-600:#059669; --turf-500:#10b981; --turf-50:#ecfdf5; --turf-300:#6ee7b7;
+    --silk-500:#d97706; --silk-400:#f59e0b; --silk-50:#fffbeb;
+    --indigo:#4f46e5; --indigo-50:#eef2ff;
+    --card-border:#eef0f4; --bg:#fbfaf7;
+    --shadow:0 8px 24px -12px rgba(15,23,42,.08);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink-900); font-family:'Inter',system-ui,-apple-system,sans-serif;
+         font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  .mono { font-family:'JetBrains Mono',ui-monospace,monospace; }
+  .wrap { max-width:1100px; margin:0 auto; padding:0 20px; }
+  header.site { position:sticky; top:0; z-index:20; background:rgba(251,250,247,.92); backdrop-filter:blur(8px);
+                border-bottom:1px solid var(--card-border); }
+  .site-inner { display:flex; align-items:center; justify-content:space-between; padding:12px 0; gap:12px; flex-wrap:wrap; }
+  .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+  .logo-mark { width:32px; height:32px; border-radius:8px; background:var(--ink-900); display:flex; align-items:center; justify-content:center; }
+  .logo-word { font-weight:600; letter-spacing:-.01em; }
+  .logo-sub { font-size:12px; color:var(--ink-400); border-left:1px solid var(--card-border); padding-left:10px; margin-left:2px; }
+  nav.site-nav { display:flex; gap:14px; font-size:13px; flex-wrap:wrap; }
+  nav.site-nav a { color:var(--ink-500); text-decoration:none; }
+  nav.site-nav a:hover { color:var(--ink-900); }
+  main { padding:40px 0 24px; }
+  h1 { font-size:clamp(26px,4vw,36px); letter-spacing:-.02em; line-height:1.15; font-weight:700; }
+  h2 { font-size:22px; letter-spacing:-.01em; margin:0 0 4px; font-weight:650; }
+  h3 { font-size:16px; font-weight:600; }
+  .lede { color:var(--ink-500); max-width:760px; margin-top:10px; }
+  section { margin:44px 0; }
+  .kicker { font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--turf-600); font-weight:600; margin-bottom:6px; }
+  .sub { color:var(--ink-500); font-size:14px; margin-bottom:18px; max-width:760px; }
+  .card { background:#fff; border:1px solid var(--card-border); border-radius:14px; box-shadow:var(--shadow); }
+  .pill { display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border-radius:999px; font-size:12px; font-weight:500; white-space:nowrap; }
+  .pill.green { background:var(--turf-50); color:var(--turf-700); }
+  .pill.amber { background:var(--silk-50); color:var(--silk-500); }
+  .pill.indigo { background:var(--indigo-50); color:var(--indigo); }
+  .pill.gray { background:#f1f5f9; color:var(--ink-500); }
+  .pill.dark { background:var(--ink-900); color:#fff; }
+  a.pill { text-decoration:none; }
+  a.pill.green:hover { background:#d1fae5; }
+  /* headline stats */
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:22px; }
+  .stat { padding:18px; }
+  .stat .n { font-size:26px; font-weight:700; letter-spacing:-.02em; }
+  .stat .d { font-size:13px; color:var(--ink-500); margin-top:4px; }
+  /* matrix table */
+  .scroller { overflow-x:auto; border-radius:14px; }
+  table.matrix { border-collapse:collapse; width:100%; min-width:920px; background:#fff; font-size:13.5px; }
+  table.matrix th, table.matrix td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--card-border); vertical-align:top; }
+  table.matrix thead th { background:#f8fafc; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-500); position:sticky; top:0; }
+  table.matrix td:first-child { font-weight:600; white-space:nowrap; }
+  table.matrix .cat { color:var(--ink-400); font-size:12px; display:block; font-weight:400; }
+  /* feature cards */
+  .feat { padding:20px 22px; margin-bottom:14px; }
+  .feat-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .feat h3 { display:flex; align-items:center; gap:8px; }
+  .feat .why { color:var(--ink-500); font-size:14px; margin-top:8px; max-width:820px; }
+  .feat .beats { margin-top:10px; font-size:13px; color:var(--ink-600); }
+  .feat .beats b { color:var(--ink-900); }
+  .prio { font-family:'JetBrains Mono',monospace; font-size:11px; padding:2px 7px; border-radius:6px; background:var(--ink-900); color:var(--turf-300); }
+  .prio.p1 { background:#334155; color:#fde68a; }
+  .prio.p2 { background:#e2e8f0; color:var(--ink-600); }
+  /* quotes */
+  .quotes { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+  blockquote { padding:18px 20px; font-size:14px; }
+  blockquote p { font-style:italic; color:var(--ink-600); }
+  blockquote footer { margin-top:10px; font-size:12px; color:var(--ink-400); font-style:normal; }
+  .divider-label { display:flex; align-items:center; gap:14px; margin:34px 0 18px; }
+  .divider-label:before, .divider-label:after { content:""; flex:1; border-top:1px dashed #d7dbe3; }
+  .divider-label span { font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-400); }
+  footer.site { border-top:1px solid var(--card-border); margin-top:56px; padding:26px 0 40px; font-size:13px; color:var(--ink-500); }
+  .foot-inner { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .foot-inner a { color:var(--ink-600); text-decoration:none; margin-right:14px; }
+  .foot-inner a:hover { color:var(--ink-900); }
+  .note { font-size:12.5px; color:var(--ink-400); }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0e1420; --ink-900:#eef2f8; --ink-600:#c3ccda; --ink-500:#93a1b5; --ink-400:#64748b;
+            --card-border:#232c3d; --shadow:0 8px 24px -12px rgba(0,0,0,.5); }
+    body { background:var(--bg); }
+    .card, table.matrix { background:#141c2b; }
+    table.matrix thead th { background:#101724; }
+    header.site { background:rgba(14,20,32,.92); }
+    .pill.gray { background:#1e293b; color:#93a1b5; }
+    .pill.green { background:rgba(16,185,129,.12); color:#34d399; }
+    .pill.amber { background:rgba(245,158,11,.12); color:#fbbf24; }
+    .pill.indigo { background:rgba(99,102,241,.15); color:#a5b4fc; }
+    .prio.p2 { background:#1e293b; color:#93a1b5; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap site-inner">
+    <a class="logo" href="./index.html">
+      <span class="logo-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+      <span class="logo-word">PostParade</span>
+      <span class="logo-sub">Feature recommendations</span>
+    </a>
+    <nav class="site-nav">
+      <a href="./index.html">Home</a>
+      <a href="./app.html">Live demo</a>
+      <a href="./architecture.html">Architecture</a>
+      <a href="./pitch.html">Pitch deck</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="kicker">Competitive research · July 2026</div>
+  <h1>What the incumbents do, what none of them do,<br>and what we build because of it.</h1>
+  <p class="lede">Thirteen parallel research passes covered the racing-office incumbent (InCompass), the data
+  incumbent (Equibase), every trainer-side tool we could find, the UK and Australian national systems, incentive
+  programs, jockey tooling, and two-sided-marketplace analogs — then an adversarial fact-check pass verified the
+  load-bearing claims. This page is the synthesis: a market map, the pain points in trainers' own words, and a
+  prioritized feature roadmap. Features marked <span class="pill green">In the demo</span> are live —
+  click through and try them.</p>
+
+  <div class="stats">
+    <div class="card stat"><div class="n">0</div><div class="d">products that compute per-horse race eligibility — every tool is filter-search; the trainer still does the math</div></div>
+    <div class="card stat"><div class="n">0</div><div class="d">products that model draw-in or "will this race go" probability — in any racing jurisdiction, worldwide</div></div>
+    <div class="card stat"><div class="n">0</div><div class="d">recruitment tools for racing secretaries — the state of the art is a whiteboard, a PA system, and 24 hours of phone calls</div></div>
+    <div class="card stat"><div class="n">7.40</div><div class="d">US average field size (2023, Jockey Club) — and 10 starters ≈ +43% handle vs 6 ≈ −58%. The money to fix this already exists</div></div>
+  </div>
+
+  <!-- ============================ MARKET MAP ============================ -->
+  <section id="matrix">
+    <h2>The market map</h2>
+    <p class="sub">Every researched product, and where PostParade overlaps. The pattern: the Jockey Club
+    (TJC Innovations) now owns the racing office (Track Manager), the data of record (Equibase), <em>and</em> —
+    since acquiring TLore in July 2024 — trainer stable management. The two-sided <b>matching layer</b> between
+    trainer and track remains unowned. That's the wedge.</p>
+    <div class="card scroller">
+      <table class="matrix">
+        <thead><tr><th>Product</th><th>Audience</th><th>Strong at</th><th>Missing (our wedge)</th><th>Pricing</th></tr></thead>
+        <tbody>
+          <tr><td>InCompass Track Manager / RTO<span class="cat">Jockey Club · office system of record</span></td><td>Racing offices (~90 tracks)</td><td>Condition-book authoring, entries, draw, overnights, stalls, 12 regulatory lists, purse accounting</td><td>Legacy IE-era UI; no recruitment tooling; no fill forecast; no matching</td><td>B2B, unpublished</td></tr>
+          <tr><td>InCompass IRO<span class="cat">trainer portal on RTO</span></td><td>Trainers (per-track opt-in)</td><td>Online entries, stall apps, stakes noms, rundown counts, list warnings</td><td>Per-track silo; condition filter with no "why"; no cross-track view; no draw-in</td><td>Free where enabled</td></tr>
+          <tr><td>Equibase ecosystem<span class="cat">data of record + Virtual Stable</span></td><td>Trainers, owners, bettors</td><td>Free alerts on ~200 watched horses; condition-book/overnight distribution (~65 tracks)</td><td>PDFs unstructured; alerts entity-centric, email-only; never "a race your horse fits appeared"</td><td>Core free</td></tr>
+          <tr><td>TLore<span class="cat">acquired by InCompass 7/2024</span></td><td>Trainers</td><td>Stable mgmt + billing + InCompass-maintained condition-book search; TJC/HISA sync</td><td>Filter search, not eligibility math; no draw-in; no track side</td><td>$4/horse/mo + $150/mo data</td></tr>
+          <tr><td>Race Trackr<span class="cat">condition-book search</span></td><td>Trainers</td><td>First searchable national condition book; save/assign/calendar planning UX</td><td>No per-horse eligibility; continuity questionable ("Coming Soon" site)</td><td>$125/mo</td></tr>
+          <tr><td>equineline Trainer Program<span class="cat">Jockey Club</span></td><td>Trainers</td><td>Interactive condition book + day-rate billing</td><td>Filter search only</td><td>$29.95/mo ≤ 20 horses</td></tr>
+          <tr><td>Backstretch<span class="cat">stable alerts app</span></td><td>Trainers</td><td>Push alerts on entries / works / results</td><td>Fires after the draw — the decision moment already passed</td><td>$10/mo</td></tr>
+          <tr><td>Stable Secretary, BarnManager, CRIO, Equicty…<span class="cat">barn management</span></td><td>Sport-horse barns</td><td>Health records, Stripe billing, owner portals, task boards</td><td>Zero racing features — barn ops and race placement are separate markets. Integrate, don't rebuild</td><td>$2–70/mo</td></tr>
+          <tr><td>Ardex / Prism<span class="cat">AUS racing stables</span></td><td>AU trainers</td><td>Official racing-data feed; ownership-%-split invoicing (the stickiest feature in the category)</td><td>AUS/NZ only; displays entries after the trainer already decided</td><td>$30–150/mo modular</td></tr>
+          <tr><td>BHA Racing Admin<span class="cat">Weatherbys · UK national system</span></td><td>UK trainers</td><td>Online entries/decs since 2018; live entry counts; elimination-sequence transparency; reserves</td><td>Purely transactional — no race finding, no forward-looking probability</td><td>Industry utility</td></tr>
+          <tr><td>Racing Australia SNS / Stable Assist<span class="cat">AU national system</span></td><td>AU trainers (75%+)</td><td>24/7 national noms/acceptances/gear/scratchings; SMS suite; receipts; one RA ID</td><td>Same: assumes the race is chosen; ballot order hand-published for marquee races only</td><td>Free utility</td></tr>
+          <tr><td>Ship &amp; Win + state-bred funds<span class="cat">Del Mar, Colonial, KTDF, NY, Cal, PA, VA</span></td><td>Trainers / owners</td><td>Real money: $5k checks + 40–50% purse bonuses; KTDF ~$27k avg supplement per race</td><td>Rules as prose/PDF/JPEG; no decision-time surfacing; no cross-track comparison; no ROI analytics</td><td>Free to horsemen</td></tr>
+          <tr><td>JockeyFinder (NZ) / JockeyHQ (AU)<span class="cat">jockey booking</span></td><td>Agents, jockeys</td><td>Ride-offer state machines, availability calendars, audit trails</td><td>Nothing exists in the US; disconnected from entries — roadmap validation</td><td>Free (promo) / pre-launch</td></tr>
+          <tr><td>Instawork, Wonolo, OpenTable, DAT<span class="cat">marketplace analogs</span></td><td>—</td><td>Tiered dispatch by fit score; reliability scores; standing "Notify" alerts; pay-on-fulfillment; reverse prospecting</td><td>None expose fill probability to users — our draw-in display is novel even outside racing</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:10px">Full per-competitor reports with sources, complaints, and fact-check corrections:
+    <span class="mono">docs/research-competitive.md</span> in the repo.</p>
+  </section>
+
+  <!-- ============================ TRAINER VOICE ============================ -->
+  <section id="voice">
+    <h2>The problem, in trainers' own words</h2>
+    <p class="sub">Voice-of-customer pass across TDN, BloodHorse, Paulick Report, The Racing Biz, and Past The Wire.</p>
+    <div class="quotes">
+      <blockquote class="card"><p>"Racing offices are guilty of not wanting to run races unless the field size is large enough… it is now quite common to card multiple extra races."</p><footer>Barry Irwin, Team Valor CEO — TDN. You can't plan a campaign against a book that keeps changing.</footer></blockquote>
+      <blockquote class="card"><p>"Some of us — and I'm one of them — have succumbed to the temptation of playing with the race conditions to get that extra horse or two."</p><footer>Sal Sinatra, Parx racing secretary — TDN. Even the office admits conditions defeat eligibility math.</footer></blockquote>
+      <blockquote class="card"><p>Racing office staff "will often tell trainers about the horses in a race to try and make it fill."</p><footer>David Donk, trainer — Paulick Report (Rice hearings). Pre-draw intel flows by phone, selectively.</footer></blockquote>
+      <blockquote class="card"><p>Paperwork under HISA doubled, "diverting time from actual horse work."</p><footer>Jason Barkley, trainer (~30 horses) — TDN/HBPA. Any new platform must reduce total admin, not add a portal.</footer></blockquote>
+    </div>
+  </section>
+
+  <!-- ============================ TRAINER FEATURES ============================ -->
+  <section id="trainer">
+    <h2>Trainer-side recommendations</h2>
+    <p class="sub">Priority order. <span class="pill green">In the demo</span> links open the live prototype.</p>
+
+    <div class="card feat" id="eligibility-engine">
+      <div class="feat-head">
+        <h3><span class="prio">P0</span> Per-horse eligibility engine — the wedge</h3>
+        <a class="pill green" href="./app.html#race/cd-jun6-r3">In the demo →</a>
+      </div>
+      <p class="why">Every incumbent gives the trainer a filter; PostParade gives an answer. For each horse, every open race
+      shows a computed YES/NO with the reason — non-winners ladders (N1X/N2L/N$Y), state-bred restrictions, vet's-list
+      holds with the eligible date, Lasix/stakes rules — replacing the error-prone math even racing secretaries admit defeats people.</p>
+      <p class="beats"><b>Beats:</b> InCompass IRO (shows inputs, never computes the answer), Race Trackr/TLore/equineline (filter search).
+      Free "why eligible / why not" is the cheapest trainer-acquisition wedge in the market.</p>
+    </div>
+
+    <div class="card feat" id="draw-in">
+      <div class="feat-head">
+        <h3><span class="prio">P0</span> Draw-in probability</h3>
+        <a class="pill green" href="./app.html#recs/zengraya">In the demo →</a>
+      </div>
+      <p class="why">The trainer's real anxiety isn't "is there a race" — it's "will I draw in." PostParade models the
+      preference system (date/stars), the field cap, and the also-eligible band into a
+      <em>Likely&nbsp;in / Likely&nbsp;AE / Unlikely</em> call on every recommendation, updating as entries land.</p>
+      <p class="beats"><b>Beats:</b> everything, everywhere — confirmed absent in the US, UK (closing-day counts only), and
+      Australia (Melbourne Cup ballot only). Even Instawork/OpenTable never expose fill probability to users.</p>
+    </div>
+
+    <div class="card feat" id="spot-alerts">
+      <div class="feat-head">
+        <h3><span class="prio">P0</span> Spot alerts — condition-centric standing watches</h3>
+        <a class="pill green" href="./app.html#trainer/alerts">In the demo →</a>
+      </div>
+      <p class="why">Inverts Equibase Virtual Stable: instead of "your horse worked," the alert is "a race your horse fits was
+      just published — entries close Thursday." One standing watch per unplaced horse; new books, extras, and substitute races
+      fire push/SMS the moment they match, with a Submit button in the notification.</p>
+      <p class="beats"><b>Beats:</b> Virtual Stable (entity-centric, email digest, hours of latency), Backstretch (post-draw only).
+      Borrowed mechanics: Resy Notify standing alerts + DAT saved-search alarms.</p>
+    </div>
+
+    <div class="card feat" id="true-purse">
+      <div class="feat-head">
+        <h3><span class="prio">P0</span> True Purse — expected value per start</h3>
+        <a class="pill green" href="./app.html#recs/zengraya">In the demo →</a>
+      </div>
+      <p class="why">One number per recommendation: expected purse earnings + Ship &amp; Win check + state-bred supplement −
+      vanning cost, weighted by draw-in probability. A trainer weighing Del Mar's $5k+50% against a KTDF-flagged Ellis race
+      currently assembles that math from five websites and a phone call.</p>
+      <p class="beats"><b>Beats:</b> nothing surfaces incentives at decision time — rules live in prose, PDFs, and literal JPEGs.
+      DAT RateView proved lane-level money transparency is what supply pays for.</p>
+    </div>
+
+    <div class="card feat" id="cut-line">
+      <div class="feat-head">
+        <h3><span class="prio">P0</span> The cut line — preference &amp; also-eligible transparency</h3>
+        <a class="pill green" href="./app.html#race/cd-jun6-r4">In the demo →</a>
+      </div>
+      <p class="why">For an oversubscribed race, the full field ranked by the track's preference system with the draw-in cut
+      and AE band marked — your barn highlighted. This is the intel the racing office shares selectively by phone today
+      (see the Rice hearings), democratized.</p>
+      <p class="beats"><b>Beats:</b> the UK's elimination-sequence panel (closing-day only) — we show it from the moment entries open.</p>
+    </div>
+
+    <div class="card feat" id="deadline-center">
+      <div class="feat-head">
+        <h3><span class="prio p1">P1</span> Deadline command center</h3>
+        <span class="pill amber">Partially in demo</span>
+      </div>
+      <p class="why">Per-horse countdown chips for every deadline that costs money when missed: entry close, scratch time,
+      stakes nomination windows, and supplement registrations (an unregistered KY-bred forfeits a ~$27k average KTDF
+      supplement). Modeled on Racing Australia's daily state-by-state deadline summary.</p>
+      <p class="beats"><b>In demo:</b> entry-close countdowns + KTDF registration rail on Spot alerts. <b>Next:</b> nomination
+      windows, scratch clocks, HIWU clearance SLA countdowns.</p>
+    </div>
+
+    <div class="card feat" id="vet-clock">
+      <div class="feat-head">
+        <h3><span class="prio p1">P1</span> Vet's-list clearance clock</h3>
+        <span class="pill amber">Gate in demo</span>
+      </div>
+      <p class="why">List status is already a hard eligibility gate in the demo (barred-until-date, recently-cleared badges).
+      The full feature adds the clearance path: required workout/bloodwork steps, the HIWU 5-business-day SLA countdown,
+      and a computed "earliest safe entry date" — preventing the documented race-day-scratch failure mode.</p>
+    </div>
+
+    <div class="card feat" id="extras-lifecycle">
+      <div class="feat-head">
+        <h3><span class="prio p1">P1</span> Extra / overnight lifecycle tracking</h3>
+        <span class="pill gray">Planned</span>
+      </div>
+      <p class="why">When a race fails to fill, auto-follow it: "brought back as an extra for Thursday — needs 3 more, your
+      horse fits." Turns West Point's documented weeks-long drawing-board loop into a push alert, and closes the loop with
+      the track-side extras board below.</p>
+    </div>
+
+    <div class="card feat" id="owner-share">
+      <div class="feat-head">
+        <h3><span class="prio p2">P2</span> Owner guest view</h3>
+        <span class="pill gray">Parked by design</span>
+      </div>
+      <p class="why">A read-only, per-horse "where we plan to run and why" card — recommendation, eligibility, draw-in odds,
+      incentive — that the trainer shares for owner approval, with auto-posted milestones ("Drew in, post 6"). TLore
+      OwnerSync, TRM, and Prism prove owner comms drive trainer stickiness. The owner workspace screens already exist in the
+      prototype, parked for exactly this.</p>
+    </div>
+  </section>
+
+  <!-- ============================ TRACK FEATURES ============================ -->
+  <section id="track">
+    <h2>Track-side recommendations</h2>
+    <p class="sub">The racing office has <em>no</em> incumbent to displace — this side of the market is a whiteboard and a phone.</p>
+
+    <div class="card feat" id="fill-board">
+      <div class="feat-head">
+        <h3><span class="prio">P0</span> Race Fill Board — fill probability per race</h3>
+        <a class="pill green" href="./app.html#track/raceday">In the demo →</a>
+      </div>
+      <p class="why">The racing office "board," digitized: every carded race with live entries vs the minimum, a
+      <em>will-it-go</em> probability, and hours-to-close — plus cancellation early warning on the strength board
+      (10 lack-of-entries cancellations in Sept 2025 alone). This is the secretary's home screen.</p>
+      <p class="beats"><b>Beats:</b> InCompass IRO's Rundown (raw counts, one track, no forecast). Racehorse 360 does adjacent
+      work but is proprietary to 1/ST's own tracks.</p>
+    </div>
+
+    <div class="card feat" id="request-flow">
+      <div class="feat-head">
+        <h3><span class="prio">P0</span> Targeted Request outreach with attached incentives</h3>
+        <a class="pill green" href="./app.html#track/race/cd-jun6-r3">In the demo →</a>
+      </div>
+      <p class="why">When a race is short, the engine ranks every eligible, fit, geographically-reachable horse — with the
+      trainer's likelihood to accept and the applicable Ship &amp; Win bonus attached — and the office sends one-tap Requests
+      instead of working a phone tree for 24 hours. Requests convert to entries when the trainer accepts.</p>
+      <p class="beats"><b>Beats:</b> the phone. Literally nothing else exists. Borrowed mechanics: Instawork tiered dispatch,
+      Wonolo preferred lists, DAT LaneMakers reverse prospecting ("trainers who have shipped this lane before").</p>
+    </div>
+
+    <div class="card feat" id="incentive-publisher">
+      <div class="feat-head">
+        <h3><span class="prio p1">P1</span> Incentive publisher + ROI dashboard</h3>
+        <span class="pill amber">Modeled in demo</span>
+      </div>
+      <p class="why">A structured form where the office defines starter checks, purse-bonus percentages, and eligibility
+      predicates — which then render on every matching horse's recommendation and power targeted Requests. Plus the analytics
+      nobody sells: cost per added starter and projected handle lift per bonus dollar, so mid-tier tracks can size a program
+      the way Del Mar sizes Ship &amp; Win. Demo already models Ship &amp; Win as executable eligibility rules with a budget cap.</p>
+    </div>
+
+    <div class="card feat" id="demand-testing">
+      <div class="feat-head">
+        <h3><span class="prio p2">P2</span> Condition demand testing</h3>
+        <span class="pill gray">Planned</span>
+      </div>
+      <p class="why">Before the book is published, float draft conditions to the trainer base and see indicated interest
+      (soft commits by eligible horses). Attacks the 8-hours-to-card-8-races problem from the demand side — and the
+      aggregated trainer-intent data is exactly what every AI-condition-book effort (Pinnacle AI, Racehorse 360) lacks.</p>
+    </div>
+
+    <div class="card feat" id="stall-apps">
+      <div class="feat-head">
+        <h3><span class="prio p2">P2</span> Multi-track stall applications</h3>
+        <span class="pill gray">Planned</span>
+      </div>
+      <p class="why">One stable profile submitted to any participating meet, with in-app status instead of confirmation by
+      mail, start-per-stall quota tracking, and the trainer's intended race schedule attached — giving the secretary a
+      horses-per-condition forecast at stall-allocation time.</p>
+    </div>
+  </section>
+
+  <!-- ============================ JOCKEYS + STRATEGY ============================ -->
+  <div class="divider-label"><span>Roadmap · not current priority</span></div>
+
+  <section id="jockeys" style="margin-top:0">
+    <h2>Jockeys &amp; agents — a validated future lane</h2>
+    <p class="sub">Per direction, jockeys are not the current priority — but the research confirms the lane is real and empty:
+    <b>no US jockey-booking software exists at all.</b> The UK books riders inside the declaration transaction; NZ/AU startups
+    (JockeyFinder, JockeyHQ) prove agents want offer state machines and availability calendars. Our path when the time comes:
+    (1) an optional "intended rider" field on every Submit — the natural seam; (2) an agent workspace reusing the existing
+    Submit/Request negotiation plumbing (requested → accepted → confirmed, with an audit trail); (3) a "rider secured" badge
+    on ship-in Requests, since an unbooked rider is a scratch risk that hurts field size. A live per-meet jockey/agent
+    directory replaces the static PDF lists tracks publish today and gets agents into the product cheaply.</p>
+  </section>
+
+  <section id="strategy">
+    <h2>Strategic notes from the research</h2>
+    <div class="card feat">
+      <ul style="margin-left:18px; display:grid; gap:10px; font-size:14px; color:var(--ink-600)">
+        <li><b>Monetize the track side; keep trainers cheap.</b> Trainer willingness-to-pay is thin ($10–30/mo tools survive; $125/mo Race Trackr didn't). Tracks already spend millions on untargeted incentives. Free alerts are the acquisition wedge; per-meet SaaS + pay-on-start incentive placement (OpenTable's $7.50-per-seated-cover model) is the revenue.</li>
+        <li><b>Sign circuits, not tracks.</b> USTA harness proved breed-wide entry rails work when a central body standardizes; per-track sales is why IRO adoption stalled. One anchor meet activates its circuit's trainers.</li>
+        <li><b>Enter-once, reuse everywhere.</b> HISA doubled paperwork; the strongest antidote to yet-another-portal resistance is one stable profile that pre-fills every Submit (IRO's exact field set: conditions, meds, equipment, rider, weight).</li>
+        <li><b>Be the software layer, never the principal.</b> Convoy automated 98% of matching and still died taking transaction risk; DAT paid ~$250M for the software layer. PostParade sits beside Equibase and InCompass — the official entry can still land in RTO.</li>
+        <li><b>Identity by registration number.</b> Virtual Stable's documented wrong-horse-by-name failures → key horses to registration/tattoo/microchip from day one.</li>
+        <li><b>Integrate barn management, don't rebuild it.</b> Stable Secretary/BarnManager own barn ops with zero racing features; HorseLinc shows a thin tool without a data moat stalls. Our moat is the eligibility/draw-in engine on Equibase-shaped data.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot-inner">
+    <div>
+      <a href="./index.html">Home</a>
+      <a href="./app.html">Live demo</a>
+      <a href="./tour.html">Guided tour</a>
+      <a href="./architecture.html">Architecture</a>
+      <a href="./pitch.html">Pitch deck</a>
+    </div>
+    <div class="note">PostParade — internal competitive brief · researched &amp; fact-checked July 2026 · sources in docs/research-competitive.md</div>
+  </div>
+</footer>
+
+</body>
+</html>
