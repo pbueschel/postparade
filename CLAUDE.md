@@ -10,6 +10,11 @@ Task playbooks live in [`docs/playbooks/`](docs/playbooks/) — read the relevan
 one before starting: competitive research, demo features, content pages,
 release, tour regeneration.
 
+**Session ritual:** read `plan.md` (including its **Held** section) and
+`docs/worklog.md` before working; end substantive sessions with the
+wrap-session ritual — update plan.md, append a worklog entry, log decisions in
+`docs/decisions.md`, run the verification gates, commit.
+
 ## File map
 
 | Path | Role |
@@ -24,7 +29,9 @@ release, tour regeneration.
 | `app/screens-trainer.js`, `app/screens-track.js` | Screen renderers — each owns its section's full innerHTML |
 | `features.html`, `architecture.html`, `pitch.html` | Self-contained content pages (no Tailwind CDN — hand-written brand CSS) |
 | `docs/research.md`, `docs/research-competitive.md` | Domain + competitive research (cite these, don't re-research settled facts) |
-| `plan.md` | Product plan: terminology, domain model, staged architecture |
+| `plan.md` | Product plan: terminology, domain model, staged architecture, **Held** deliverables |
+| `docs/worklog.md` | Session journal, append-only — read before working, append before stopping |
+| `docs/decisions.md` | Decision log, append-only (product decisions from June 2026 are in plan.md §9) |
 | `test/app-smoke.js`, `test/engine-smoke.js` | Verification suites — run with `bun` |
 
 ## Hard rules

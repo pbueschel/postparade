@@ -16,6 +16,15 @@ research corrected it. Date: 2026-06-07.
 4. **The loop is the product:** Trainer **Submits** ⇄ Track **Requests**, one
    recommendation engine in the middle, Ship-and-Win to fill the hard races.
 
+## Held — awaiting Phil's go-ahead
+
+Built (or specced) but not shipped; `main` deploys publicly, so these wait for
+explicit approval. Session status lives in [`docs/worklog.md`](./docs/worklog.md).
+
+- [ ] **Investor walkthrough guide** — companion doc to the demo/pitch pages.
+- [ ] **`tour.html` regeneration** — one-pass rebuild from the current app;
+      procedure in [`docs/playbooks/tour-regeneration.md`](./docs/playbooks/tour-regeneration.md).
+
 ---
 
 ## 1. Scope
