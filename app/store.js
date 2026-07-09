@@ -4,7 +4,8 @@
    Stage 2 swap: these methods become API calls, same shapes (plan.md §6). */
 (function () {
   const KEY = 'pp.demo.v1';
-  const blank = () => ({ version: 1, submissions: [], requests: [], raceSpecOverrides: {}, stallOverrides: {} });
+  const blank = () => ({ version: 1, submissions: [], requests: [], raceSpecOverrides: {}, stallOverrides: {},
+    createdMeets: [], createdRaceDays: [], createdRaces: [], createdPrograms: [] });
 
   let state = blank();
   try {
@@ -78,15 +79,78 @@
     return state.raceSpecOverrides[raceId];
   }
 
-  /* Seed race merged with any persisted spec edits from the race builder. */
+  /* --- "Build a meet" creation layer -------------------------------------
+     Unlike raceSpecOverrides (which edit an existing seeded entity), these add
+     brand-new entities at runtime. Each persists as its own delta array. The
+     createRace defaults intentionally mirror every field on a seeded race so
+     downstream readers (breadcrumbs, condLine, fillState, the scoring engine)
+     work on created races without special-casing. Stage 2: POST to the API. */
+  function createMeet(spec) {
+    const id = newId('meet');
+    const meet = Object.assign({
+      status: 'draft', meetType: 'regular', supplementProgramIds: [],
+    }, spec, { id });
+    state.createdMeets.push(meet);
+    save();
+    return meet;
+  }
+  function getCreatedMeet(id) { return state.createdMeets.find(m => m.id === id) || null; }
+  function listCreatedMeets() { return state.createdMeets; }
+
+  function createRaceDay(spec) {
+    const id = newId('rd');
+    const day = Object.assign({ status: 'draft' }, spec, { id });
+    state.createdRaceDays.push(day);
+    save();
+    return day;
+  }
+  function getCreatedRaceDay(id) { return state.createdRaceDays.find(d => d.id === id) || null; }
+  function listCreatedRaceDays(meetId) { return state.createdRaceDays.filter(d => d.meetId === meetId); }
+
+  function createRace(spec) {
+    const id = newId('race');
+    const race = Object.assign({
+      raceNumber: 1, classLadder: 'Alw', surface: 'D', isTurf: false, mtoAllowed: false,
+      distanceYards: 1320, purse: 20000, par: null,
+      fieldTarget: { min: 8, max: 10 }, alsoEligibleCap: 4, preferenceSystem: 'none',
+      entryClose: null, postTime: null,
+      stateBredRestricted: false, stateBredCode: null,
+      conditions: { sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3, maidenOnly: false, claimingPrice: null, nonWinners: null, text: '' },
+      bonusAmount: null, bonusMi: null,
+    }, spec, { id });
+    state.createdRaces.push(race);
+    save();
+    return race;
+  }
+  function getCreatedRace(id) { return state.createdRaces.find(r => r.id === id) || null; }
+  function listCreatedRaces(raceDayId) { return state.createdRaces.filter(r => r.raceDayId === raceDayId); }
+
+  function createShipProgram(spec) {
+    const id = newId('prog');
+    const prog = Object.assign({ type: 'shipAndWin', label: 'Ship & Win' }, spec, { id });
+    state.createdPrograms.push(prog);
+    save();
+    return prog;
+  }
+  function getCreatedProgram(meetId) {
+    const meet = getCreatedMeet(meetId);
+    const ids = (meet && meet.supplementProgramIds) || [];
+    return state.createdPrograms.find(p => ids.indexOf(p.id) >= 0) || null;
+  }
+
+  /* Seed OR created race merged with any persisted spec edits from the race
+     builder. Created races (no PPData seed) resolve from state.createdRaces so
+     the Race Builder screen (#track/race/<id>) works on brand-new races too. */
   function raceFor(raceId) {
     const base = (window.PPData && PPData.getRace) ? PPData.getRace(raceId) : null;
+    const created = state.createdRaces.find(r => r.id === raceId);
+    const b = base || created;
     const patch = state.raceSpecOverrides[raceId];
-    if (!base) return base;
-    if (!patch) return base;
-    const merged = Object.assign({}, base, patch);
-    if (base.conditions || patch.conditions) {
-      merged.conditions = Object.assign({}, base.conditions, patch.conditions);
+    if (!b) return null;
+    if (!patch) return b;
+    const merged = Object.assign({}, b, patch);
+    if (b.conditions || patch.conditions) {
+      merged.conditions = Object.assign({}, b.conditions, patch.conditions);
     }
     return merged;
   }
@@ -115,6 +179,10 @@
     entriesForRace,
     overrideRace,
     raceOverride: (raceId) => state.raceSpecOverrides[raceId] || null,
+    createMeet, getCreatedMeet, listCreatedMeets,
+    createRaceDay, getCreatedRaceDay, listCreatedRaceDays,
+    createRace, getCreatedRace, listCreatedRaces,
+    createShipProgram, getCreatedProgram,
     raceFor,
     overrideStall,
     stallOverride: (appId) => state.stallOverrides[appId] || null,

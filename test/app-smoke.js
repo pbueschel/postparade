@@ -64,7 +64,7 @@ window.rerender = () => {};
 const keys = Object.keys(R);
 console.log('renderers registered:', keys.join(', '));
 const expected = ['dashboard', 'scr-horse', 'scr-recs', 'scr-race', 'trainer/requests', 'trainer/alerts',
-  'track/meets', 'scr-track-meet', 'scr-track-stalls', 'scr-track-stall-builder',
+  'track/meets', 'scr-track-meet', 'track/meet-builder', 'scr-track-stalls', 'scr-track-stall-builder',
   'scr-track-raceday', 'scr-track-race', 'track/requests', 'track/strength'];
 const missing = expected.filter(k => !R[k]);
 if (missing.length) { console.error('MISSING RENDERERS:', missing); process.exit(1); }
@@ -98,6 +98,9 @@ tryRender('scr-track-stall-builder', null);
 tryRender('scr-track-stall-builder', 'cd-2026-summer');
 tryRender('scr-track-stall-builder', 'elp-2026-summer');
 tryRender('scr-track-stall-builder', 'nonexistent-meet');
+tryRender('track/meet-builder', null);
+tryRender('track/meet-builder', 'cd-2026-summer');
+tryRender('track/meet-builder', 'nonexistent-meet');
 tryRender('scr-track-raceday', null);
 tryRender('scr-track-race', null);
 tryRender('scr-track-race', 'cd-jun6-r4');  // showcase over-subscribed race
@@ -127,6 +130,20 @@ PPStore.overrideStall('stall-cd-3', { status: 'assigned', barnId: 'barn-cd-14' }
 const stallAfter = PPStore.stallFor('stall-cd-3');
 if (stallAfter.status !== 'assigned' || stallAfter.barnId !== 'barn-cd-14') { console.error('FAIL stall assign:', stallAfter); fails++; }
 else { console.log('stall assign ok'); }
+
+// Store loop: build a meet → race day → race, and confirm every merge-aware
+// read path (list, dashboard, ship program, race builder) resolves it.
+const newProg = PPStore.createShipProgram({ label: 'Test Ship & Win', flatAmount: 2750, eligibility: { minShipMi: 275 }, cap: { totalBudget: 40000, claimed: 0 } });
+const newMeet = PPStore.createMeet({ track: 'KEE', trackName: 'Keeneland', name: 'Keeneland — Fall 2026', label: 'Fall meet', start: '2026-09-01', end: '2026-09-30', meetType: 'regular', supplementProgramIds: [newProg.id] });
+if (!PPData.listMeets().concat(PPStore.listCreatedMeets()).some(m => m.id === newMeet.id)) { console.error('FAIL: created meet missing from merged meets list'); fails++; }
+const newDay = PPStore.createRaceDay({ meetId: newMeet.id, date: '2026-09-05', label: 'Saturday, September 5' });
+const newRace = PPStore.createRace({ raceDayId: newDay.id, meetId: newMeet.id, raceNumber: 1 });
+if (!PPStore.raceFor(newRace.id)) { console.error('FAIL: raceFor did not resolve a created race'); fails++; }
+else console.log('build-a-meet loop ok:', newMeet.id, newDay.id, newRace.id);
+tryRender('track/meets');
+tryRender('scr-track-meet', newMeet.id);
+tryRender('track/meet-builder', newMeet.id);
+tryRender('scr-track-race', newRace.id);
 
 // re-render everything again with live store state
 tryRender('trainer/requests');

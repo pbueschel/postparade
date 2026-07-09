@@ -38,9 +38,25 @@
   function entrantHorses(raceId) { return entriesOf(raceId).map(e => PPData.getHorse(e.horseId)).filter(Boolean); }
   function parseMoney(s) { return Math.round(+String(s == null ? '' : s).replace(/[^0-9.]/g, '') || 0); }
 
+  // Merge-aware lookups: a "Build a meet" creation exists only in PPStore, not
+  // in the PPData seed, so every "the meet / its days / its races / its program"
+  // read must check BOTH sources or a created meet silently misbehaves.
+  function meetFor(id) { return (id && (PPData.getMeet(id) || PPStore.getCreatedMeet(id))) || null; }
+  function raceDaysForMeet(meetId) { return PPData.listRaceDays(meetId).concat(PPStore.listCreatedRaceDays(meetId)); }
+  function racesForMeet(meetId) {
+    const days = raceDaysForMeet(meetId);
+    const seeded = PPData.listRaces({ meetId });
+    const created = days.reduce((acc, d) => acc.concat(PPStore.listCreatedRaces(d.id)), []);
+    return seeded.concat(created);
+  }
+  function shipProgramFor(meetId) {
+    return PPStore.getCreatedMeet(meetId) ? PPStore.getCreatedProgram(meetId) : PPData.shipProgram(meetId);
+  }
+  function raceDayFor(id) { return (id && (PPData.getRaceDay(id) || PPStore.getCreatedRaceDay(id))) || null; }
+
   function raceTrackId(race) {
-    const rd = PPData.getRaceDay(race.raceDayId);
-    const meet = rd ? PPData.getMeet(rd.meetId) : null;
+    const rd = raceDayFor(race.raceDayId);
+    const meet = rd ? meetFor(rd.meetId) : null;
     return meet ? meet.track : 'CD';
   }
   function meetIdForRace(race) {
@@ -52,7 +68,7 @@
   function ctxFor(race) {
     const trackId = raceTrackId(race);
     const entrants = entrantHorses(race.id);
-    const program = PPData.shipProgram(meetIdForRace(race));
+    const program = shipProgramFor(meetIdForRace(race));
     return function (h) {
       const mi = PPData.shipMiles(h.home, trackId);
       return { entrants, shipMi: (mi != null ? mi : h.shipMi), program, today: PPData.today };
@@ -82,7 +98,7 @@
   // ===========================================================================
   R['track/meets'] = function () {
     const D = PPData;
-    const meets = D.listMeets();
+    const meets = D.listMeets().concat(PPStore.listCreatedMeets());
 
     const cards = meets.map(meet => {
       const races = D.listRaces({ meetId: meet.id });
@@ -90,7 +106,7 @@
       races.forEach(r => { const e = enteredCount(r.id); totalEntered += e; if (e < r.fieldTarget.min) underfilled++; });
       const avg = races.length ? totalEntered / races.length : 0;
       const days = D.listRaceDays(meet.id);
-      const prog = D.shipProgram(meet.id);
+      const prog = shipProgramFor(meet.id);
       const cap = (prog && prog.cap) || { totalBudget: 0, claimed: 0 };
       const raceIds = new Set(races.map(r => r.id));
       const reqOut = PPStore.requests.list().filter(r => raceIds.has(r.raceId)).length;
@@ -121,16 +137,117 @@
   };
 
   // ===========================================================================
+  // 0b. Build a meet — one-shot create flow. Mode A (no id) creates a meet;
+  //     Mode B (id) adds race days and seeds draft races into it.
+  // ===========================================================================
+  const inputCls = 'w-full px-3 py-2 rounded-lg border border-slate-200 bg-white';
+  R['track/meet-builder'] = function (meetId) {
+    const D = PPData;
+
+    // Mode B — an existing/created meet: add race days + races.
+    if (meetId) {
+      const meet = meetFor(meetId);
+      if (!meet) { mount('track/meet-builder', '<div class="text-sm text-slate-500">Meet not found.</div>'); return; }
+      const days = raceDaysForMeet(meetId);
+      const races = racesForMeet(meetId);
+
+      const dayRows = days.map(day => {
+        const rc = D.listRaces({ raceDayId: day.id }).concat(PPStore.listCreatedRaces(day.id)).length;
+        return `
+          <div class="px-5 py-4 flex items-center justify-between gap-3">
+            <div>
+              <div class="font-medium">${esc(day.label || 'Race day')}</div>
+              <div class="text-xs text-slate-500">${day.date ? fmtDate(day.date) : ''} · ${rc} race${rc === 1 ? '' : 's'}</div>
+            </div>
+            <button class="pp-create-race text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-race-day-id="${esc(day.id)}" data-meet-id="${esc(meetId)}"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add race</button>
+          </div>`;
+      }).join('') || '<div class="px-5 py-8 text-center text-sm text-slate-500">No race days yet — add one above to get started.</div>';
+
+      mount('track/meet-builder', `
+        <div class="text-xs text-slate-500 flex items-center gap-1.5">
+          <a href="#track/meets" class="hover:text-ink-900">Meets</a>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+          <a href="#track/meet/${esc(meetId)}" class="hover:text-ink-900">${esc(meet.name || meet.label || 'Meet')}</a>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+          <span class="text-ink-900 font-medium">Build</span>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || meet.track || 'Track')} · ${esc(meet.label || 'meet')}</div>
+          <h1 class="text-2xl font-semibold tracking-tight">${esc(meet.name || 'Meet')}</h1>
+          <div class="text-sm text-slate-600">${days.length} race day${days.length === 1 ? '' : 's'} · ${races.length} race${races.length === 1 ? '' : 's'} so far</div>
+        </div>
+
+        <div class="card ring-soft p-5">
+          <div class="font-semibold">Add a race day</div>
+          <div class="text-xs text-slate-500">Give it a date and label, then add races to it below.</div>
+          <div class="mt-4 grid sm:grid-cols-3 gap-x-4 gap-y-3 text-sm items-end">
+            <label class="block"><div class="text-xs text-slate-500 mb-1">Date</div><input id="mb-day-date" type="date" class="${inputCls}"></label>
+            <label class="block"><div class="text-xs text-slate-500 mb-1">Label</div><input id="mb-day-label" type="text" placeholder="e.g. Saturday, September 5" class="${inputCls}"></label>
+            <button class="pp-create-raceday px-3 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center justify-center gap-1.5" data-meet-id="${esc(meetId)}"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add race day</button>
+          </div>
+        </div>
+
+        <div class="card ring-soft">
+          <div class="px-5 py-4 border-b border-slate-100"><div class="font-semibold">Race days</div><div class="text-xs text-slate-500">Add races to each day — each opens the race builder to spec it out.</div></div>
+          <div class="divide-y divide-slate-100 text-sm">${dayRows}</div>
+        </div>
+
+        <a href="#track/meet/${esc(meetId)}" class="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white">Finish → go to meet dashboard</a>`);
+      return;
+    }
+
+    // Mode A — fresh landing: create the meet itself.
+    mount('track/meet-builder', `
+      <div class="text-xs text-slate-500 flex items-center gap-1.5">
+        <a href="#track/meets" class="hover:text-ink-900">Meets</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-ink-900 font-medium">Build a meet</span>
+      </div>
+      <div>
+        <div class="text-xs text-slate-500 uppercase tracking-wider">TRACK WORKSPACE</div>
+        <h1 class="text-2xl font-semibold tracking-tight">Build a meet</h1>
+        <div class="text-sm text-slate-600">Set up the meet, then add race days and races.</div>
+      </div>
+
+      <div class="card ring-soft p-5 max-w-2xl">
+        <div class="font-semibold">Meet details</div>
+        <div class="text-xs text-slate-500">Create the meet first — you'll add race days and races next.</div>
+        <div class="mt-4 grid sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          <label class="block"><div class="text-xs text-slate-500 mb-1">Track</div>${selectHtml('mb-track', D.listTracks().map(t => [t.id, t.name]), 'CD')}</label>
+          <label class="block"><div class="text-xs text-slate-500 mb-1">Meet type</div>${selectHtml('mb-type', [['regular', 'Regular'], ['boutique', 'Boutique']], 'regular')}</label>
+          <label class="block sm:col-span-2"><div class="text-xs text-slate-500 mb-1">Meet name</div><input id="mb-name" type="text" placeholder="e.g. Keeneland — Fall 2026" class="${inputCls}"></label>
+          <label class="block"><div class="text-xs text-slate-500 mb-1">Label</div><input id="mb-label" type="text" placeholder="e.g. Fall meet" class="${inputCls}"></label>
+          <label class="block"></label>
+          <label class="block"><div class="text-xs text-slate-500 mb-1">Start date</div><input id="mb-start" type="date" class="${inputCls}"></label>
+          <label class="block"><div class="text-xs text-slate-500 mb-1">End date</div><input id="mb-end" type="date" class="${inputCls}"></label>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-100">
+          <label class="flex items-center gap-2 accent-text"><input type="checkbox" id="mb-bonus-on" checked class="rounded border-slate-300"><i data-lucide="truck" class="w-4 h-4"></i><span class="font-semibold text-ink-900">Include a Ship &amp; Win bonus program</span></label>
+          <div class="mt-3 grid sm:grid-cols-3 gap-x-4 gap-y-3 text-sm">
+            <label class="block"><div class="text-xs text-slate-500 mb-1">Bonus amount</div><input id="mb-bonus-amount" type="text" value="1500" class="${inputCls}"></label>
+            <label class="block"><div class="text-xs text-slate-500 mb-1">Min ship miles</div><input id="mb-bonus-mi" type="number" value="150" step="25" class="${inputCls}"></label>
+            <label class="block"><div class="text-xs text-slate-500 mb-1">Bonus pool budget</div><input id="mb-bonus-budget" type="text" value="30000" class="${inputCls}"></label>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <button class="pp-create-meet text-sm px-4 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Create meet →</button>
+        </div>
+      </div>`);
+  };
+
+  // ===========================================================================
   // 1. Meet overview — computed KPIs, race-day cards, ship-in bonus panel.
   // ===========================================================================
   R['scr-track-meet'] = function (meetId) {
     const D = PPData;
     const mid = meetId || CD_MEET;
-    const meet = D.getMeet(mid);
+    const meet = meetFor(mid);
     if (!meet) { mount('scr-track-meet', '<div class="text-sm text-slate-500">Meet not found.</div>'); return; }
-    const races = D.listRaces({ meetId: mid });
-    const days = D.listRaceDays(mid);
-    const prog = D.shipProgram(mid);
+    const races = racesForMeet(mid);
+    const days = raceDaysForMeet(mid);
+    const prog = shipProgramFor(mid);
     const cap = (prog && prog.cap) || { totalBudget: 0, claimed: 0 };
 
     let totalEntered = 0, underfilled = 0;
@@ -173,7 +290,7 @@
           <h1 class="text-2xl font-semibold tracking-tight">${esc(meet.name || 'Summer meet')}</h1>
           <div class="text-sm text-slate-600">${days.length} race days · ${races.length} races · <span class="text-red-600 font-medium">${underfilled} underfilled</span> · ship-in pool ${fmtMoney(cap.totalBudget)}</div>
         </div>
-        <a href="#track/race/cd-jun6-r3" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
+        <a href="#track/meet-builder/${esc(mid)}" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
       </div>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -207,10 +324,10 @@
   // ===========================================================================
   R['scr-track-raceday'] = function (param) {
     const D = PPData;
-    const day = param ? D.getRaceDay(param) : D.listRaceDays(CD_MEET)[0];
+    const day = param ? raceDayFor(param) : D.listRaceDays(CD_MEET)[0];
     if (!day) { mount('scr-track-raceday', '<div class="text-sm text-slate-500">Race day not found.</div>'); return; }
-    const meet = D.getMeet(day.meetId) || {};
-    const races = D.listRaces({ raceDayId: day.id });
+    const meet = meetFor(day.meetId) || {};
+    const races = D.listRaces({ raceDayId: day.id }).concat(PPStore.listCreatedRaces(day.id));
 
     let ent = 0, under = 0, openN = 0;
     races.forEach(r => { const e = enteredCount(r.id); ent += e; if (e < r.fieldTarget.min) under++; if (r.entryClose > D.today) openN++; });
@@ -313,9 +430,9 @@
     const raceId = param || 'cd-jun6-r3';
     const race = PPStore.raceFor(raceId);
     if (!race) { mount('scr-track-race', '<div class="text-sm text-slate-500">Race not found.</div>'); return; }
-    const day = D.getRaceDay(race.raceDayId) || {};
-    const meet = D.getMeet(meetIdForRace(race)) || {};
-    const prog = D.shipProgram(meetIdForRace(race));
+    const day = raceDayFor(race.raceDayId) || {};
+    const meet = meetFor(meetIdForRace(race)) || {};
+    const prog = shipProgramFor(meetIdForRace(race));
 
     const entries = entriesOf(raceId);
     const enteredIds = new Set(entries.map(e => e.horseId));
@@ -566,7 +683,7 @@
   R['scr-track-stalls'] = function (meetId) {
     const D = PPData;
     const mid = meetId || CD_MEET;
-    const meet = D.getMeet(mid);
+    const meet = meetFor(mid);
     if (!meet) { mount('scr-track-stalls', '<div class="text-sm text-slate-500">Meet not found.</div>'); return; }
 
     const barns = D.listStallBarns(mid);
@@ -591,7 +708,7 @@
         </div>`;
     }).join('') || '<div class="px-5 py-8 text-center text-sm text-slate-500">No barns configured for this meet.</div>';
 
-    const prog = D.shipProgram(mid);
+    const prog = shipProgramFor(mid);
     const cap = (prog && prog.cap) || { totalBudget: 0, claimed: 0 };
 
     mount('scr-track-stalls', `
@@ -735,6 +852,63 @@
       return;
     }
     if (ev.target.closest && ev.target.closest('.pp-recompute')) { window.rerender(); return; }
+
+    const createMeetBtn = ev.target.closest && ev.target.closest('.pp-create-meet');
+    if (createMeetBtn) {
+      const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+      const trackId = val('mb-track');
+      const trackObj = PPData.getTrack(trackId) || {};
+      const bonusOn = document.getElementById('mb-bonus-on');
+      let supplementProgramIds = [];
+      if (bonusOn && bonusOn.checked) {
+        const prog = PPStore.createShipProgram({
+          label: 'Ship & Win',
+          flatAmount: parseMoney(val('mb-bonus-amount')),
+          eligibility: { minShipMi: +val('mb-bonus-mi') || 0 },
+          cap: { totalBudget: parseMoney(val('mb-bonus-budget')), claimed: 0 },
+        });
+        supplementProgramIds = [prog.id];
+      }
+      const meet = PPStore.createMeet({
+        track: trackId,
+        trackName: trackObj.name || trackId,
+        name: val('mb-name') || 'New meet',
+        label: val('mb-label') || 'New meet',
+        start: val('mb-start'),
+        end: val('mb-end'),
+        meetType: val('mb-type') || 'regular',
+        status: 'draft',
+        supplementProgramIds,
+      });
+      toast('Meet created — now add race days');
+      location.hash = '#track/meet-builder/' + meet.id;
+      return;
+    }
+    const createDayBtn = ev.target.closest && ev.target.closest('.pp-create-raceday');
+    if (createDayBtn) {
+      const meetId = createDayBtn.getAttribute('data-meet-id');
+      const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+      PPStore.createRaceDay({ meetId, date: val('mb-day-date'), label: val('mb-day-label') || 'Race day', status: 'draft' });
+      toast('Race day added');
+      window.rerender();
+      return;
+    }
+    const createRaceBtn = ev.target.closest && ev.target.closest('.pp-create-race');
+    if (createRaceBtn) {
+      const raceDayId = createRaceBtn.getAttribute('data-race-day-id');
+      const meetId = createRaceBtn.getAttribute('data-meet-id');
+      const existing = PPData.listRaces({ raceDayId }).concat(PPStore.listCreatedRaces(raceDayId));
+      const raceNumber = existing.length + 1;
+      const day = raceDayFor(raceDayId);
+      const race = PPStore.createRace({
+        raceDayId, meetId, raceNumber,
+        entryClose: day ? day.date : null,
+        postTime: day ? day.date : null,
+      });
+      toast('Draft race ' + raceNumber + ' created — spec it out below');
+      location.hash = '#track/race/' + race.id;
+      return;
+    }
 
     const assignBtn = ev.target.closest && ev.target.closest('.pp-stall-assign');
     if (assignBtn) {

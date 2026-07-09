@@ -831,6 +831,13 @@
     </section>
 
     <!-- =========================================================== -->
+    <!-- TRACK · BUILD A MEET (optional param: meetId)                 -->
+    <!-- =========================================================== -->
+    <section id="track/meet-builder" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
+    </section>
+
+    <!-- =========================================================== -->
     <!-- TRACK · STALLS & SHIP-INS OVERVIEW (param: meetId)            -->
     <!-- =========================================================== -->
     <section id="scr-track-stalls" class="screen p-6 space-y-6">
@@ -958,7 +965,8 @@
       role: 'Track workspace',
       userRole: 'Racing secretary',
       home: 'track/meets',
-      cta: 'Build a race',
+      cta: 'Build a meet',
+      ctaHref: 'track/meet-builder',
       prefixes: ['track/'],
     },
     // owner parked for future guest-access (see docs/races-and-recommendations.md §1)
@@ -1008,6 +1016,7 @@
     { prefix: 'track/meet/',    section: 'scr-track-meet' },
     { prefix: 'track/stall-builder/', section: 'scr-track-stall-builder' },
     { prefix: 'track/stalls/', section: 'scr-track-stalls' },
+    { prefix: 'track/meet-builder/', section: 'track/meet-builder' },
     { prefix: 'horse/',         section: 'scr-horse' },
     { prefix: 'recs/',          section: 'scr-recs' },
     { prefix: 'race/',          section: 'scr-race' },
@@ -1216,6 +1225,15 @@
   /* ---------- Reset demo data ---------- */
   const resetBtn = document.getElementById('pp-reset-demo');
   if (resetBtn && window.PPStore) resetBtn.addEventListener('click', () => PPStore.reset());
+
+  /* ---------- Primary top-bar CTA (workspace-aware) ---------- */
+  const topCtaBtn = document.getElementById('topCta');
+  if (topCtaBtn) {
+    topCtaBtn.addEventListener('click', () => {
+      const ws = workspaces[document.body.dataset.ws];
+      if (ws && ws.ctaHref) location.hash = '#' + ws.ctaHref;
+    });
+  }
 
   /* ---------- Boot ---------- */
   showScreen(location.hash);
