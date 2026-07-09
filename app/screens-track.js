@@ -40,19 +40,39 @@
 
   // Merge-aware lookups: a "Build a meet" creation exists only in PPStore, not
   // in the PPData seed, so every "the meet / its days / its races / its program"
-  // read must check BOTH sources or a created meet silently misbehaves.
-  function meetFor(id) { return (id && (PPData.getMeet(id) || PPStore.getCreatedMeet(id))) || null; }
-  function raceDaysForMeet(meetId) { return PPData.listRaceDays(meetId).concat(PPStore.listCreatedRaceDays(meetId)); }
+  // read must check BOTH sources or a created meet silently misbehaves. These
+  // also filter out anything soft-deleted (PPStore.isMeetDeleted/isRaceDayDeleted)
+  // so a deleted meet or race day disappears everywhere, not just where deleted.
+  function meetFor(id) {
+    if (!id || PPStore.isMeetDeleted(id)) return null;
+    return PPData.getMeet(id) || PPStore.getCreatedMeet(id) || null;
+  }
+  function raceDaysForMeet(meetId) {
+    return PPData.listRaceDays(meetId).concat(PPStore.listCreatedRaceDays(meetId))
+      .filter(d => !PPStore.isRaceDayDeleted(d.id));
+  }
   function racesForMeet(meetId) {
     const days = raceDaysForMeet(meetId);
-    const seeded = PPData.listRaces({ meetId });
+    const dayIds = new Set(days.map(d => d.id));
+    const seeded = PPData.listRaces({ meetId }).filter(r => dayIds.has(r.raceDayId));
     const created = days.reduce((acc, d) => acc.concat(PPStore.listCreatedRaces(d.id)), []);
     return seeded.concat(created);
   }
   function shipProgramFor(meetId) {
     return PPStore.getCreatedMeet(meetId) ? PPStore.getCreatedProgram(meetId) : PPData.shipProgram(meetId);
   }
-  function raceDayFor(id) { return (id && (PPData.getRaceDay(id) || PPStore.getCreatedRaceDay(id))) || null; }
+  function raceDayFor(id) {
+    if (!id || PPStore.isRaceDayDeleted(id)) return null;
+    return PPData.getRaceDay(id) || PPStore.getCreatedRaceDay(id) || null;
+  }
+  // Inclusive count of calendar days a meet spans, or null if start/end aren't set.
+  function meetDaySpan(meet) {
+    if (!meet || !meet.start || !meet.end) return null;
+    const s = new Date(meet.start + 'T00:00:00');
+    const e = new Date(meet.end + 'T00:00:00');
+    if (isNaN(s) || isNaN(e) || e < s) return null;
+    return Math.round((e - s) / 86400000) + 1;
+  }
 
   function raceTrackId(race) {
     const rd = raceDayFor(race.raceDayId);
@@ -98,7 +118,7 @@
   // ===========================================================================
   R['track/meets'] = function () {
     const D = PPData;
-    const meets = D.listMeets().concat(PPStore.listCreatedMeets());
+    const meets = D.listMeets().concat(PPStore.listCreatedMeets()).filter(m => !PPStore.isMeetDeleted(m.id));
 
     const cards = meets.map(meet => {
       const races = D.listRaces({ meetId: meet.id });
@@ -159,9 +179,32 @@
               <div class="font-medium">${esc(day.label || 'Race day')}</div>
               <div class="text-xs text-slate-500">${day.date ? fmtDate(day.date) : ''} · ${rc} race${rc === 1 ? '' : 's'}</div>
             </div>
-            <button class="pp-create-race text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-race-day-id="${esc(day.id)}" data-meet-id="${esc(meetId)}"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add race</button>
+            <div class="flex items-center gap-2">
+              <button class="pp-create-race text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-race-day-id="${esc(day.id)}" data-meet-id="${esc(meetId)}"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add race</button>
+              <button class="pp-delete-raceday text-sm px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 inline-flex items-center gap-1.5" data-day-id="${esc(day.id)}" title="Delete race day"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            </div>
           </div>`;
       }).join('') || '<div class="px-5 py-8 text-center text-sm text-slate-500">No race days yet — add one above to get started.</div>';
+
+      const totalDays = meetDaySpan(meet);
+      const atCap = totalDays != null && days.length >= totalDays;
+      const spanNote = totalDays != null
+        ? ` ${days.length} of ${totalDays} day${totalDays === 1 ? '' : 's'} scheduled.`
+        : '';
+      const addDayForm = atCap
+        ? `<div class="card ring-soft p-5">
+             <div class="font-semibold">Add a race day</div>
+             <div class="mt-2 text-sm text-slate-600">All ${totalDays} day${totalDays === 1 ? '' : 's'} of this meet already have race days.</div>
+           </div>`
+        : `<div class="card ring-soft p-5">
+             <div class="font-semibold">Add a race day</div>
+             <div class="text-xs text-slate-500">Give it a date and label, then add races to it below.${spanNote}</div>
+             <div class="mt-4 grid sm:grid-cols-3 gap-x-4 gap-y-3 text-sm items-end">
+               <label class="block"><div class="text-xs text-slate-500 mb-1">Date</div><input id="mb-day-date" type="date" required ${meet.start ? `min="${esc(meet.start)}"` : ''} ${meet.end ? `max="${esc(meet.end)}"` : ''} class="${inputCls}"></label>
+               <label class="block"><div class="text-xs text-slate-500 mb-1">Label</div><input id="mb-day-label" type="text" required placeholder="e.g. Saturday, September 5" class="${inputCls}"></label>
+               <button class="pp-create-raceday px-3 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center justify-center gap-1.5" data-meet-id="${esc(meetId)}"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add race day</button>
+             </div>
+           </div>`;
 
       mount('track/meet-builder', `
         <div class="text-xs text-slate-500 flex items-center gap-1.5">
@@ -171,21 +214,16 @@
           <i data-lucide="chevron-right" class="w-3 h-3"></i>
           <span class="text-ink-900 font-medium">Build</span>
         </div>
-        <div>
-          <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || meet.track || 'Track')} · ${esc(meet.label || 'meet')}</div>
-          <h1 class="text-2xl font-semibold tracking-tight">${esc(meet.name || 'Meet')}</h1>
-          <div class="text-sm text-slate-600">${days.length} race day${days.length === 1 ? '' : 's'} · ${races.length} race${races.length === 1 ? '' : 's'} so far</div>
+        <div class="flex items-end justify-between flex-wrap gap-3">
+          <div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || meet.track || 'Track')} · ${esc(meet.label || 'meet')}</div>
+            <h1 class="text-2xl font-semibold tracking-tight">${esc(meet.name || 'Meet')}</h1>
+            <div class="text-sm text-slate-600">${days.length} race day${days.length === 1 ? '' : 's'} · ${races.length} race${races.length === 1 ? '' : 's'} so far</div>
+          </div>
+          <button class="pp-delete-meet text-sm px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 inline-flex items-center gap-1.5" data-meet-id="${esc(meetId)}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i>Delete meet</button>
         </div>
 
-        <div class="card ring-soft p-5">
-          <div class="font-semibold">Add a race day</div>
-          <div class="text-xs text-slate-500">Give it a date and label, then add races to it below.</div>
-          <div class="mt-4 grid sm:grid-cols-3 gap-x-4 gap-y-3 text-sm items-end">
-            <label class="block"><div class="text-xs text-slate-500 mb-1">Date</div><input id="mb-day-date" type="date" class="${inputCls}"></label>
-            <label class="block"><div class="text-xs text-slate-500 mb-1">Label</div><input id="mb-day-label" type="text" placeholder="e.g. Saturday, September 5" class="${inputCls}"></label>
-            <button class="pp-create-raceday px-3 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center justify-center gap-1.5" data-meet-id="${esc(meetId)}"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add race day</button>
-          </div>
-        </div>
+        ${addDayForm}
 
         <div class="card ring-soft">
           <div class="px-5 py-4 border-b border-slate-100"><div class="font-semibold">Race days</div><div class="text-xs text-slate-500">Add races to each day — each opens the race builder to spec it out.</div></div>
@@ -215,11 +253,11 @@
         <div class="mt-4 grid sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
           <label class="block"><div class="text-xs text-slate-500 mb-1">Track</div>${selectHtml('mb-track', D.listTracks().map(t => [t.id, t.name]), 'CD')}</label>
           <label class="block"><div class="text-xs text-slate-500 mb-1">Meet type</div>${selectHtml('mb-type', [['regular', 'Regular'], ['boutique', 'Boutique']], 'regular')}</label>
-          <label class="block sm:col-span-2"><div class="text-xs text-slate-500 mb-1">Meet name</div><input id="mb-name" type="text" placeholder="e.g. Keeneland — Fall 2026" class="${inputCls}"></label>
+          <label class="block sm:col-span-2"><div class="text-xs text-slate-500 mb-1">Meet name</div><input id="mb-name" type="text" required placeholder="e.g. Keeneland — Fall 2026" class="${inputCls}"></label>
           <label class="block"><div class="text-xs text-slate-500 mb-1">Label</div><input id="mb-label" type="text" placeholder="e.g. Fall meet" class="${inputCls}"></label>
           <label class="block"></label>
-          <label class="block"><div class="text-xs text-slate-500 mb-1">Start date</div><input id="mb-start" type="date" class="${inputCls}"></label>
-          <label class="block"><div class="text-xs text-slate-500 mb-1">End date</div><input id="mb-end" type="date" class="${inputCls}"></label>
+          <label class="block"><div class="text-xs text-slate-500 mb-1">Start date</div><input id="mb-start" type="date" required class="${inputCls}"></label>
+          <label class="block"><div class="text-xs text-slate-500 mb-1">End date</div><input id="mb-end" type="date" required class="${inputCls}"></label>
         </div>
 
         <div class="mt-4 pt-4 border-t border-slate-100">
@@ -260,7 +298,7 @@
     const pendingCount = stallApps.filter(a => a.status === 'pending').length;
 
     const dayCards = days.map(day => {
-      const dr = D.listRaces({ raceDayId: day.id });
+      const dr = D.listRaces({ raceDayId: day.id }).concat(PPStore.listCreatedRaces(day.id));
       let ent = 0, soft = 0;
       dr.forEach(r => { const e = enteredCount(r.id); ent += e; if (e < r.fieldTarget.min) soft++; });
       const dAvg = dr.length ? ent / dr.length : 0;
@@ -290,7 +328,10 @@
           <h1 class="text-2xl font-semibold tracking-tight">${esc(meet.name || 'Summer meet')}</h1>
           <div class="text-sm text-slate-600">${days.length} race days · ${races.length} races · <span class="text-red-600 font-medium">${underfilled} underfilled</span> · ship-in pool ${fmtMoney(cap.totalBudget)}</div>
         </div>
-        <a href="#track/meet-builder/${esc(mid)}" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
+        <div class="flex items-center gap-2">
+          <a href="#track/meet-builder/${esc(mid)}" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Build a race</a>
+          <button class="pp-delete-meet text-sm px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 inline-flex items-center gap-1.5" data-meet-id="${esc(mid)}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i>Delete meet</button>
+        </div>
       </div>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -367,6 +408,10 @@
           <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || 'Churchill Downs')} · ${esc(meet.label || 'meet')}</div>
           <h1 class="text-2xl font-semibold tracking-tight">Race day — ${esc(day.label)}</h1>
           <div class="text-sm text-slate-600">${races.length} races · ${openN} open for entry · <span class="text-red-600 font-medium">${under} underfilled</span></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="pp-create-race text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5" data-race-day-id="${esc(day.id)}" data-meet-id="${esc(meet.id || '')}"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add race</button>
+          <button class="pp-delete-raceday text-sm px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 inline-flex items-center gap-1.5" data-day-id="${esc(day.id)}" data-after-delete="#track/meet/${esc(meet.id || '')}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i>Delete race day</button>
         </div>
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -856,6 +901,9 @@
     const createMeetBtn = ev.target.closest && ev.target.closest('.pp-create-meet');
     if (createMeetBtn) {
       const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+      const meetStart = val('mb-start'), meetEnd = val('mb-end');
+      if (!val('mb-name') || !meetStart || !meetEnd) { toast('Enter a meet name, start date, and end date'); return; }
+      if (meetStart > meetEnd) { toast('Start date must be before the end date'); return; }
       const trackId = val('mb-track');
       const trackObj = PPData.getTrack(trackId) || {};
       const bonusOn = document.getElementById('mb-bonus-on');
@@ -888,7 +936,17 @@
     if (createDayBtn) {
       const meetId = createDayBtn.getAttribute('data-meet-id');
       const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
-      PPStore.createRaceDay({ meetId, date: val('mb-day-date'), label: val('mb-day-label') || 'Race day', status: 'draft' });
+      const date = val('mb-day-date');
+      const label = val('mb-day-label');
+      if (!date || !label) { toast('Enter a date and label for the race day'); return; }
+      const meet = meetFor(meetId);
+      if (meet && meet.start && date < meet.start) { toast('Date is before the meet starts'); return; }
+      if (meet && meet.end && date > meet.end) { toast('Date is after the meet ends'); return; }
+      const existingDays = raceDaysForMeet(meetId);
+      if (existingDays.some(d => d.date === date)) { toast('This meet already has a race day on that date'); return; }
+      const span = meetDaySpan(meet);
+      if (span != null && existingDays.length >= span) { toast('This meet already has race days for all ' + span + ' days'); return; }
+      PPStore.createRaceDay({ meetId, date, label, status: 'draft' });
       toast('Race day added');
       window.rerender();
       return;
@@ -907,6 +965,28 @@
       });
       toast('Draft race ' + raceNumber + ' created — spec it out below');
       location.hash = '#track/race/' + race.id;
+      return;
+    }
+
+    const deleteMeetBtn = ev.target.closest && ev.target.closest('.pp-delete-meet');
+    if (deleteMeetBtn) {
+      const meetId = deleteMeetBtn.getAttribute('data-meet-id');
+      const meet = meetFor(meetId);
+      if (!confirm('Delete "' + ((meet && (meet.name || meet.label)) || 'this meet') + '" and all its race days? This cannot be undone.')) return;
+      PPStore.deleteMeet(meetId);
+      toast('Meet deleted');
+      location.hash = '#track/meets';
+      return;
+    }
+    const deleteDayBtn = ev.target.closest && ev.target.closest('.pp-delete-raceday');
+    if (deleteDayBtn) {
+      const dayId = deleteDayBtn.getAttribute('data-day-id');
+      const day = raceDayFor(dayId);
+      if (!confirm('Delete "' + ((day && day.label) || 'this race day') + '" and its races? This cannot be undone.')) return;
+      PPStore.deleteRaceDay(dayId);
+      toast('Race day deleted');
+      const after = deleteDayBtn.getAttribute('data-after-delete');
+      if (after) location.hash = after; else window.rerender();
       return;
     }
 

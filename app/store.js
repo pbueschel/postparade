@@ -5,7 +5,8 @@
 (function () {
   const KEY = 'pp.demo.v1';
   const blank = () => ({ version: 1, submissions: [], requests: [], raceSpecOverrides: {}, stallOverrides: {},
-    createdMeets: [], createdRaceDays: [], createdRaces: [], createdPrograms: [] });
+    createdMeets: [], createdRaceDays: [], createdRaces: [], createdPrograms: [],
+    deletedMeetIds: [], deletedRaceDayIds: [] });
 
   let state = blank();
   try {
@@ -138,15 +139,39 @@
     return state.createdPrograms.find(p => ids.indexOf(p.id) >= 0) || null;
   }
 
+  /* --- Soft delete ---------------------------------------------------------
+     Seeded meets/race days are immutable (PPData never mutates), so "delete"
+     is an id-set overlay the screens layer filters against, same shape as
+     raceSpecOverrides — not a splice. Deleting a meet cascades to its race
+     days (seeded + created) so nothing is left reachable underneath it. */
+  function deleteMeet(meetId) {
+    if (state.deletedMeetIds.indexOf(meetId) === -1) state.deletedMeetIds.push(meetId);
+    const seededDays = (window.PPData && PPData.listRaceDays) ? PPData.listRaceDays(meetId) : [];
+    const createdDays = state.createdRaceDays.filter(d => d.meetId === meetId);
+    seededDays.concat(createdDays).forEach(d => {
+      if (state.deletedRaceDayIds.indexOf(d.id) === -1) state.deletedRaceDayIds.push(d.id);
+    });
+    save();
+  }
+  function isMeetDeleted(meetId) { return state.deletedMeetIds.indexOf(meetId) !== -1; }
+
+  function deleteRaceDay(dayId) {
+    if (state.deletedRaceDayIds.indexOf(dayId) === -1) state.deletedRaceDayIds.push(dayId);
+    save();
+  }
+  function isRaceDayDeleted(dayId) { return state.deletedRaceDayIds.indexOf(dayId) !== -1; }
+
   /* Seed OR created race merged with any persisted spec edits from the race
      builder. Created races (no PPData seed) resolve from state.createdRaces so
-     the Race Builder screen (#track/race/<id>) works on brand-new races too. */
+     the Race Builder screen (#track/race/<id>) works on brand-new races too.
+     A race whose race day was deleted resolves to null too — no ghost races
+     reachable by direct link after their day (or meet) is gone. */
   function raceFor(raceId) {
     const base = (window.PPData && PPData.getRace) ? PPData.getRace(raceId) : null;
     const created = state.createdRaces.find(r => r.id === raceId);
     const b = base || created;
+    if (!b || state.deletedRaceDayIds.indexOf(b.raceDayId) !== -1) return null;
     const patch = state.raceSpecOverrides[raceId];
-    if (!b) return null;
     if (!patch) return b;
     const merged = Object.assign({}, b, patch);
     if (b.conditions || patch.conditions) {
@@ -183,6 +208,8 @@
     createRaceDay, getCreatedRaceDay, listCreatedRaceDays,
     createRace, getCreatedRace, listCreatedRaces,
     createShipProgram, getCreatedProgram,
+    deleteMeet, isMeetDeleted,
+    deleteRaceDay, isRaceDayDeleted,
     raceFor,
     overrideStall,
     stallOverride: (appId) => state.stallOverrides[appId] || null,
