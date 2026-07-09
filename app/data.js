@@ -128,6 +128,27 @@
     { id: 'elp-jul11', meetId: 'elp-2026-summer', date: '2026-07-11', label: 'Saturday, July 11', status: 'draft' },
   ];
 
+  // ---- Stall barns + trainer stall applications (assigned at the meet level)
+  const stallBarns = [
+    { id: 'barn-cd-12',  meetId: 'cd-2026-summer',  name: 'Barn 12', totalStalls: 40 },
+    { id: 'barn-cd-14',  meetId: 'cd-2026-summer',  name: 'Barn 14', totalStalls: 36 },
+    { id: 'barn-cd-18',  meetId: 'cd-2026-summer',  name: 'Barn 18', totalStalls: 32 },
+    { id: 'barn-cd-22',  meetId: 'cd-2026-summer',  name: 'Barn 22', totalStalls: 24 },
+    { id: 'barn-elp-3',  meetId: 'elp-2026-summer', name: 'Barn 3',  totalStalls: 28 },
+    { id: 'barn-elp-5',  meetId: 'elp-2026-summer', name: 'Barn 5',  totalStalls: 20 },
+  ];
+
+  const stallApplications = [
+    { id: 'stall-cd-1',  meetId: 'cd-2026-summer',  stableId: 'snellgrove', horseCount: 6,  preferredBarnId: 'barn-cd-12', status: 'assigned',   barnId: 'barn-cd-12' },
+    { id: 'stall-cd-2',  meetId: 'cd-2026-summer',  stableId: 'walden',     horseCount: 8,  preferredBarnId: 'barn-cd-12', status: 'assigned',   barnId: 'barn-cd-12' },
+    { id: 'stall-cd-3',  meetId: 'cd-2026-summer',  stableId: 'cox',        horseCount: 10, preferredBarnId: 'barn-cd-14', status: 'pending',    barnId: null },
+    { id: 'stall-cd-4',  meetId: 'cd-2026-summer',  stableId: 'murphy',     horseCount: 5,  preferredBarnId: 'barn-cd-18', status: 'pending',    barnId: null },
+    { id: 'stall-cd-5',  meetId: 'cd-2026-summer',  stableId: 'hartman',    horseCount: 4,  preferredBarnId: 'barn-cd-22', status: 'waitlisted', barnId: null },
+    { id: 'stall-elp-1', meetId: 'elp-2026-summer', stableId: 'stewart',    horseCount: 6,  preferredBarnId: 'barn-elp-3', status: 'assigned',   barnId: 'barn-elp-3' },
+    { id: 'stall-elp-2', meetId: 'elp-2026-summer', stableId: 'lobo',       horseCount: 5,  preferredBarnId: 'barn-elp-5', status: 'pending',    barnId: null },
+    { id: 'stall-elp-3', meetId: 'elp-2026-summer', stableId: 'asmussen',   horseCount: 3,  preferredBarnId: 'barn-elp-5', status: 'waitlisted', barnId: null },
+  ];
+
   // ---- Races ---------------------------------------------------------------
   // Distances (yards): 5.5f=1210, 6f=1320, 6.5f=1430, 7f=1540, 1mi=1760,
   // 1m70y=1830, 8.5f=1870, 9f=1980. entryClose sits ~72h before postTime.
@@ -585,6 +606,8 @@
   const stableById = byId(stables);
   const horseById = byId(horses);
   const programById = byId(supplementPrograms);
+  const stallBarnById = byId(stallBarns);
+  const stallApplicationById = byId(stallApplications);
 
   const meetOfRace = (r) => (r.meetId || (raceDayById[r.raceDayId] || {}).meetId);
 
@@ -606,6 +629,7 @@
 
     // normalized collections (handy for the new data-driven screens) --------
     tracks, meets, raceDays, races, stables, entries, shipMi,
+    stallBarns, stallApplications,
 
     // tracks
     getTrack(id) { return trackById[id] || null; },
@@ -641,6 +665,12 @@
     // stables
     getStable(id) { return stableById[id] || null; },
     listStables() { return stables; },
+
+    // stall barns + trainer stall applications (meet-level)
+    getStallBarn(id) { return stallBarnById[id] || null; },
+    listStallBarns(meetId) { return stallBarns.filter((b) => b.meetId === meetId); },
+    getStallApplication(id) { return stallApplicationById[id] || null; },
+    listStallApplications(meetId) { return stallApplications.filter((a) => a.meetId === meetId); },
     demoStable() { return stables.find((s) => s.isDemoUser) || null; },
 
     // shipping + incentives

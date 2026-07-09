@@ -226,7 +226,6 @@
         <span class="ml-auto pill bg-indigo-500 text-white">2</span>
       </a>
       <a href="#race/cd-jun6-r3"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-clock" class="w-4 h-4"></i>Race detail</a>
-      <a href="#parser"           class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="scan-text" class="w-4 h-4"></i>Condition parser</a>
 
       <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Stable</div>
       <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="user-round" class="w-4 h-4"></i>Jockeys</a>
@@ -235,16 +234,17 @@
 
     <!-- Track nav -->
     <nav data-nav="track" class="p-2 text-sm flex-1">
-      <a href="#track/meet"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-range" class="w-4 h-4"></i>Meet</a>
+      <a href="#track/meets"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-range" class="w-4 h-4"></i>Meets</a>
       <a href="#track/raceday"  class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="calendar-days" class="w-4 h-4"></i>Raceday card</a>
       <a href="#track/race/cd-jun6-r3" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="flag-triangle-right" class="w-4 h-4"></i>Race builder</a>
       <a href="#track/requests" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="megaphone" class="w-4 h-4"></i>Fill &amp; request
         <span class="ml-auto pill bg-indigo-500 text-white">3</span>
       </a>
       <a href="#track/strength" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="activity" class="w-4 h-4"></i>Field strength</a>
+      <a href="#track/stall-builder" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="warehouse" class="w-4 h-4"></i>Stalls</a>
 
       <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Meet</div>
-      <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="warehouse" class="w-4 h-4"></i>Stalls &amp; ship-ins</a>
+      <a href="#track/stalls" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="warehouse" class="w-4 h-4"></i>Stalls &amp; ship-ins</a>
       <a href="#" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="book-open" class="w-4 h-4"></i>Condition books</a>
     </nav>
 
@@ -817,9 +817,30 @@
     </section>
 
     <!-- =========================================================== -->
-    <!-- TRACK · MEET OVERVIEW                                     -->
+    <!-- TRACK · MEETS LIST                                           -->
     <!-- =========================================================== -->
-    <section id="track/meet" class="screen p-6 space-y-6">
+    <section id="track/meets" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
+    </section>
+
+    <!-- =========================================================== -->
+    <!-- TRACK · MEET OVERVIEW (param: meetId)                        -->
+    <!-- =========================================================== -->
+    <section id="scr-track-meet" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
+    </section>
+
+    <!-- =========================================================== -->
+    <!-- TRACK · STALLS & SHIP-INS OVERVIEW (param: meetId)            -->
+    <!-- =========================================================== -->
+    <section id="scr-track-stalls" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-*.js (PPRenderers) -->
+    </section>
+
+    <!-- =========================================================== -->
+    <!-- TRACK · STALL BUILDER / ASSIGNMENT (param: meetId)            -->
+    <!-- =========================================================== -->
+    <section id="scr-track-stall-builder" class="screen p-6 space-y-6">
       <!-- rendered by app/screens-*.js (PPRenderers) -->
     </section>
 
@@ -936,7 +957,7 @@
       abbr: 'CD',
       role: 'Track workspace',
       userRole: 'Racing secretary',
-      home: 'track/meet',
+      home: 'track/meets',
       cta: 'Build a race',
       prefixes: ['track/'],
     },
@@ -984,12 +1005,17 @@
   const paramRoutes = [                                // longest prefix first
     { prefix: 'track/race/',    section: 'scr-track-race' },
     { prefix: 'track/raceday/', section: 'scr-track-raceday' },
+    { prefix: 'track/meet/',    section: 'scr-track-meet' },
+    { prefix: 'track/stall-builder/', section: 'scr-track-stall-builder' },
+    { prefix: 'track/stalls/', section: 'scr-track-stalls' },
     { prefix: 'horse/',         section: 'scr-horse' },
     { prefix: 'recs/',          section: 'scr-recs' },
     { prefix: 'race/',          section: 'scr-race' },
   ];
   function resolveRoute(id) {
     if (id === 'track/raceday') return { section: 'scr-track-raceday', param: null };
+    if (id === 'track/stalls') return { section: 'scr-track-stalls', param: null };
+    if (id === 'track/stall-builder') return { section: 'scr-track-stall-builder', param: null };
     const r = paramRoutes.find(r => id.startsWith(r.prefix));
     return r ? { section: r.section, param: id.slice(r.prefix.length) }
              : { section: id, param: null };

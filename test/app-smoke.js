@@ -64,7 +64,8 @@ window.rerender = () => {};
 const keys = Object.keys(R);
 console.log('renderers registered:', keys.join(', '));
 const expected = ['dashboard', 'scr-horse', 'scr-recs', 'scr-race', 'trainer/requests', 'trainer/alerts',
-  'track/meet', 'scr-track-raceday', 'scr-track-race', 'track/requests', 'track/strength'];
+  'track/meets', 'scr-track-meet', 'scr-track-stalls', 'scr-track-stall-builder',
+  'scr-track-raceday', 'scr-track-race', 'track/requests', 'track/strength'];
 const missing = expected.filter(k => !R[k]);
 if (missing.length) { console.error('MISSING RENDERERS:', missing); process.exit(1); }
 
@@ -84,7 +85,19 @@ tryRender('scr-recs', 'zengraya');
 tryRender('scr-race', null);
 tryRender('scr-race', 'cd-jun6-r4');
 tryRender('trainer/requests');
-tryRender('track/meet');
+tryRender('track/meets');
+tryRender('scr-track-meet', null);
+tryRender('scr-track-meet', 'cd-2026-summer');
+tryRender('scr-track-meet', 'elp-2026-summer');
+tryRender('scr-track-meet', 'nonexistent-meet');
+tryRender('scr-track-stalls', null);
+tryRender('scr-track-stalls', 'cd-2026-summer');
+tryRender('scr-track-stalls', 'elp-2026-summer');
+tryRender('scr-track-stalls', 'nonexistent-meet');
+tryRender('scr-track-stall-builder', null);
+tryRender('scr-track-stall-builder', 'cd-2026-summer');
+tryRender('scr-track-stall-builder', 'elp-2026-summer');
+tryRender('scr-track-stall-builder', 'nonexistent-meet');
 tryRender('scr-track-raceday', null);
 tryRender('scr-track-race', null);
 tryRender('scr-track-race', 'cd-jun6-r4');  // showcase over-subscribed race
@@ -106,6 +119,14 @@ if (!sub || PPStore.entriesForRace('cd-jun6-r3').length < before + 1) { console.
 // persisted?
 if (!storage['pp.demo.v1'] || !storage['pp.demo.v1'].includes('zengraya')) { console.error('FAIL: not persisted to localStorage'); fails++; }
 console.log('store loop ok; persisted bytes:', (storage['pp.demo.v1'] || '').length);
+
+// Store loop: pending stall application → assign → status flips
+const stallBefore = PPStore.stallFor('stall-cd-3');
+if (stallBefore.status !== 'pending') { console.error('FAIL stall pre-state: expected pending, got', stallBefore.status); fails++; }
+PPStore.overrideStall('stall-cd-3', { status: 'assigned', barnId: 'barn-cd-14' });
+const stallAfter = PPStore.stallFor('stall-cd-3');
+if (stallAfter.status !== 'assigned' || stallAfter.barnId !== 'barn-cd-14') { console.error('FAIL stall assign:', stallAfter); fails++; }
+else { console.log('stall assign ok'); }
 
 // re-render everything again with live store state
 tryRender('trainer/requests');

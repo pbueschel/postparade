@@ -4,7 +4,7 @@
    Stage 2 swap: these methods become API calls, same shapes (plan.md §6). */
 (function () {
   const KEY = 'pp.demo.v1';
-  const blank = () => ({ version: 1, submissions: [], requests: [], raceSpecOverrides: {} });
+  const blank = () => ({ version: 1, submissions: [], requests: [], raceSpecOverrides: {}, stallOverrides: {} });
 
   let state = blank();
   try {
@@ -91,6 +91,19 @@
     return merged;
   }
 
+  function overrideStall(appId, patch) {
+    state.stallOverrides[appId] = Object.assign({}, state.stallOverrides[appId], patch);
+    save();
+    return state.stallOverrides[appId];
+  }
+
+  /* Seed stall application merged with any persisted assignment edits. */
+  function stallFor(appId) {
+    const base = (window.PPData && PPData.getStallApplication) ? PPData.getStallApplication(appId) : null;
+    const patch = state.stallOverrides[appId];
+    return base ? Object.assign({}, base, patch) : null;
+  }
+
   function reset() {
     try { localStorage.removeItem(KEY); } catch (e) {}
     location.reload();
@@ -103,6 +116,9 @@
     overrideRace,
     raceOverride: (raceId) => state.raceSpecOverrides[raceId] || null,
     raceFor,
+    overrideStall,
+    stallOverride: (appId) => state.stallOverrides[appId] || null,
+    stallFor,
     reset,
     _debug: () => JSON.parse(JSON.stringify(state)),
   };

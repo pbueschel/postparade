@@ -78,20 +78,69 @@
   }
 
   // ===========================================================================
+  // 0. Meets list — one card per meet, aggregate stats scoped to that meet.
+  // ===========================================================================
+  R['track/meets'] = function () {
+    const D = PPData;
+    const meets = D.listMeets();
+
+    const cards = meets.map(meet => {
+      const races = D.listRaces({ meetId: meet.id });
+      let totalEntered = 0, underfilled = 0;
+      races.forEach(r => { const e = enteredCount(r.id); totalEntered += e; if (e < r.fieldTarget.min) underfilled++; });
+      const avg = races.length ? totalEntered / races.length : 0;
+      const days = D.listRaceDays(meet.id);
+      const prog = D.shipProgram(meet.id);
+      const cap = (prog && prog.cap) || { totalBudget: 0, claimed: 0 };
+      const raceIds = new Set(races.map(r => r.id));
+      const reqOut = PPStore.requests.list().filter(r => raceIds.has(r.raceId)).length;
+      const tag = underfilled === 0 ? pill('healthy', 'accent-soft')
+        : pill(`${underfilled} underfilled`, underfilled <= 1 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700');
+
+      return `
+        <a href="#track/meet/${esc(meet.id)}" class="card ring-soft p-5 hover:border-indigo-300 transition block">
+          <div class="flex items-center justify-between"><div class="font-semibold">${esc(meet.name)}</div>${tag}</div>
+          <div class="text-xs text-slate-500 mt-1">${esc(meet.trackName || '')} · ${esc(meet.label || '')}</div>
+          <div class="text-xs text-slate-500">${fmtDate(meet.start)} – ${fmtDate(meet.end)}</div>
+          <div class="mt-3 text-sm text-slate-600">${days.length} race days · ${races.length} races</div>
+          <div class="mt-2 flex items-center gap-2 text-xs">
+            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full ${underfilled === 0 ? 'accent-bg' : underfilled <= 1 ? 'bg-amber-500' : 'bg-red-500'}" style="width:${Math.min(100, Math.round(avg / 9 * 100))}%"></div></div>
+            <span class="text-slate-500">avg ${avg.toFixed(1)}</span>
+          </div>
+          <div class="mt-2 text-xs text-slate-500">ship-in pool ${fmtMoney(cap.totalBudget)} · ${reqOut} requests out</div>
+        </a>`;
+    }).join('');
+
+    mount('track/meets', `
+      <div>
+        <div class="text-xs text-slate-500 uppercase tracking-wider">TRACK WORKSPACE</div>
+        <h1 class="text-2xl font-semibold tracking-tight">Meets</h1>
+        <div class="text-sm text-slate-600">${meets.length} meets · ${meets.filter(m => m.status === 'published').length} published</div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-4">${cards}</div>`);
+  };
+
+  // ===========================================================================
   // 1. Meet overview — computed KPIs, race-day cards, ship-in bonus panel.
   // ===========================================================================
-  R['track/meet'] = function () {
+  R['scr-track-meet'] = function (meetId) {
     const D = PPData;
-    const meet = D.getMeet(CD_MEET) || {};
-    const races = D.listRaces({ meetId: CD_MEET });
-    const days = D.listRaceDays(CD_MEET);
-    const prog = D.shipProgram(CD_MEET);
+    const mid = meetId || CD_MEET;
+    const meet = D.getMeet(mid);
+    if (!meet) { mount('scr-track-meet', '<div class="text-sm text-slate-500">Meet not found.</div>'); return; }
+    const races = D.listRaces({ meetId: mid });
+    const days = D.listRaceDays(mid);
+    const prog = D.shipProgram(mid);
     const cap = (prog && prog.cap) || { totalBudget: 0, claimed: 0 };
 
     let totalEntered = 0, underfilled = 0;
     races.forEach(r => { const e = enteredCount(r.id); totalEntered += e; if (e < r.fieldTarget.min) underfilled++; });
     const avg = races.length ? totalEntered / races.length : 0;
     const reqOut = PPStore.requests.list().length;
+
+    const barns = D.listStallBarns(mid);
+    const stallApps = D.listStallApplications(mid).map(a => PPStore.stallFor(a.id));
+    const pendingCount = stallApps.filter(a => a.status === 'pending').length;
 
     const dayCards = days.map(day => {
       const dr = D.listRaces({ raceDayId: day.id });
@@ -112,7 +161,12 @@
         </a>`;
     }).join('');
 
-    mount('track/meet', `
+    mount('scr-track-meet', `
+      <div class="text-xs text-slate-500 flex items-center gap-1.5">
+        <a href="#track/meets" class="hover:text-ink-900">Meets</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-ink-900 font-medium">${esc(meet.name || meet.label || 'Meet')}</span>
+      </div>
       <div class="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || 'Churchill Downs')} · ${esc(meet.label || 'meet')}</div>
@@ -130,6 +184,14 @@
       </div>
 
       <div class="grid lg:grid-cols-3 gap-4">${dayCards}</div>
+
+      <a href="#track/stalls/${esc(mid)}" class="card ring-soft p-5 hover:border-indigo-300 transition flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg accent-soft flex items-center justify-center"><i data-lucide="warehouse" class="w-5 h-5"></i></div>
+          <div><div class="font-semibold">Stalls &amp; ship-ins</div><div class="text-xs text-slate-500">${barns.length} barns · ${pendingCount} pending</div></div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </a>
 
       <div class="card ring-soft p-5 stripe">
         <div class="flex items-center gap-2 accent-text"><i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold">${esc((prog && prog.label) || 'Ship & Win')}, meet-wide</div></div>
@@ -179,7 +241,7 @@
 
     mount('scr-track-raceday', `
       <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/meet" class="hover:text-ink-900">${esc(meet.label || 'Meet')}</a>
+        <a href="#track/meet/${esc(meet.id)}" class="hover:text-ink-900">${esc(meet.label || 'Meet')}</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <span class="text-ink-900 font-medium">${esc(day.label)}</span>
       </div>
@@ -281,7 +343,7 @@
 
     mount('scr-track-race', `
       <div class="text-xs text-slate-500 flex items-center gap-1.5">
-        <a href="#track/meet" class="hover:text-ink-900">${esc(meet.label || 'Meet')}</a>
+        <a href="#track/meet/${esc(meet.id)}" class="hover:text-ink-900">${esc(meet.label || 'Meet')}</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <a href="#track/raceday/${esc(race.raceDayId)}" class="hover:text-ink-900">${esc(day.label || 'Race day')}</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
@@ -412,7 +474,7 @@
           <h1 class="text-2xl font-semibold tracking-tight">Requests &amp; outreach</h1>
           <div class="text-sm text-slate-600">Every horse you've requested for a race, grouped by where it stands. Requests convert to entries when the trainer accepts.</div>
         </div>
-        <a href="#track/meet" class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Back to meet</a>
+        <a href="#track/meet/${CD_MEET}" class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Back to meet</a>
       </div>
       ${reqs.length === 0 ? `<div class="card ring-soft p-5 stripe text-sm text-slate-600"><span class="font-medium">No requests sent yet.</span> Open a race builder, find qualifying horses in the fits list, and hit <span class="accent-text font-medium">Request</span> to reach their trainers.</div>` : ''}
       <div class="grid lg:grid-cols-3 gap-4">${groupHtml}</div>
@@ -498,6 +560,166 @@
       </div>`);
   };
 
+  // ===========================================================================
+  // 6. Stalls & ship-ins — read-only overview of barn capacity + applications.
+  // ===========================================================================
+  R['scr-track-stalls'] = function (meetId) {
+    const D = PPData;
+    const mid = meetId || CD_MEET;
+    const meet = D.getMeet(mid);
+    if (!meet) { mount('scr-track-stalls', '<div class="text-sm text-slate-500">Meet not found.</div>'); return; }
+
+    const barns = D.listStallBarns(mid);
+    const apps = D.listStallApplications(mid).map(a => PPStore.stallFor(a.id));
+    const assignedIn = (barnId) => apps.filter(a => a.barnId === barnId && a.status === 'assigned').reduce((s, a) => s + a.horseCount, 0);
+
+    const totalStalls = barns.reduce((s, b) => s + b.totalStalls, 0);
+    const assignedTotal = barns.reduce((s, b) => s + assignedIn(b.id), 0);
+    const openTotal = totalStalls - assignedTotal;
+    const pendingCount = apps.filter(a => a.status === 'pending').length;
+
+    const barnRows = barns.map(b => {
+      const assigned = assignedIn(b.id);
+      const fs = fillState(assigned, b.totalStalls);
+      return `
+        <div class="px-5 py-4 grid grid-cols-12 gap-3 items-center">
+          <div class="col-span-4"><div class="font-medium">${esc(b.name)}</div><div class="text-xs text-slate-500">${b.totalStalls} stalls</div></div>
+          <div class="col-span-6"><div class="flex items-center gap-2">
+            <div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full ${fs.bar}" style="width:${fs.pct}%"></div></div>
+            <div class="text-xs text-slate-500">${assigned}/${b.totalStalls}</div></div></div>
+          <div class="col-span-2 text-right text-xs text-slate-500">${b.totalStalls - assigned} open</div>
+        </div>`;
+    }).join('') || '<div class="px-5 py-8 text-center text-sm text-slate-500">No barns configured for this meet.</div>';
+
+    const prog = D.shipProgram(mid);
+    const cap = (prog && prog.cap) || { totalBudget: 0, claimed: 0 };
+
+    mount('scr-track-stalls', `
+      <div class="text-xs text-slate-500 flex items-center gap-1.5">
+        <a href="#track/meets" class="hover:text-ink-900">Meets</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <a href="#track/meet/${esc(meet.id)}" class="hover:text-ink-900">${esc(meet.name || meet.label || 'Meet')}</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-ink-900 font-medium">Stalls &amp; ship-ins</span>
+      </div>
+      <div class="flex items-end justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || 'Churchill Downs')} · ${esc(meet.label || 'meet')}</div>
+          <h1 class="text-2xl font-semibold tracking-tight">Stalls &amp; ship-ins</h1>
+          <div class="text-sm text-slate-600">${barns.length} barns · ${totalStalls} stalls · ${pendingCount} pending applications</div>
+        </div>
+        <a href="#track/stall-builder/${esc(mid)}" class="text-sm px-3 py-1.5 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>Manage assignments →</a>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Total stalls</div><div class="mt-1 text-2xl font-semibold">${totalStalls}</div><div class="text-xs text-slate-500">across ${barns.length} barns</div></div>
+        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Assigned</div><div class="mt-1 text-2xl font-semibold">${assignedTotal}</div><div class="text-xs accent-text">horses stabled</div></div>
+        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Open</div><div class="mt-1 text-2xl font-semibold">${openTotal}</div><div class="text-xs text-slate-500">stalls available</div></div>
+        <div class="card ring-soft p-4"><div class="text-xs text-slate-500">Pending applications</div><div class="mt-1 text-2xl font-semibold text-amber-600">${pendingCount}</div><div class="text-xs text-slate-500">awaiting assignment</div></div>
+      </div>
+
+      <div class="card ring-soft">
+        <div class="px-5 py-4 border-b border-slate-100"><div class="font-semibold">Barns</div><div class="text-xs text-slate-500">Assigned horses vs. capacity per barn</div></div>
+        <div class="divide-y divide-slate-100 text-sm">${barnRows}</div>
+      </div>
+
+      <div class="card ring-soft p-5 stripe">
+        <div class="flex items-center gap-2 accent-text"><i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold">${esc((prog && prog.label) || 'Ship & Win')}, meet-wide</div></div>
+        <div class="mt-2 text-sm text-slate-700">
+          <span class="font-medium">${fmtMoney(prog ? prog.flatAmount : 0)}</span> to any horse shipping in <span class="font-medium">≥ ${prog ? prog.eligibility.minShipMi : 0} mi</span>, applied to underfilled non-stakes races. Individual races can override.
+          <span class="text-slate-500">Pool ${fmtMoney(cap.totalBudget)} · ${fmtMoney(cap.claimed)} committed.</span>
+        </div>
+      </div>`);
+  };
+
+  // ===========================================================================
+  // 7. Stall builder — interactive assignment tool (pending → assign/waitlist).
+  // ===========================================================================
+  function stallRow(a) {
+    const D = PPData;
+    const stable = D.getStable(a.stableId) || {};
+    const prefName = (D.getStallBarn(a.preferredBarnId) || {}).name || '—';
+    const assignedName = a.status === 'assigned' ? ((D.getStallBarn(a.barnId) || {}).name || '—') : '';
+    const actions = a.status === 'pending'
+      ? `<div class="mt-2 flex flex-wrap gap-2">
+          <button class="pp-stall-assign text-xs px-2.5 py-1 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1" data-app-id="${esc(a.id)}" data-barn-id="${esc(a.preferredBarnId)}"><i data-lucide="check" class="w-3 h-3"></i>Assign to preferred barn</button>
+          <button class="pp-stall-waitlist text-xs px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-1" data-app-id="${esc(a.id)}"><i data-lucide="hourglass" class="w-3 h-3"></i>Waitlist</button>
+        </div>`
+      : '';
+    return `
+      <div class="px-5 py-3">
+        <div class="flex items-center justify-between gap-3">
+          <div><div class="font-medium">${esc(stable.name || 'Stable')}</div><div class="text-xs text-slate-500">${esc(stable.trainer || '')}</div></div>
+          <div class="text-xs text-slate-500 text-right">${a.horseCount} horses</div>
+        </div>
+        <div class="mt-1 text-xs text-slate-500">Prefers ${esc(prefName)}${assignedName ? ' · <span class="accent-text font-medium">Assigned ' + esc(assignedName) + '</span>' : ''}</div>
+        ${actions}
+      </div>`;
+  }
+
+  R['scr-track-stall-builder'] = function (meetId) {
+    const D = PPData;
+    const mid = meetId || CD_MEET;
+    const meet = D.getMeet(mid);
+    if (!meet) { mount('scr-track-stall-builder', '<div class="text-sm text-slate-500">Meet not found.</div>'); return; }
+
+    const apps = D.listStallApplications(mid).map(a => PPStore.stallFor(a.id));
+    const barns = D.listStallBarns(mid);
+    const assignedIn = (barnId) => apps.filter(a => a.barnId === barnId && a.status === 'assigned').reduce((s, a) => s + a.horseCount, 0);
+
+    const capCards = barns.map(b => {
+      const assigned = assignedIn(b.id);
+      const fs = fillState(assigned, b.totalStalls);
+      return `
+        <div class="rounded-lg border border-slate-100 p-3">
+          <div class="flex items-center justify-between"><div class="text-sm font-medium">${esc(b.name)}</div><div class="text-xs text-slate-500">${b.totalStalls - assigned} open</div></div>
+          <div class="mt-2 flex items-center gap-2"><div class="flex-1 h-1.5 rounded bg-slate-100 overflow-hidden"><div class="h-full ${fs.bar}" style="width:${fs.pct}%"></div></div><div class="text-xs text-slate-500">${assigned}/${b.totalStalls}</div></div>
+        </div>`;
+    }).join('') || '<div class="text-sm text-slate-500">No barns configured.</div>';
+
+    const groups = [
+      ['pending', 'Awaiting assignment', 'clock', 'bg-amber-50 text-amber-700'],
+      ['assigned', 'Assigned', 'check-circle-2', 'accent-soft'],
+      ['waitlisted', 'Waitlisted', 'hourglass', 'bg-red-50 text-red-700'],
+    ];
+    const groupHtml = groups.map(([st, label, icon, cls]) => {
+      const list = apps.filter(a => a.status === st);
+      const items = list.map(stallRow).join('') || `<div class="px-5 py-3 text-sm text-slate-400">Nothing here yet.</div>`;
+      return `
+        <div class="card ring-soft">
+          <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+            <div class="font-semibold flex items-center gap-2"><i data-lucide="${icon}" class="w-4 h-4"></i>${label}</div>
+            <span class="pill ${cls}">${list.length}</span></div>
+          <div class="divide-y divide-slate-100">${items}</div>
+        </div>`;
+    }).join('');
+
+    mount('scr-track-stall-builder', `
+      <div class="text-xs text-slate-500 flex items-center gap-1.5">
+        <a href="#track/meets" class="hover:text-ink-900">Meets</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <a href="#track/meet/${esc(meet.id)}" class="hover:text-ink-900">${esc(meet.name || meet.label || 'Meet')}</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-ink-900 font-medium">Stalls</span>
+      </div>
+      <div class="flex items-end justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || 'Churchill Downs')} · ${esc(meet.label || 'meet')}</div>
+          <h1 class="text-2xl font-semibold tracking-tight">Stall assignments</h1>
+          <div class="text-sm text-slate-600">Assign pending applications to barns or waitlist them. Capacity updates live.</div>
+        </div>
+        <a href="#track/stalls/${esc(mid)}" class="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Back to overview</a>
+      </div>
+
+      <div class="card ring-soft p-5">
+        <div class="font-semibold">Barn capacity</div>
+        <div class="text-xs text-slate-500 mb-3">Remaining stalls per barn — assigning fills these live.</div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">${capCards}</div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-4">${groupHtml}</div>`);
+  };
+
   // ---- Delegated interactivity (wired once) --------------------------------
   function onClick(ev) {
     const reqBtn = ev.target.closest && ev.target.closest('.pp-request');
@@ -512,7 +734,29 @@
       }
       return;
     }
-    if (ev.target.closest && ev.target.closest('.pp-recompute')) { window.rerender(); }
+    if (ev.target.closest && ev.target.closest('.pp-recompute')) { window.rerender(); return; }
+
+    const assignBtn = ev.target.closest && ev.target.closest('.pp-stall-assign');
+    if (assignBtn) {
+      const appId = assignBtn.getAttribute('data-app-id');
+      const barnId = assignBtn.getAttribute('data-barn-id');
+      PPStore.overrideStall(appId, { status: 'assigned', barnId });
+      const app = PPStore.stallFor(appId);
+      const stable = app && PPData.getStable(app.stableId);
+      toast(((stable && stable.name) || 'Stable') + ' assigned a stall');
+      window.rerender();
+      return;
+    }
+    const waitlistBtn = ev.target.closest && ev.target.closest('.pp-stall-waitlist');
+    if (waitlistBtn) {
+      const appId = waitlistBtn.getAttribute('data-app-id');
+      PPStore.overrideStall(appId, { status: 'waitlisted' });
+      const app = PPStore.stallFor(appId);
+      const stable = app && PPData.getStable(app.stableId);
+      toast(((stable && stable.name) || 'Stable') + ' waitlisted');
+      window.rerender();
+      return;
+    }
   }
 
   function onChange(ev) {
