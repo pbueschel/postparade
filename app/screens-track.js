@@ -532,7 +532,7 @@
             <label class="block"><div class="text-xs text-slate-500 mb-1">Age / sex restriction</div>${selectHtml('rb-restrict', RESTRICTS, restrictOf(race))}</label>
             <label class="block"><div class="text-xs text-slate-500 mb-1">Field target (max)</div>${selectHtml('rb-target', TARGETS, String(target.max))}</label>
             <label class="block sm:col-span-2"><div class="text-xs text-slate-500 mb-1">Condition text</div>
-              <textarea id="rb-conditions" rows="3" readonly class="w-full font-mono text-xs leading-relaxed p-3 rounded-lg bg-slate-50 border border-slate-200">${esc((race.conditions && race.conditions.text) || '')}</textarea></label>
+              <textarea id="rb-conditions" rows="3" placeholder="e.g. FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD." class="w-full font-mono text-xs leading-relaxed p-3 rounded-lg bg-white border border-slate-200 focus:border-slate-400 focus:outline-none">${esc((race.conditions && race.conditions.text) || '')}</textarea></label>
           </div>
           <div class="mt-4 pt-4 border-t border-slate-100">
             <div class="flex items-center gap-2 accent-text"><i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold text-ink-900">Shipping bonus</div></div>
@@ -896,7 +896,14 @@
       }
       return;
     }
-    if (ev.target.closest && ev.target.closest('.pp-recompute')) { window.rerender(); return; }
+    const recomputeBtn = ev.target.closest && ev.target.closest('.pp-recompute');
+    if (recomputeBtn) {
+      const scope = recomputeBtn.closest('[data-race-id]');
+      const raceId = scope && scope.getAttribute('data-race-id');
+      if (raceId) saveRaceSpec(raceId);
+      window.rerender();
+      return;
+    }
 
     const createMeetBtn = ev.target.closest && ev.target.closest('.pp-create-meet');
     if (createMeetBtn) {
@@ -1013,12 +1020,12 @@
     }
   }
 
-  function onChange(ev) {
-    const t = ev.target;
-    if (!t || !t.id || t.id.indexOf('rb-') !== 0) return;
-    const scope = t.closest('[data-race-id]');
-    const raceId = scope && scope.getAttribute('data-race-id');
-    if (!raceId) return;
+  // Reads every rb-* field for the given race and saves it as one patch —
+  // shared by onChange (fires on blur/select) and the Recompute button (which
+  // must commit whatever's currently typed, even in an un-blurred number
+  // input, before re-rendering — otherwise a value typed but not yet
+  // committed gets silently discarded by the re-render).
+  function saveRaceSpec(raceId) {
     const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
     const restrict = val('rb-restrict'), type = val('rb-type');
     const base = PPStore.raceFor(raceId) || {};
@@ -1035,9 +1042,19 @@
         sexes: restrict.charAt(0) === 'F' ? ['F', 'M'] : ['F', 'M', 'G', 'C', 'H', 'R'],
         minAge: restrict.indexOf('2') >= 0 ? 2 : 3,
         maidenOnly: (type === 'S' || type === 'M'),
+        text: val('rb-conditions'),
       },
     };
     PPStore.overrideRace(raceId, patch);
+  }
+
+  function onChange(ev) {
+    const t = ev.target;
+    if (!t || !t.id || t.id.indexOf('rb-') !== 0) return;
+    const scope = t.closest('[data-race-id]');
+    const raceId = scope && scope.getAttribute('data-race-id');
+    if (!raceId) return;
+    saveRaceSpec(raceId);
     window.rerender();
   }
 
