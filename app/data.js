@@ -54,6 +54,12 @@
   const rollLabel   = `Saturday, ${MONTH_NAMES[rollRaceDay.getUTCMonth()]} ${rollRaceDay.getUTCDate()}`;
   const rollCloseISO = `${ymd(rollClose)}T10:00:00-05:00`;              // shared entryClose for the card
   const rollPostISO  = (hhmm) => `${rollDate}T${hhmm}:00-05:00`;        // per-race post time on the rolling Saturday
+  // A vet's-list clearance date that always lands AFTER the rolling ELP card, so
+  // the vet's-list showcase (steel-thistle, demo-fiction) stays perpetually
+  // "still barred" on the live card instead of decaying to cleared as its old
+  // fixed 2026-06-20 date aged past `today`. Demo-fiction horse only — never a
+  // real LaRose horse (a vet flag asserts real unsoundness). See plan.md R5.1.
+  const rollVetEligible = ymd(new Date(rollRaceDay.getTime() + 14 * DAY_MS));
 
   // Class ladder enum (mirrors PPEngine.CLASS_LADDER; kept here for the data layer).
   const classLadder = [
@@ -544,6 +550,41 @@
         text: 'FOR THREE YEAR OLDS AND UPWARD WHICH HAVE NEVER WON THREE RACES OTHER THAN MAIDEN, CLAIMING, OR STARTER. One Mile And 70 Yards.',
       },
     },
+    // R5.1 — the draw-in / also-eligible SHOWCASE on the live ELP card, the
+    // rolling-date reconstruction of the old cd-jun6-r4. FICTIONAL: deliberately
+    // seeded OVER fieldTarget.max (12 entered / 10 cap) so the field spills into
+    // the also-eligible band, driving the cut-line panel. Entries are all
+    // demo-fiction ship-in horses — never LaRose's real barn.
+    {
+      id: 'elp-jul11-r4', raceDayId: 'elp-jul11', raceNumber: 4,
+      classLadder: 'Clm', surface: 'D', isTurf: false, mtoAllowed: false,
+      distanceYards: 1320, purse: 22000, par: 80,
+      fieldTarget: { min: 8, max: 10 }, alsoEligibleCap: 4, preferenceSystem: 'date',
+      entryClose: rollCloseISO, postTime: rollPostISO('14:30'),
+      stateBredRestricted: false, stateBredCode: null,
+      conditions: {
+        sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3, claimingPrice: 20000,
+        text: 'FOR THREE YEAR OLDS AND UPWARD. Claiming Price $20,000. Six Furlongs. (Overfilled — preference by last-start date; also-eligibles drawn if scratches occur.)',
+      },
+    },
+    // R5.1 — the medication (Lasix) gate SHOWCASE on the live ELP card, the
+    // rolling-date reconstruction of the old cd-jun6-r7. FICTIONAL Listed turf
+    // stakes prohibiting race-day Lasix: a demo-fiction Lasix mare (silverware)
+    // is eligible on class/distance but gated out with the named reason. Seeded
+    // with the two demo-fiction no-Lasix horses so the field itself is legal.
+    {
+      id: 'elp-jul11-r5', raceDayId: 'elp-jul11', raceNumber: 5,
+      classLadder: 'Listed', surface: 'T', isTurf: true, mtoAllowed: false,
+      distanceYards: 1870, purse: 125000, par: 93,
+      fieldTarget: { min: 6, max: 12 }, alsoEligibleCap: 4, preferenceSystem: 'stars',
+      entryClose: rollCloseISO, postTime: rollPostISO('16:00'),
+      stateBredRestricted: false, stateBredCode: null,
+      conditions: {
+        sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3, lasixProhibited: true,
+        name: 'Ellis Park Turf Stakes (Listed)',
+        text: 'THE ELLIS PARK TURF STAKES (LISTED). FOR THREE YEAR OLDS AND UPWARD. One And One Sixteenth Miles (Turf). No race-day Lasix permitted.',
+      },
+    },
 
     // ==== Real races for the LaRose demo — see docs/research-delta-downs-larose-2026-07-09.md ====
 
@@ -738,7 +779,7 @@
       preference: { date: '2026-04-29', stars: 3 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: 'KY', flags: ['ky-bred'] },
     { id: 'steel-thistle', name: 'Steel Thistle', stableId: 'snellgrove', stable: 'Snellgrove Racing', trainer: 'Beschizza A.', sex: 'C', age: 3, maiden: true, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 118, lastSpeed: 84, daysSince: 45, home: 'CD', shipMi: 0, trainerPct: 0.20,
       record: { starts: 4, careerWins: 0, winsOtherThanMdnClmStarter: 0, lastWinDate: null }, lastStartDate: '2026-04-17',
-      preference: { date: '2026-04-17', stars: 3 }, vetList: { listed: true, reason: 'unsound', eligibleDate: '2026-06-20' }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['vet-list'] },
+      preference: { date: '2026-04-17', stars: 3 }, vetList: { listed: true, reason: 'unsound', eligibleDate: rollVetEligible }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['vet-list'] },
     { id: 'harbor-mist', name: 'Harbor Mist', stableId: 'snellgrove', stable: 'Snellgrove Racing', trainer: 'Bauer P.', sex: 'F', age: 4, maiden: false, under50k: false, surf: ['D'], sweet: [1430, 1760], classR: 117, lastSpeed: 86, daysSince: 40, home: 'CD', shipMi: 0, trainerPct: 0.18,
       record: { starts: 11, careerWins: 2, winsOtherThanMdnClmStarter: 0, lastWinDate: '2026-03-15' }, lastStartDate: '2026-04-22',
       preference: { date: '2026-04-22', stars: 3 }, vetList: { listed: true, reason: 'bled', eligibleDate: '2026-05-28' }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['recently-cleared'] },
@@ -981,6 +1022,12 @@
     'elp-jul11-r1': ['silk-purse', 'crescent-moon', 'ozark-ruby'],
     'elp-jul11-r2': ['frost-bank', 'battis-grove'],
     'elp-jul11-r3': ['bourbon-barrel', 'frost-bank'],
+    // Showcase (R5.1): 12 demo-fiction entries against fieldTarget.max = 10 →
+    // spills to also-eligibles (rolling-date reconstruction of cd-jun6-r4).
+    'elp-jul11-r4': ['battis-grove', 'bourbon-barrel', 'delta-duke', 'bluegrass-baron', 'frost-bank', 'ozark-ruby', 'quiet-storm', 'cajun-belle', 'island-barbie', 'silk-purse', 'painted-lily', 'river-sonata'],
+    // Lasix-stakes showcase (R5.1): the two demo-fiction no-Lasix horses fill the
+    // legal field; the Lasix mare (silverware) shows as a gated near-miss.
+    'elp-jul11-r5': ['battis-grove', 'bourbon-barrel'],
     // Real LaRose-demo race entries — see docs/research-delta-downs-larose-2026-07-09.md
     'sar-jul11-r1': ['midnight-still'],
     'sar-jul11-r2': ['hormesis'],

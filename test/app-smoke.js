@@ -104,6 +104,10 @@ tryRender('track/meet-builder', 'nonexistent-meet');
 tryRender('scr-track-raceday', null);
 tryRender('scr-track-race', null);
 tryRender('scr-track-race', 'cd-jun6-r4');  // showcase over-subscribed race
+tryRender('scr-track-race', 'elp-jul11-r4'); // R5.1 live-card AE + near-miss panel
+tryRender('scr-track-race', 'elp-jul11-r5'); // R5.1 Lasix-stakes near-miss panel
+tryRender('scr-race', 'elp-jul11-r4');       // R5.1 trainer-side cut-line/AE panel
+tryRender('scr-race', 'elp-jul11-r5');
 tryRender('track/requests');
 tryRender('track/strength');
 
@@ -241,6 +245,41 @@ const loopRace = 'elp-jul11-r3', loopHorse = 'arthur-jr';
   const anyTbOpen = PPData.listRaces({ openOnly: true }).find(r => r.discipline === 'TB');
   if (anyTbOpen && E.score(qh, anyTbOpen, { today: PPData.today }).eligible) { console.error('FAIL R3: AQHA horse should be ineligible for a TB race'); fails++; }
   else console.log('R3 QH-horse sanity ok: AQHA horse gated out of TB races, renderers stable');
+}
+
+// R5.1 — the four dormant feature showcases, reconstructed on the live ELP card
+// (rolling dates keep them perpetually reachable). Each asserts the STATE exists
+// so a future seed edit that breaks a showcase trips here. Illustrative states
+// sit on demo-fiction horses only (steel-thistle vet list, silverware win
+// count/Lasix) — never on a real LaRose horse.
+{
+  const t = { today: PPData.today };
+  // (1) Also-eligible spill: elp-jul11-r4 seeded OVER fieldTarget.max.
+  const aeRace = PPData.getRace('elp-jul11-r4');
+  const aeEnt = PPStore.entriesForRace('elp-jul11-r4').map(e => PPData.getHorse(e.horseId)).filter(Boolean);
+  if (!aeRace || aeEnt.length <= aeRace.fieldTarget.max) {
+    console.error('FAIL R5 AE: elp-jul11-r4 not over cap —', aeEnt.length, 'vs max', aeRace && aeRace.fieldTarget.max); fails++;
+  } else {
+    const zones = (E.preferenceOrder(aeEnt, aeRace) || []).map(x => x.zone);
+    if (zones[0] !== 'in' || !zones.includes('ae')) { console.error('FAIL R5 AE: no also-eligible spill —', zones.join(',')); fails++; }
+    else console.log(`R5 AE showcase ok: ${aeEnt.length} entered / ${aeRace.fieldTarget.max} cap → ${zones.join(',')}`);
+  }
+  // (2) Vet's-list ineligibility: steel-thistle gated out of the live N3X race with the named reason.
+  const r3 = PPData.getRace('elp-jul11-r3');
+  const steelE = E.eligibility(PPData.getHorse('steel-thistle'), r3, t);
+  const vetR = (steelE.reasons || []).find(r => /Vet's list/.test(r.label) && !r.pass);
+  if (steelE.eligible || !vetR) { console.error('FAIL R5 vet: steel-thistle not vet-gated on elp-jul11-r3 —', JSON.stringify(steelE.reasons)); fails++; }
+  else console.log('R5 vet showcase ok:', vetR.label);
+  // (3) Non-winners near-miss with the failing rule named: silverware over the N3X bar.
+  const nxE = E.eligibility(PPData.getHorse('silverware'), r3, t);
+  const nxR = (nxE.reasons || []).find(r => /N3X/.test(r.label) && !r.pass);
+  if (nxE.eligible || !nxR) { console.error('FAIL R5 N3X: silverware not N3X-gated on elp-jul11-r3 —', JSON.stringify(nxE.reasons)); fails++; }
+  else console.log('R5 N3X near-miss ok:', nxR.label);
+  // (4) Medication gate: silverware Lasix-blocked from the ELP Listed turf stakes.
+  const lxE = E.eligibility(PPData.getHorse('silverware'), PPData.getRace('elp-jul11-r5'), t);
+  const lxR = (lxE.reasons || []).find(r => /Lasix/.test(r.label) && !r.pass);
+  if (lxE.eligible || !lxR) { console.error('FAIL R5 Lasix: silverware not Lasix-gated on elp-jul11-r5 —', JSON.stringify(lxE.reasons)); fails++; }
+  else console.log('R5 Lasix showcase ok:', lxR.label);
 }
 
 console.log(fails ? `SMOKE FAILED: ${fails} failures` : 'SMOKE PASSED');

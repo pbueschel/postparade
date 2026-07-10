@@ -118,7 +118,7 @@ now-historical Churchill meet and are no longer reachable from the featured
 dashboards; `docs/playbooks/demo-feature.md` still names those horses.
 Flagged in `docs/progress.md`, not fixed.
 
-- [ ] **R5.1 — Recreate showcase states on current content.** On the live
+- [x] **R5.1 — Recreate showcase states on current content.** On the live
       LaRose/ELP world: one horse on the vet's list (real vet roster already
       exists), one N1X near-miss, one over-subscribed race spilling to
       also-eligibles (the `cd-jun6-r4` pattern). Illustrative states go on
@@ -126,21 +126,33 @@ Flagged in `docs/progress.md`, not fixed.
       horses — mark them the way the seed already marks engine-input numbers.
       *Accept:* each showcase reachable ≤2 clicks from a featured dashboard;
       `docs/playbooks/demo-feature.md` updated to current names.
+      *Done:* placed **Track-side** on the perpetually-open ELP card using the
+      demo-fiction Snellgrove roster (the Trainer workspace is the real LaRose —
+      no illustrative flag may sit on his barn). `steel-thistle` vet-barred with
+      a rolling clearance date + `silverware` over the N3X bar both surface in a
+      new **"One rule away"** near-miss panel on `elp-jul11-r3`; `elp-jul11-r4`
+      is seeded 12-over-10 for the also-eligible spill (cut-line panel on
+      `#race/elp-jul11-r4`); `elp-jul11-r5` is a no-Lasix Listed stakes gating
+      `silverware`. Reach: Track Meets → Ellis Park → the `elp-jul11` race day →
+      race builder. See `docs/decisions.md` (placement rationale) and the
+      updated `docs/playbooks/demo-feature.md`. app-smoke asserts all four
+      showcase states.
 
 ### R6 — Docs drift from the pivot
 
-- [ ] **R6.1** Annotate §9.4 below as superseded (single-track Churchill MVP →
+- [x] **R6.1** Annotate §9.4 below as superseded (single-track Churchill MVP →
       multi-track real content) pointing at `docs/decisions.md` 2026-07-09 —
-      done in this revision, verify it sticks.
-- [ ] **R6.2** Add `docs/progress.md` to CLAUDE.md's file map (it's referenced
+      done in `f42b45e`, verified it sticks (§9.4 carries the "*Superseded
+      2026-07-09*" note).
+- [x] **R6.2** Add `docs/progress.md` to CLAUDE.md's file map (it's referenced
       by the session ritual docs but unmapped).
-- [ ] **R6.3** Worklog corrective entry: the 07-09 entry says the LaRose pivot
+- [x] **R6.3** Worklog corrective entry: the 07-09 entry says the LaRose pivot
       was "uncommitted — pending review," but `f7739b3`/`6e95ca5` were committed
       and pushed to public `main` later that evening without a closing worklog
-      update.
-- [ ] **R6.4** §5's shared "condition parser playground" no longer has a nav
-      entry (dead link removed 07-09) — either restore it as a Track-side tool
-      or mark it deferred here.
+      update. — done in `f42b45e` (top worklog entry carries the correction).
+- [x] **R6.4** §5's shared "condition parser playground" no longer has a nav
+      entry (dead link removed 07-09) — marked **deferred** in §5 (parked in
+      backlog; condition text now round-trips through the Race Builder).
 
 **Sequencing recommendation:** R1 + R2 immediately (R1 before Saturday or the
 public demo goes dark); R3 + R4 together next (the gate makes the loop-path
@@ -268,7 +280,11 @@ open races; **Track (Request)** fixes the race, ranks eligible-not-entered horse
 `trainer/campaign/:id` *(v1: point-to a target, prep spacing, nomination
 reminders)*.
 
-**Shared** — condition parser playground.
+**Shared** — condition parser playground. *(Deferred — 2026-07-09. Its Trainer
+nav link was removed in `af74099` as a dead link; the screen was never built.
+Parked in backlog rather than restored, since the condition text now round-trips
+through the Race Builder's editable conditions field. Revisit if a standalone
+parser earns its own screen. See plan.md R6.4.)*
 
 ---
 

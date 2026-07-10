@@ -21,13 +21,43 @@ contracts. Read `CLAUDE.md` first — the hard rules there are the contract.
 ## Storyline seeding
 
 Every gate/signal needs a horse or race that demonstrates it, or the demo
-can't show it. Current storyline entities (keep them working):
-`steel-thistle` vet-barred to Jun 20 · `harbor-mist` vet-cleared May 28 ·
-`silverware` Lasix vs the Listed stakes (`cd-jun6-r7`) · `copper-kettle`
-demo-stable KY-bred · `quarry-road` N1X-eligible vs `tin-roof`/`delta-duke`
-not · `cd-jun6-r4` the over-subscribed showcase race (12 entered / 10 cap,
-drives cut-line + AE) · ship-in qualifiers at OP/FG · `gale-warning` turf+MTO
-(`cd-jun5-r3`). If your feature needs a new storyline, add one and list it here.
+can't show it.
+
+**Live showcases (on the perpetually-open Ellis Park `elp-jul11` card — reach
+them from the Track workspace: Meets → Ellis Park → the `elp-jul11` race day → a
+race builder).** After the 2026-07-09 LaRose/Delta Downs pivot the featured
+Trainer is the *real* Kinnon LaRose, so illustrative eligibility states can't
+sit on his barn (a vet-list/Lasix flag on a real horse asserts a real-world
+fact — forbidden per docs/decisions.md 2026-07-09). They live instead on the
+**demo-fiction** Snellgrove/other-barn roster and surface **Track-side** as
+"who fits" + a **"One rule away"** near-miss panel on the race builder
+(`scr-track-race`), plus the trainer-side cut-line panel (`#race/:id`):
+
+- **Vet's list** — `steel-thistle` (demo-fiction colt) is vet-barred with a
+  *rolling* clearance date (`rollVetEligible` = ELP race day + 14d, so it never
+  decays to cleared). Shows as a named near-miss on `elp-jul11-r3`
+  ("Vet's list (unsound) — eligible …").
+- **Non-winners (the card's N3X)** — `silverware` (3 wins other than
+  mdn/clm/starter) is one over the `elp-jul11-r3` N3X bar → near-miss
+  "over N3X limit". (`quarry-road`/`arthur-jr`, 0 wins-other, pass; the loop
+  Requests them into r3.)
+- **Also-eligible / cut line** — `elp-jul11-r4` (open Clm) is seeded 12 entries
+  against `fieldTarget.max` 10 → spills to also-eligibles (rolling-date
+  reconstruction of the old `cd-jun6-r4`). Cut-line + AE band render on the
+  trainer-side `#race/elp-jul11-r4`.
+- **Lasix / medication** — `elp-jul11-r5` is a Listed turf stakes prohibiting
+  race-day Lasix; the demo-fiction Lasix mare `silverware` is class/distance
+  eligible but gated out → near-miss "Lasix not permitted". `battis-grove` /
+  `bourbon-barrel` (no Lasix) fill the legal field.
+
+**Historical CD storyline (still in the seed, now dormant — tour.html + the CD
+meet).** `steel-thistle` also carries the CD-era vet flag · `harbor-mist`
+vet-cleared · `silverware` Lasix vs the Listed stakes (`cd-jun6-r7`) ·
+`copper-kettle` demo-stable KY-bred · `quarry-road` N1X-eligible vs
+`tin-roof`/`delta-duke` · `cd-jun6-r4` the over-subscribed showcase race ·
+ship-in qualifiers at OP/FG · `gale-warning` turf+MTO (`cd-jun5-r3`).
+
+If your feature needs a new storyline, add one and list it here.
 
 ## Division of labor (what parallelizes)
 

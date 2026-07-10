@@ -3,6 +3,42 @@
 <!-- Append-only session journal, newest entry first.
      Written at the end of every substantive session — by Phil or by an agent. -->
 
+## 2026-07-09/10 — Remediation branch `plan-gap-remediation`: R1–R6 executed
+- **Changed (four commits on `plan-gap-remediation`, off `main`):**
+  - `f42b45e` — the gap review itself (plan.md Remediation section R1–R6,
+    §9.4 superseded note, worklog corrective entry).
+  - `c81d806` — **R1** rolling demo-fiction Ellis Park `elp-jul11` card (race
+    day / entryClose / postTime derive from `PPData.today`, always the upcoming
+    Saturday) so the demo never runs out of open races; smoke guard trips if it
+    decays. **R2** strict `PPData.shipProgramForMeet()` used in both workspaces
+    so program-less meets (SAR/LS/DED) show no phantom Ship & Win; loose
+    `shipProgram()` untouched for the tour contract.
+  - `20333f2` — **R3** engine registry/discipline gate (Jockey Club⇄TB,
+    AQHA⇄QH) as a `{pass,label}` reason that skips silently on flat specs; a
+    `discipline` stamp on meets/races; discipline pills. **R4** Ellis Park tuned
+    (`elp-jul11-r3` → N3X) so LaRose's real dirt roster genuinely fits — ELP
+    carries the Submit⇄Request loop while Delta Downs stays the QH showcase.
+  - This session — **R5** the four dormant showcases (vet's-list, N3X
+    near-miss, also-eligible spill, Lasix gate) rebuilt on the live ELP card,
+    **Track-side on demo-fiction horses** (never LaRose's real barn): rolling
+    vet date on `steel-thistle`, `silverware` over the N3X bar, new
+    `elp-jul11-r4` (12-over-10 AE spill) and `elp-jul11-r5` (no-Lasix Listed
+    stakes), a new **"One rule away"** near-miss panel on the Track race builder.
+    **R6** docs drift — `docs/progress.md` added to CLAUDE.md's file map, §5
+    condition-parser playground marked deferred, §9.4 supersession + worklog
+    corrective verified. plan.md R1–R6 checkboxes all ticked.
+- **Verification:** `bun test/engine-smoke.js` 38 pass; `bun test/app-smoke.js`
+  SMOKE PASSED (adds the four R5 showcase-state assertions + the R4 ELP loop +
+  demo-decay guards); headless-Chrome dumps of `#dashboard`, `#trainer/alerts`,
+  `#trainer/requests`, the three ELP race routes, `#race/elp-jul11-r4`, a DED
+  route — no `undefined|NaN|[object`; **tour.html renders byte-identical**
+  (257,118 bytes, empty diff) against the committed data.js.
+- **Next:** Phil reviews `plan-gap-remediation` and merges to `main` (nothing
+  pushed — `main` is the public GitHub Pages deploy). Then the Held items.
+- **Held/blocked:** Investor walkthrough guide; `tour.html` regeneration — the
+  latter now with an explicit open decision (follow the new LaRose/Delta Downs
+  storyline or stay a frozen Snellgrove snapshot). Both await Phil's go-ahead.
+
 ## 2026-07-09 (later) — Gap review of the day's session; remediation plan added
 - **Correction to the entry below:** the LaRose/Delta Downs pivot it lists as
   "uncommitted — pending review" was in fact committed and pushed to public

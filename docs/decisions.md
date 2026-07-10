@@ -1,5 +1,34 @@
 # Decisions
 
+## 2026-07-09 — Dormant showcases rebuilt Track-side on demo-fiction horses, not in LaRose's barn (R5.1)
+- **Decision:** The vet's-list, non-winners (N3X), also-eligible, and Lasix
+  showcases now live on the perpetually-open Ellis Park `elp-jul11` card, driven
+  by the **demo-fiction** Snellgrove/other-barn roster and surfaced on the
+  **Track** side (the "who fits" list plus a new **"One rule away"** near-miss
+  panel on the race builder, and the trainer-side cut-line panel). New fictional
+  races: `elp-jul11-r4` (12-over-10 also-eligible spill) and `elp-jul11-r5`
+  (no-Lasix Listed stakes). `steel-thistle`'s vet-clearance date was made
+  *rolling* (ELP race day + 14d) so the vet showcase never decays to cleared.
+- **Why Track-side, not the Trainer's own barn:** the featured Trainer workspace
+  is the **real** Kinnon LaRose. Putting a vet's-list / Lasix / near-miss state
+  on one of his real horses would assert a false real-world fact about a real
+  person's stable (a vet's-list flag claims unsoundness) — forbidden by the
+  2026-07-09 "real facts vs. engine-input numbers" decision below. Illustrative
+  eligibility states may sit **only** on demo-fiction entities. The Snellgrove
+  roster is already demo-fiction and already carries exactly these states, so it
+  is reused (given ELP entries / near-miss candidacy) rather than inventing a new
+  fictional stable or, worse, faking horses into LaRose's barn.
+- **Consequence:** trainer-side showcases of these gates ("your horse is
+  vet-listed") intentionally do **not** exist for LaRose — the reconstruction is
+  Track-facing ("who almost fits this race, and the one rule that blocks them").
+  The near-miss panel truthfully lists real LaRose horses too when a real record
+  (e.g. Modo's 5 allowance wins → over N3X, a 2yo → too young) is the blocking
+  rule; that is a true statement computed by the engine, not a planted flag.
+- **Rejected:** a fictional horse inside the real LaRose stable (asserts a false
+  fact); a brand-new fictional Ellis Park stable (more invented fiction than
+  reusing the already-fictional Snellgrove roster); leaving the showcases only in
+  the now-historical Churchill Downs meet (unreachable from the featured demo).
+
 ## 2026-07-09 — Discipline derived from the meet, stamped onto races (R3.1)
 - **Why:** The registry gate needs a per-race discipline, but the engine must
   stay seed-agnostic and tour-safe. Chosen: add `discipline` ('TB'|'QH') to each

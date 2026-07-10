@@ -528,6 +528,19 @@
     const candidates = D.horses.filter(h => !enteredIds.has(h.id));
     const fits = PPEngine.fitsForRace(candidates, race, ctxFor(race));
 
+    // Near misses (R5.1): demo-fiction horses that clear every condition but ONE
+    // — the live-card reconstruction of the dormant vet's-list / non-winners /
+    // medication showcases. fitsForRace drops every ineligible horse, so a horse
+    // one rule short is invisible without this panel. Illustrative states live
+    // only on demo-fiction horses (steel-thistle's vet list, silverware's win
+    // count/Lasix), never on a real trainer's barn, so naming the blocking rule
+    // asserts no false fact. Exactly one failing reason = a true near miss.
+    const ctxOf = ctxFor(race);
+    const nearMisses = candidates.map(h => {
+      const fails = (PPEngine.eligibility(h, race, ctxOf(h)).reasons || []).filter(x => !x.pass);
+      return { h, fail: fails.length === 1 ? fails[0] : null };
+    }).filter(x => x.fail).slice(0, 6);
+
     const whosIn = entries.map(en => {
       const h = D.getHorse(en.horseId); if (!h) return '';
       const label = en.source === 'submission' ? 'entered' : en.source === 'request' ? 'via request' : 'card';
@@ -538,6 +551,21 @@
 
     const fitRows = fits.map(({ h, s }) => fitRow(h, s, raceId)).join('')
       || '<div class="px-5 py-8 text-center text-sm text-slate-500">No eligible horses match these conditions. Loosen the spec to widen the pool.</div>';
+
+    const nearMissRows = nearMisses.map(({ h, fail }) => `
+      <div class="px-5 py-3 grid grid-cols-12 gap-3 items-center">
+        <div class="col-span-4"><div class="font-medium flex items-center gap-1.5">${esc(h.name)}${disciplinePill(h.registry)}</div><div class="text-xs text-slate-500">${esc(h.sex)} ${h.age}yo · ${esc(h.stable)}</div></div>
+        <div class="col-span-3 text-xs text-slate-500">${esc(h.trainer)}</div>
+        <div class="col-span-5 flex items-center gap-1.5 text-xs"><i data-lucide="x-circle" class="w-3.5 h-3.5 text-red-500 shrink-0"></i><span class="text-slate-700">${esc(fail.label)}</span></div>
+      </div>`).join('');
+    const nearMissPanel = nearMisses.length ? `
+      <div class="card ring-soft">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+          <div><div class="font-semibold">One rule away</div><div class="text-xs text-slate-500">Horses eligible on every condition but one — the rule that blocks each is named</div></div>
+          <div class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="filter-x" class="w-3.5 h-3.5"></i>${nearMisses.length} near ${nearMisses.length === 1 ? 'miss' : 'misses'}</div>
+        </div>
+        <div class="divide-y divide-slate-100 text-sm">${nearMissRows}</div>
+      </div>` : '';
 
     const bonusAmount = race.bonusAmount != null ? race.bonusAmount : (prog ? prog.flatAmount : 1500);
     const bonusMi = race.bonusMi != null ? race.bonusMi : (prog ? prog.eligibility.minShipMi : 150);
@@ -622,7 +650,9 @@
           <div class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5"></i>PostParade recommendation engine</div>
         </div>
         <div class="divide-y divide-slate-100 text-sm">${fitRows}</div>
-      </div>`);
+      </div>
+
+      ${nearMissPanel}`);
   };
 
   // ===========================================================================

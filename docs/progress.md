@@ -62,17 +62,27 @@ trainer and real tracks. All commits below are on `main`.
 | Pull Kinnon LaRose's broader horse roster | Done — **10 new real horses added** (15 total, up from 5): Glen Airy, Eye Dee Kay, Arthur Jr., Carbone, Batter Up, Oscar's Hope, Standoutsensation, Authentic Gallop, Hello Angel, My Noble Knight. Equibase itself stayed blocked (HTTP 403, Incapsula) on every direct-fetch attempt; sourced instead via irishracing.com race charts, Oaklawn Park barn notes, and BloodHorse race-result pages — all directly fetched, not search-summarized. One AI-summary name error was caught and corrected against the primary chart ("Eve Dee Kay" → the real spelling, **Eye Dee Kay**). Hoosier Philly (a graded-stakes winner still nominally in the barn) and four other named horses (Market Runner, Curly Jack, Fade to Gold, Hay Jude) were searched but explicitly excluded — no verifiable 2026 activity. Full detail with per-horse confidence tiers in `docs/research-delta-downs-larose-2026-07-09.md`. Also recomputed Modo's and Molly McIver's `daysSince` against the real-time clock (they were still calibrated to the retired fixed demo date). |
 | This progress file | Done — `docs/progress.md` created. |
 
-## Known gaps / not yet addressed
+## Remediation branch `plan-gap-remediation` (2026-07-09/10)
 
-- **`tour.html` still shows the old Snellgrove/Churchill-Downs content.** It's
-  a frozen clone (own nav/router/markup) that only dynamically loads
-  `app/data.js`/`app/engine.js` — it wasn't touched, so it still reads
-  correctly, just shows stale content relative to the live app now. Tracked
-  in `plan.md` → Held; regeneration awaits Phil's go-ahead per that section.
-- **Churchill Downs' fictional storyline is now dormant.** The vet's-list,
-  Lasix-vs-stakes, and N1X-eligibility demonstrations were all built around
-  Snellgrove's horses, referenced by name in `docs/playbooks/demo-feature.md`.
-  They're no longer reachable from the Trainer's own dashboard now that
-  LaRose is the featured persona. No replacement demo path has been built —
-  flagged, not fixed.
-- **Investor walkthrough guide** — still Held, unstarted (plan.md).
+The six gaps flagged below on 07-09 were worked through on branch
+`plan-gap-remediation` (four commits: `f42b45e` gap plan, `c81d806` R1/R2,
+`20333f2` R3/R4, plus the R5/R6 + closeout commit). **All of R1–R6 are done and
+their plan.md checkboxes ticked; the branch awaits Phil's review + merge to
+`main`.** Highlights: rolling demo-fiction ELP card so the demo never runs out of
+open races (R1); strict per-meet Ship & Win helper, no phantom bonuses (R2);
+engine registry/discipline gate, TB⇄QH (R3); Ellis Park carries the Submit⇄
+Request loop for LaRose horses (R4); the vet's-list / N3X / also-eligible / Lasix
+showcases rebuilt on the live ELP card, Track-side, on demo-fiction horses (R5);
+docs drift fixed (R6). Verification gates (engine-smoke, app-smoke, headless
+routes, tour byte-identical) pass on the branch.
+
+## Still open (awaiting Phil)
+
+- **Merge `plan-gap-remediation` → `main`** after review (nothing pushed;
+  `main` deploys publicly).
+- **`tour.html` regeneration** — HELD. Still a frozen clone showing the old
+  Snellgrove/Churchill-Downs storyline; it renders correctly (verified
+  byte-identical this branch), just shows content that predates the LaRose pivot.
+  Regeneration carries an **open decision for Phil** (follow the new LaRose/Delta
+  Downs storyline vs. stay a frozen Snellgrove snapshot) — see plan.md → Held.
+- **Investor walkthrough guide** — HELD, unstarted (plan.md).

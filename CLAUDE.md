@@ -31,6 +31,7 @@ wrap-session ritual — update plan.md, append a worklog entry, log decisions in
 | `docs/research.md`, `docs/research-competitive.md` | Domain + competitive research (cite these, don't re-research settled facts) |
 | `plan.md` | Product plan: terminology, domain model, staged architecture, **Held** deliverables |
 | `docs/worklog.md` | Session journal, append-only — read before working, append before stopping |
+| `docs/progress.md` | Living per-session task tracker (current status in place); distinct from the append-only worklog and the why-focused decisions log |
 | `docs/decisions.md` | Decision log, append-only (product decisions from June 2026 are in plan.md §9) |
 | `test/app-smoke.js`, `test/engine-smoke.js` | Verification suites — run with `bun` |
 
