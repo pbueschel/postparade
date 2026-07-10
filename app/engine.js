@@ -261,8 +261,14 @@
       return { shipMi, shipIn, bonus: qualifies ? amount : 0 };
     }
 
-    // Program-driven path.
-    const program = ctx.program ?? (global.PPData && global.PPData.shipProgram && global.PPData.shipProgram());
+    // Program-driven path. A caller-supplied ctx OWNS the program decision: if
+    // it carries a `program` key we respect it even when it's null/undefined
+    // (the strict per-meet helpers pass null for a program-less meet — no
+    // phantom bonus). Only the no-ctx two-arg/tour path (ctx has no `program`
+    // key) falls back to the global default program. (R2.1)
+    const program = ('program' in ctx)
+      ? ctx.program
+      : (global.PPData && global.PPData.shipProgram && global.PPData.shipProgram());
     if (!program) return { shipMi, shipIn, bonus: 0 };
 
     const e = program.eligibility || {};

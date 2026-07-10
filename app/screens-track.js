@@ -74,16 +74,14 @@
     const created = days.reduce((acc, d) => acc.concat(PPStore.listCreatedRaces(d.id)), []);
     return seeded.concat(created);
   }
-  // PPData.shipProgram() falls back to the FIRST ship-and-win program in the
-  // whole seed (a tour.html back-compat behavior we can't change at the
-  // source) whenever a meet's own supplementProgramIds is empty — which would
-  // silently show every program-less meet Churchill Downs' numbers. Guard
-  // against that here instead of touching PPData.shipProgram itself.
+  // Ship-and-Win program for a meet, strict (no cross-meet fallback). Created
+  // meets carry their program in the store; seeded meets resolve through
+  // PPData.shipProgramForMeet (R2.1), which returns null for a program-less
+  // meet instead of leaking the first ship-and-win program in the seed the way
+  // the loose PPData.shipProgram() (kept for the tour contract) would.
   function shipProgramFor(meetId) {
     if (PPStore.getCreatedMeet(meetId)) return PPStore.getCreatedProgram(meetId);
-    const meet = PPData.getMeet(meetId);
-    if (!meet || !meet.supplementProgramIds || !meet.supplementProgramIds.length) return null;
-    return PPData.shipProgram(meetId);
+    return PPData.shipProgramForMeet(meetId);
   }
   function raceDayFor(id) {
     if (!id || PPStore.isRaceDayDeleted(id)) return null;

@@ -47,8 +47,10 @@
   }
 
   // Engine ctx builder: returns (race)=>ctx per the engine contract. `program`
-  // is resolved from the race's own meet so ship-in bonuses reflect the right
-  // supplement program (CD vs Ellis) rather than always the default.
+  // is resolved from the race's own meet via the STRICT helper (R2.1) — a
+  // program-less meet (Saratoga/Lone Star/Delta Downs) yields null, so its
+  // recommendations never show a phantom Ship & Win. The loose
+  // PPData.shipProgram() would fall back to Churchill's program and leak it.
   function ctxFor(h) {
     return function (race) {
       const entrants = (PPStore.entriesForRace(race.id) || [])
@@ -58,7 +60,7 @@
         entrants,
         shipMi: mi != null ? mi : h.shipMi,
         today: PPData.today,
-        program: PPData.shipProgram(meetOfRace(race)),
+        program: PPData.shipProgramForMeet(meetOfRace(race)),
       };
     };
   }

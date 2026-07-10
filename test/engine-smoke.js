@@ -103,5 +103,18 @@ ok('(x) program shipping excludes stakes -> bonus 0', shipNo.bonus === 0, shipNo
 const races = E.racesForHorse(flatHorse, [flatRace, { sexes: ['M'], minAge: 3, distance: 1320 }]);
 ok('(x) racesForHorse filters to eligible + returns {race,s}', races.length === 1 && races[0].race && races[0].s.eligible, races.length);
 
+// (y) ctx OWNS the program decision (R2.1). A ctx carrying program:null must
+// NOT fall back to a global program (no phantom bonus for a program-less meet);
+// a ctx with NO program key still falls back (the two-arg/tour path).
+const savedSP = global.PPData.shipProgram;
+global.PPData.shipProgram = () => ({ id: 'fallback', flatAmount: 999, purseBonusPct: 0, eligibility: {} });
+const progRace = { classLadder: 'Alw', purse: 50000 };
+const shipperY = { shipMi: 300, record: { starts: 4 } };
+const shipExplicitNull = E.shipping(shipperY, progRace, { shipMi: 300, program: null });
+const shipNoKey = E.shipping(shipperY, progRace, { shipMi: 300 });
+global.PPData.shipProgram = savedSP;
+ok('(y) explicit program:null in ctx -> no global fallback, bonus 0', shipExplicitNull.bonus === 0, shipExplicitNull);
+ok('(y) ctx without program key -> global fallback applies', shipNoKey.bonus === 999, shipNoKey);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

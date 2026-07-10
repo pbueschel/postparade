@@ -48,7 +48,7 @@ already closed on 07-08, one day after the same lapsed-deadline bug class was
 fixed in `f7739b3`. After Saturday: zero open races → Trainer recs, Submit,
 draw-in chips, alerts, and the Track fill story all render empty.
 
-- [ ] **R1.1 — Rolling dates for demo-fiction races.** Derive race day /
+- [x] **R1.1 — Rolling dates for demo-fiction races.** Derive race day /
       `entryClose` / `postTime` for *fictional* cards (ELP `elp-jul11-*`, and any
       future demo cards) relative to `PPData.today` (e.g. always next Saturday,
       close T-72h), so the demo is perpetually live. Real historical races
@@ -57,7 +57,7 @@ draw-in chips, alerts, and the Track fill story all render empty.
       a cited real result.
       *Accept:* on any wall-clock date, ≥1 meet has ≥3 open races reachable from
       both workspaces; seeded real results unchanged; tour.html untouched.
-- [ ] **R1.2 — Smoke-test guard against decay.** `test/app-smoke.js` fails when
+- [x] **R1.2 — Smoke-test guard against decay.** `test/app-smoke.js` fails when
       open-race count < 3 or when the featured trainer has zero open, eligible
       recommendations.
       *Accept:* guard trips if R1.1's derivation is reverted to fixed dates.
@@ -71,7 +71,7 @@ whose fallback returns the first ship-and-win program for any meet without one �
 so Saratoga/Lone Star recommendations can show a phantom Ship & Win bonus, and
 `engine.js`'s own no-ctx fallback does the same.
 
-- [ ] **R2.1 — One strict helper, both workspaces.** Add a strict
+- [x] **R2.1 — One strict helper, both workspaces.** Add a strict
       `PPData.shipProgramForMeet(meetId)` (null when the meet has no program);
       use it in both screens files; keep the loose `shipProgram()` untouched for
       the tour back-compat contract (CLAUDE.md rule 2).

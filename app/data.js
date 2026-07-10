@@ -22,12 +22,38 @@
   // (which would emit a 'Z' suffix and silently break those comparisons).
   // Content with fixed real-world dates (meets, race days) will naturally
   // age into "closed"/historical as real time passes them — expected, not a bug.
+  const pad2 = (n) => String(n).padStart(2, '0');
   function nowAsCentralISO() {
-    const pad = (n) => String(n).padStart(2, '0');
     const d = new Date(Date.now() - 5 * 3600 * 1000); // shift to Central wall-clock, read back as UTC fields
-    return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}-05:00`;
+    return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}T${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())}:${pad2(d.getUTCSeconds())}-05:00`;
   }
   const today = nowAsCentralISO();
+
+  // ---- Rolling demo-fiction race day (R1.1) --------------------------------
+  // The *fictional* Ellis Park `elp-jul11-*` card is kept perpetually live by
+  // deriving its date from `today` at seed-build time, instead of a fixed
+  // calendar date that decays into "closed" as real time advances. It always
+  // lands on the upcoming Saturday that leaves ≥72h of entry runway (so
+  // `entryClose > today` always holds and the card stays open in both
+  // workspaces). ONLY this invented card rolls — every real, cited race/result
+  // (Saratoga, Bluebonnet, Delta Downs, Molly McIver's Ellis win) keeps its
+  // fixed real date per docs/decisions.md (2026-07-09). See plan.md R1.1.
+  const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  const DAY_MS = 86400000;
+  function ymd(d) { return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`; }
+  const rollBase = new Date(today.slice(0, 10) + 'T00:00:00Z');
+  // Days to the next Saturday (getUTCDay: 0=Sun … 6=Sat); if that Saturday is
+  // under 4 days out (entryClose would fall on/before today), skip to the one
+  // after so there is always a live countdown.
+  let toSat = (6 - rollBase.getUTCDay() + 7) % 7;
+  if (toSat < 4) toSat += 7;
+  const rollRaceDay = new Date(rollBase.getTime() + toSat * DAY_MS);   // the card's Saturday
+  const rollClose   = new Date(rollRaceDay.getTime() - 3 * DAY_MS);    // entries close ~72h before post
+  const rollDate    = ymd(rollRaceDay);                                 // 'YYYY-MM-DD' race-day date
+  const rollLabel   = `Saturday, ${MONTH_NAMES[rollRaceDay.getUTCMonth()]} ${rollRaceDay.getUTCDate()}`;
+  const rollCloseISO = `${ymd(rollClose)}T10:00:00-05:00`;              // shared entryClose for the card
+  const rollPostISO  = (hhmm) => `${rollDate}T${hhmm}:00-05:00`;        // per-race post time on the rolling Saturday
 
   // Class ladder enum (mirrors PPEngine.CLASS_LADDER; kept here for the data layer).
   const classLadder = [
@@ -133,7 +159,10 @@
       name: 'Ellis Park — Summer 2026',
       label: 'Ellis summer meet',
       start: '2026-07-04',
-      end: '2026-08-30',
+      // End extends to whichever is later — the fixed seed end or two weeks past
+      // the rolling demo card (R1.1) — so the perpetually-live card always falls
+      // inside the meet window even as `today` advances.
+      end: ymd(new Date(Math.max(Date.parse('2026-08-30T00:00:00Z'), rollRaceDay.getTime() + 14 * DAY_MS))),
       status: 'published',
       meetType: 'boutique',
       supplementProgramIds: ['elp-ship-and-win'],
@@ -164,7 +193,9 @@
     { id: 'cd-jun05', meetId: 'cd-2026-summer', date: '2026-06-05', label: 'Friday, June 5', status: 'published' },
     { id: 'cd-jun06', meetId: 'cd-2026-summer', date: '2026-06-06', label: 'Saturday, June 6', status: 'published' },
     { id: 'cd-jun07', meetId: 'cd-2026-summer', date: '2026-06-07', label: 'Sunday, June 7', status: 'published' },
-    { id: 'elp-jul11', meetId: 'elp-2026-summer', date: '2026-07-11', label: 'Saturday, July 11', status: 'draft' },
+    // Ellis Park — fictional demo card, dates roll off `today` (R1.1) so it is
+    // always the upcoming Saturday and always open. Keeps its `elp-jul11` id.
+    { id: 'elp-jul11', meetId: 'elp-2026-summer', date: rollDate, label: rollLabel, status: 'published' },
     // Real race days for the LaRose demo — see docs/research-delta-downs-larose-2026-07-09.md
     // Saratoga — the live, still-open card (Jul 11 is after `today`)
     { id: 'sar-jul11', meetId: 'sar-2026-summer', date: '2026-07-11', label: 'Saturday, July 11', status: 'published' },
@@ -462,13 +493,13 @@
       },
     },
 
-    // --- Ellis Park, Saturday, July 11 (draft meet) ---
+    // --- Ellis Park fictional demo card — dates roll off `today` (R1.1), always open ---
     {
       id: 'elp-jul11-r1', raceDayId: 'elp-jul11', raceNumber: 1,
       classLadder: 'MSW', surface: 'D', isTurf: false, mtoAllowed: false,
       distanceYards: 1320, purse: 42000, par: 78,
       fieldTarget: { min: 6, max: 10 }, alsoEligibleCap: 4, preferenceSystem: 'date',
-      entryClose: '2026-07-08T10:00:00-05:00', postTime: '2026-07-11T13:00:00-05:00',
+      entryClose: rollCloseISO, postTime: rollPostISO('13:00'),
       stateBredRestricted: false, stateBredCode: null,
       conditions: {
         sexes: ['F', 'M'], minAge: 3, maidenOnly: true,
@@ -481,7 +512,7 @@
       classLadder: 'Clm', surface: 'D', isTurf: false, mtoAllowed: false,
       distanceYards: 1430, purse: 18000, par: 78,
       fieldTarget: { min: 6, max: 10 }, alsoEligibleCap: 4, preferenceSystem: 'date',
-      entryClose: '2026-07-08T10:00:00-05:00', postTime: '2026-07-11T13:30:00-05:00',
+      entryClose: rollCloseISO, postTime: rollPostISO('13:30'),
       stateBredRestricted: false, stateBredCode: null,
       conditions: {
         sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3, claimingPrice: 15000,
@@ -493,7 +524,7 @@
       classLadder: 'Alw', surface: 'D', isTurf: false, mtoAllowed: false,
       distanceYards: 1830, purse: 44000, par: 84,
       fieldTarget: { min: 6, max: 9 }, alsoEligibleCap: 3, preferenceSystem: 'date',
-      entryClose: '2026-07-08T10:00:00-05:00', postTime: '2026-07-11T14:00:00-05:00',
+      entryClose: rollCloseISO, postTime: rollPostISO('14:00'),
       stateBredRestricted: false, stateBredCode: null,
       conditions: {
         sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3,
@@ -1050,6 +1081,20 @@
       }
       // Fallback preserves the original find-by-type behavior.
       return supplementPrograms.find((p) => p.type === 'shipAndWin') || null;
+    },
+    // Strict variant (R2.1): the meet's OWN ship-and-win program, or null —
+    // NO cross-meet fallback. Both workspaces use this so a program-less meet
+    // (Saratoga/Lone Star/Delta Downs) never shows another meet's phantom Ship
+    // & Win. The loose shipProgram() above keeps its fallback untouched for the
+    // tour.html back-compat contract (CLAUDE.md rule 2).
+    shipProgramForMeet(meetId) {
+      const m = meetById[meetId];
+      const ids = (m && m.supplementProgramIds) || [];
+      for (let i = 0; i < ids.length; i++) {
+        const p = programById[ids[i]];
+        if (p && p.type === 'shipAndWin') return p;
+      }
+      return null;
     },
 
     // entries

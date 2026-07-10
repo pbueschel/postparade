@@ -179,5 +179,37 @@ if (!tp || typeof tp.ev !== 'number') { console.error('FAIL truePurse:', JSON.st
 else console.log('truePurse ok: ev', tp.ev, '|', tp.detail);
 if (E.fillProbability({ distance: 1320 }, 5) !== null) { console.error('FAIL: fillProbability flat spec must be null'); fails++; }
 
+// Demo-decay guard (R1.2): the app must never run out of live content. Trips
+// if the rolling demo-fiction card (R1.1) is reverted to fixed dates that age
+// past `today`. Two independent checks so a regression can't slip through one.
+const openRaces = PPData.listRaces({ openOnly: true });
+if (openRaces.length < 3) {
+  console.error(`FAIL demo-decay: only ${openRaces.length} open race(s) (need >=3) — the rolling ELP card (R1.1) likely decayed to fixed dates`);
+  fails++;
+} else {
+  console.log('demo-decay open-race count ok:', openRaces.length);
+}
+// The featured trainer (larose) must have at least one open, eligible race to
+// recommend — mirrors screens-trainer's engine call (strict per-meet program).
+const featured = PPData.demoStable();
+if (!featured) { console.error('FAIL demo-decay: no featured demo stable (isDemoUser)'); fails++; }
+else {
+  const meetOfRace = (r) => r.meetId || (PPData.getRaceDay(r.raceDayId) || {}).meetId;
+  const featuredHorses = PPData.listHorses({ stableId: featured.id });
+  let recs = 0;
+  for (const h of featuredHorses) {
+    for (const r of openRaces) {
+      const ctx = { today: PPData.today, program: PPData.shipProgramForMeet(meetOfRace(r)) };
+      if (E.score(h, r, ctx).eligible) recs++;
+    }
+  }
+  if (recs === 0) {
+    console.error(`FAIL demo-decay: featured trainer "${featured.id}" has zero open, eligible recommendations`);
+    fails++;
+  } else {
+    console.log(`demo-decay featured-trainer recs ok: ${recs} open eligible pairing(s) for "${featured.id}"`);
+  }
+}
+
 console.log(fails ? `SMOKE FAILED: ${fails} failures` : 'SMOKE PASSED');
 process.exit(fails ? 1 : 0);
