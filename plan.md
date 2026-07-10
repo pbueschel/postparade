@@ -22,11 +22,22 @@ Built (or specced) but not shipped; `main` deploys publicly, so these wait for
 explicit approval. Session status lives in [`docs/worklog.md`](./docs/worklog.md).
 
 - [ ] **Investor walkthrough guide** — companion doc to the demo/pitch pages.
-- [ ] **`tour.html` regeneration** — one-pass rebuild from the current app;
-      procedure in [`docs/playbooks/tour-regeneration.md`](./docs/playbooks/tour-regeneration.md).
-      **Open decision for Phil:** after the 2026-07-09 LaRose/Delta Downs pivot,
-      should the regenerated tour follow the new real-content storyline, or stay
-      a frozen snapshot of the Snellgrove/Churchill Downs demo?
+      Produce it from **this regenerated tour's** story arc (LaRose barn → Ellis
+      Park allowance → Delta Downs QH breadth → Submit⇄Request loop), same scenes
+      as prose + screenshots instead of the live overlay (per
+      [`docs/playbooks/tour-regeneration.md`](./docs/playbooks/tour-regeneration.md)).
+      The last Held item.
+
+### Done pending Phil's review/merge
+
+- [x] **`tour.html` regeneration** — done 2026-07-10 (Phil's go-ahead). One-pass
+      rebuild from the current app: the tour now drives the REAL renderers
+      (`PPRenderers` over `PPData`/`PPEngine`/`PPStore`) instead of cloned static
+      markup, following the live LaRose / Ellis Park / Delta Downs storyline. Ten
+      stops close the Submit⇄Request loop on-screen (real PPStore mutation).
+      Verification (engine-smoke, app-smoke unchanged; headless per-stop render +
+      target resolution) in the worklog. On `plan-gap-remediation`, **not merged**
+      — `main` is the public deploy, awaiting Phil's click-through + merge.
 
 ---
 

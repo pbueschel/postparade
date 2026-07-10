@@ -80,9 +80,13 @@ routes, tour byte-identical) pass on the branch.
 
 - **Merge `plan-gap-remediation` → `main`** after review (nothing pushed;
   `main` deploys publicly).
-- **`tour.html` regeneration** — HELD. Still a frozen clone showing the old
-  Snellgrove/Churchill-Downs storyline; it renders correctly (verified
-  byte-identical this branch), just shows content that predates the LaRose pivot.
-  Regeneration carries an **open decision for Phil** (follow the new LaRose/Delta
-  Downs storyline vs. stay a frozen Snellgrove snapshot) — see plan.md → Held.
-- **Investor walkthrough guide** — HELD, unstarted (plan.md).
+- **`tour.html` regeneration** — **DONE 2026-07-10** (Phil's go-ahead), pending
+  his review/merge. Regenerated in one pass to drive the REAL renderers over the
+  live LaRose/Ellis Park/Delta Downs storyline (old frozen Snellgrove/Churchill
+  clone replaced). Targets resolve after render — `app.html`/`app/screens-*.js`
+  byte-identical. Verified: engine-smoke + app-smoke pass unchanged; headless
+  per-stop render + target resolution (`?step=N`); no `undefined|NaN|[object`.
+  Back-compat aliases retained but no longer exercised by the tour. See
+  `docs/decisions.md` (2026-07-10) and `docs/playbooks/tour-regeneration.md`.
+- **Investor walkthrough guide** — HELD, unstarted; now the only Held item.
+  Build from the regenerated tour's arc (plan.md).

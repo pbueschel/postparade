@@ -1,5 +1,50 @@
 # Decisions
 
+## 2026-07-10 — tour.html regenerated to the live LaRose/Ellis Park/Delta Downs storyline
+- **Decision:** Executed the HELD one-pass regeneration (Phil's 2026-07-10
+  go-ahead), resolving the open decision recorded in plan.md → Held: the tour
+  **follows the new real-content storyline**, not a frozen Snellgrove/Churchill
+  snapshot. The old frozen clone (a full static copy of the pre-pivot app under
+  a guided overlay) is replaced wholesale.
+- **Mechanism change (the substantive part):** the new tour is built from the
+  current `app.html` shell and drives the **real renderers** — it reuses the app
+  shell's `showScreen`/`setWorkspace`/`workspaces` router and lets `PPRenderers`
+  (over `PPData`/`PPEngine`/`PPStore`) paint each screen live, then a small
+  per-stop **resolver in tour.html locates the target in the freshly-rendered
+  DOM** (by stable selector/heading text) to spotlight it. The preserved overlay
+  mechanism (TOUR stops array, `.tour-ring` #10b981 spotlight, `.tour-pop`
+  popover, centered welcome/outro modal, step counter excluding welcome/outro,
+  keyboard nav) is carried over from the old tour.
+- **No app-screen edits:** targets resolve after render — **zero `data-tour`
+  attributes** were added to `app/screens-*.js`. `app.html` and the screens files
+  are byte-identical to HEAD; the change is confined to `tour.html`.
+- **Real state, not a mock loop:** determinism by clearing `pp.demo.v1` at tour
+  start (one-time reload when leftover exists); the Submit⇄Request beat writes a
+  real Request to `PPStore` for Arthur Jr. into `elp-jul11-r3` and Accepts it
+  on-screen (the inbox clears, the entered count rises); the outro offers a reset.
+  A `?step=N` deep-link/debug hook renders any stop directly (review + headless
+  verification).
+- **Story anchors (verified against the live data):** 7 real LaRose horses fit
+  `elp-jul11-r3`; Arthur Jr. leads at fit 86 / 95% accept with a real $1,000
+  Ellis Ship Bonus (130-mi CD→ELP van) and ~+$10k True Purse EV; `elp-jul11-r4`
+  is the 12-for-10 cut line (10 in, 2 also-eligible); Delta Downs' Quarter Horse
+  meet carries the discipline-breadth beat; the "One rule away" panel names the
+  single rule blocking each near-miss (incl. real LaRose horses truthfully over
+  the N3X bar — a computed fact, not a planted flag).
+- **Back-compat aliases NOT removed, and NO LONGER load-bearing for the tour:**
+  the new tour never touches `PPData.race`/`PPData.meet`, never calls
+  `PPEngine.score` against a flat race spec, and resolves ship programs through
+  the strict per-meet path (`ctx.program`) — so the loose `PPData.shipProgram()`
+  fallback, flat two-arg `score`, and `PPData.race/meet` anchors (CLAUDE.md
+  rule 2) are **no longer needed by any tour code**. They were **retained** this
+  pass per the task's explicit instruction (removal is a separate decision for
+  Phil); the old tour is gone, so nothing on the branch still exercises them.
+- **Rejected:** patching the old cloned markup incrementally (2026-07-06
+  decision already chose one-pass regen); adding `data-tour` attributes to the
+  app screens (a self-contained resolver in tour.html avoids touching shared app
+  files); a static prose walkthrough in place of the live overlay (that's the
+  remaining Held deliverable, built from this same arc).
+
 ## 2026-07-09 — Dormant showcases rebuilt Track-side on demo-fiction horses, not in LaRose's barn (R5.1)
 - **Decision:** The vet's-list, non-winners (N3X), also-eligible, and Lasix
   showcases now live on the perpetually-open Ellis Park `elp-jul11` card, driven

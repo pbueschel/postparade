@@ -3,6 +3,45 @@
 <!-- Append-only session journal, newest entry first.
      Written at the end of every substantive session — by Phil or by an agent. -->
 
+## 2026-07-10 — `tour.html` regenerated to the live LaRose storyline (HELD item shipped)
+- **Changed (one commit on `plan-gap-remediation`, off `main`):** replaced the
+  frozen Snellgrove/Churchill tour clone with a one-pass regeneration built from
+  the current `app.html`. The tour now **drives the real renderers** — it reuses
+  the app shell's `showScreen`/`setWorkspace`/`workspaces` router and lets
+  `PPRenderers` (over `PPData`/`PPEngine`/`PPStore`) paint each screen live, then
+  a per-stop `resolve()` in `tour.html` **locates the target in the rendered DOM**
+  (stable selector / heading text) to spotlight it. The overlay mechanism
+  (TOUR array, `.tour-ring` #10b981, `.tour-pop`, welcome/outro modal, step
+  counter excluding modals, keyboard nav) is preserved from the old tour.
+- **Story (10 stops):** welcome → LaRose dashboard → Spot alerts → Arthur Jr.
+  recs (his `elp-jul11-r3` card: fit 86, draw-in, ~+$10k True Purse EV, real
+  $1,000 Ellis Ship Bonus) → `elp-jul11-r4` cut line (10 in / 2 AE) → Delta
+  Downs Quarter Horse meet (yards, AQHA, discipline pills) → ELP race-builder
+  spec + "will it go?" fill prob → who-fits + "One rule away", **Request** Arthur
+  Jr. → trainer inbox **Accept** (loop closes, entered count rises) → outro
+  (links + reset). Real state: clears `pp.demo.v1` at boot (one-time reload on
+  leftover); the Request→Accept beat mutates `PPStore` on-screen; `?step=N`
+  deep-links any stop.
+- **No app-screen edits:** targets resolve after render, **zero `data-tour`**
+  added — `git diff` shows `app.html`/`app/screens-*.js`/`app/*.js` byte-identical
+  to HEAD; the change is confined to `tour.html`.
+- **Back-compat aliases (CLAUDE.md rule 2):** the new tour does **not** use
+  `PPData.race/meet`, flat-spec two-arg `score`, or the loose `shipProgram()`
+  fallback — it drives real races and the strict per-meet program path. The
+  aliases were **retained** (removal is a separate call for Phil), but the old
+  tour that exercised them is gone.
+- **Verification:** `bun test/engine-smoke.js` 38 pass; `bun test/app-smoke.js`
+  SMOKE PASSED — both unchanged. Headless Chrome: base load shows the welcome
+  modal, no `undefined|NaN|[object`; every stop via `?step=1..9` renders its
+  route and resolves its target (exactly one applied `tour-spot` element per spot
+  stop, 0 on the outro modal); confirmed the `elp-jul11-r3` rec card, the "One
+  rule away" panel, the r4 cut-line divider, the Delta Downs QH meet card, and
+  the inbox Accept button + Ship & Win callout. HTML tag balance clean.
+- **Next:** Phil clicks through `tour.html` (and `?step=N`) and merges
+  `plan-gap-remediation` → `main` (nothing pushed — `main` is the public deploy).
+  Then the **walkthrough guide** (last Held item) from this same arc.
+- **Held/blocked:** Investor walkthrough guide — the only remaining Held item.
+
 ## 2026-07-09/10 — Remediation branch `plan-gap-remediation`: R1–R6 executed
 - **Changed (four commits on `plan-gap-remediation`, off `main`):**
   - `f42b45e` — the gap review itself (plan.md Remediation section R1–R6,
