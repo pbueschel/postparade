@@ -3,6 +3,26 @@
 <!-- Append-only session journal, newest entry first.
      Written at the end of every substantive session — by Phil or by an agent. -->
 
+## 2026-07-10 — Released: remediation R1–R6 + regenerated tour → public main
+- **Changed:** Phil reported the live demo still showed Snellgrove — root cause:
+  all fixes sat unmerged on `plan-gap-remediation` while Pages serves `main`.
+  With his go-ahead ("update asap"), ran the release playbook gates (both smoke
+  suites; headless-Chrome checks on `#dashboard`, `#trainer/alerts`,
+  `#track/race/cd-jun6-r4`, `#race/cd-jun6-r4` — cards render, zero
+  undefined/NaN; tour marker gate updated in spirit: grep `Kinnon LaRose`, not
+  the stale `Zengraya`; tag balance clean on all four HTML pages), then
+  fast-forwarded `main` to `c91b5c3` and pushed. Live verified ~40s later:
+  tour serves the LaRose storyline (17 refs, 0 Snellgrove), the new
+  screens-track.js ("One rule away") is live, all six pages HTTP 200.
+- **Note for the next release:** `docs/playbooks/release.md` still greps
+  `Zengraya` as its tour-compat gate — stale since the regeneration; swap for a
+  current-content marker when next touched.
+- **Next:** The investor walkthrough guide (last Held item) on Phil's
+  go-ahead — reuse the regenerated tour's ten-stop arc per the playbook.
+  Optional cleanup now recorded in decisions.md: retire the unused back-compat
+  aliases (CLAUDE.md rule 2) in a dedicated pass.
+- **Held/blocked:** Investor walkthrough guide only.
+
 ## 2026-07-10 — `tour.html` regenerated to the live LaRose storyline (HELD item shipped)
 - **Changed (one commit on `plan-gap-remediation`, off `main`):** replaced the
   frozen Snellgrove/Churchill tour clone with a one-pass regeneration built from
