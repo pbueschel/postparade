@@ -11,9 +11,12 @@ Kinnon LaRose, 28, grew up in Ogdensburg, NY, making regular family trips to
 Saratoga. He played Division I basketball at Siena College then Sacred Heart
 University, then joined Tom Amoss's stable as a hot walker in October 2020 after
 emailing Amoss directly. He worked up through groom, foreman, and six years as
-Amoss's head assistant before taking over as head trainer of "Kinnon LaRose
-Racing Stables" (the former Amoss operation) on April 1, 2026, when Amoss moved
-to an advisory/broadcasting role. As of the meet notes below, the stable runs
+Amoss's head assistant before taking over as head trainer of the former Amoss
+operation on April 1, 2026, when Amoss moved to an advisory/broadcasting role
+(the app displays this as just "Kinnon LaRose" — the earlier "Kinnon LaRose
+Racing Stables" label in this doc and in the app was never an independently
+verified business name, corrected 2026-07-09). As of the meet notes below,
+the stable runs
 ~60 horses: 28 at Churchill Downs, 8 at Churchill Downs' Trackside Training
 Center, and 32 stalls at Keeneland.
 
@@ -173,3 +176,37 @@ Sources: [Wikipedia — Lone Star Park](https://en.wikipedia.org/wiki/Lone_Star_
    QH-specific set (MDN/Clm/Alw/Stk-G1-3/RG1-3/Futurity/Derby/Trial) alongside
    the existing Thoroughbred one — used only for Delta Downs races, leaving
    every existing Thoroughbred screen/table unchanged.
+
+## Kinnon LaRose — 10 additional real horses (2026-07-09 follow-up)
+
+Equibase itself stayed blocked on every attempt (HTTP 403, Incapsula bot
+protection, both `/profiles/` and `/premium/` URLs, direct fetch and `curl`
+with a browser user-agent). Sourced instead via irishracing.com race charts
+(mirrors official US result data, fetched cleanly), Oaklawn Park's own barn
+notes, and BloodHorse race-result pages — all directly fetched and dated, not
+search-summarized. One correction caught: a Yahoo Sports AI-summary rendered
+a horse's name as "Eve Dee Kay"; the primary irishracing chart confirms the
+real spelling is **Eye Dee Kay**.
+
+| Horse | Real facts | Result | Source |
+|---|---|---|---|
+| Glen Airy | 6yo chestnut gelding, sire Sky Mesa, dam My Favorite Tune, owner Maggi Moss | 3rd, Oaklawn R1 ($70k clm, 4yo+), 2026-04-26, jockey Rafael Bejarano, 11/4 co-favorite | [irishracing.com chart](https://www.irishracing.com/raceresults/Sun-26th-Apr-2026/Oaklawn-Park/1845) |
+| Eye Dee Kay | 7yo chestnut gelding, sire Overanalyze, dam Crab Key (by Candy Ride) | Won, Keeneland R3, 2026-04-11, jockey Irad Ortiz Jr. | [irishracing.com chart](https://www.irishracing.com/raceresults/Sat-11th-Apr-2026/Keeneland/1904) |
+| Arthur Jr. | 4yo bay/brown gelding, sire Authentic, dam Parade Of Roses, owner L F Geaux Racing | Won by ½L, Keeneland R4 (1 1/16mi), 2026-04-10, jockey Jose Ortiz, 1:45.56 — LaRose's first win as head trainer | [irishracing.com chart](https://www.irishracing.com/raceresults/Fri-10th-Apr-2026/Keeneland/1936) |
+| Carbone | 5yo gelding by Mitole, claimed $50k by 8:38 Racing off a Feb 5 win | Won $126,000 alw opt clm sprint, Oaklawn R10, 2026-05-01, jockey Rafael Bejarano ($6.60) — LaRose's most lucrative win to date | [Oaklawn 5/2/26 Barn Notes](https://oaklawn.com/racing/news/5-2-26-barn-notes/) |
+| Batter Up | Sex/age not sourced (used gelding/4 as an illustrative placeholder) | Won, Oaklawn R1, 2026-05-01, jockey Rafael Bejarano, favored ($6) | [Oaklawn 5/2/26 Barn Notes](https://oaklawn.com/racing/news/5-2-26-barn-notes/) |
+| Oscar's Hope | Bay colt, sire Twirling Candy, dam Hopeful Princess (by Not This Time), owner Michael McLoughlin, bred by Stonestreet | 2nd (head), $400,000 Lafayette S. (Listed), Keeneland, 2026-04-03, jockey Irad Ortiz Jr., earned $78,000 | [BloodHorse chart](https://www.bloodhorse.com/horse-racing/stakes-result/291029/lafayette-stakes-trouble-calling) · [Keeneland](https://www.keeneland.com/media/news/quotes-400000-lafayette-l-keeneland-0) |
+| Standoutsensation | Mare, sire Take Charge Indy, prior wins incl. the Pippin S. and Turnback the Alarm S. | 3rd, $200,000 Dig a Diamond S., Oaklawn, 2026-04-25, jockey Rafael Bejarano | [BloodHorse chart](https://www.bloodhorse.com/horse-racing/race/usa/op/2026/4/25/10/dig-a-diamond-s-bt) |
+| Authentic Gallop | 4yo gelding, sire Authentic, dam Galloping Ami | 7th of 8, $100,000 Evangeline Mile S., Evangeline Downs, 2026-04-04, jockey Kevin Roman | [BloodHorse chart](https://www.bloodhorse.com/horse-racing/race/USA/EVD/2026/4/4/9/evangeline-mile-s) |
+| Hello Angel | Sex/age not sourced (used filly/4 as an illustrative placeholder) | Won, Oaklawn R3, 2026-04-16, jockey Ramon Vazquez, favored ($6.20) — LaRose's first Oaklawn win | [Oaklawn 4/17/26 Barn Notes](https://oaklawn.com/racing/news/4-17-26-barn-notes/) |
+| My Noble Knight | Sex/age not sourced (used gelding/5 as an illustrative placeholder) | 4th, Oaklawn R2 ($50k starter alw, 1 1/8mi), 2026-04-02 — LaRose's first career starter as head trainer | [Oaklawn 4/2/26 Barn Notes](https://oaklawn.com/racing/news/4-2-26-barn-notes/) |
+
+**Searched, explicitly excluded — no verifiable 2026 activity:** Market
+Runner (single uncorroborated AI-summary claim; the specific race/date it
+cited does not actually contain this horse when the chart was directly
+checked), Curly Jack, Fade to Gold, Hay Jude (no 2026-dated result found
+under Kinnon LaRose for any of the three). **Hoosier Philly** (6yo mare,
+graded-stakes winner, still nominally trained by LaRose per Horse Racing
+Nation) was excluded from the active roster — her last race was July 2025,
+over a year stale; she's a real "stable star" mention, not an active 2026
+entry.

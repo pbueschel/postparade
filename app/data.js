@@ -644,7 +644,7 @@
     { id: 'hartman',    name: 'Hartman Racing',    trainer: 'Hartman J.',      homeTrack: 'TP',  trainerPct: 0.15 },
     // Kinnon LaRose — real trainer + new demo persona; see docs/research-delta-downs-larose-2026-07-09.md
     // trainer/homeTrack real; trainerPct 0.26 ≈ his real ~26-28% strike rate (Oaklawn barn-notes); other fields are demo convention.
-    { id: 'larose', name: 'Kinnon LaRose Racing Stables', trainer: 'Kinnon LaRose', homeTrack: 'CD', trainerPct: 0.26, isDemoUser: true },
+    { id: 'larose', name: 'Kinnon LaRose', trainer: 'Kinnon LaRose', homeTrack: 'CD', trainerPct: 0.26, isDemoUser: true },
     // Real Delta Downs Quarter Horse trainers (research doc, Delta Downs section)
     { id: 'ponce',      name: 'Josue Ponce Racing',        trainer: 'Josue Ponce',        homeTrack: 'DED', trainerPct: 0.24 },
     { id: 'jgarcia',    name: 'Jose A. Garcia Stable',     trainer: 'Jose A. Garcia',     homeTrack: 'DED', trainerPct: 0.18 },
@@ -762,34 +762,98 @@
       record: { starts: 5, careerWins: 0, winsOtherThanMdnClmStarter: 0, lastWinDate: null }, lastStartDate: '2026-04-29',
       preference: { date: '2026-04-29', stars: 2 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: 'KY', flags: ['ship-in', 'below-bonus-min', 'ky-bred'] },
 
-    // ===== Kinnon LaRose Racing Stables — 5 real horses; see docs/research-delta-downs-larose-2026-07-09.md =====
+    // ===== Kinnon LaRose — 5 real horses; see docs/research-delta-downs-larose-2026-07-09.md =====
     // REAL per horse: name, sex, age, entered race/track/date, jockey, ML (in research doc). Real results for Modo/Molly.
     // ILLUSTRATIVE engine input: classR, lastSpeed, sweet, surf, home, shipMi, trainerPct, preference, par-adjacent figs.
     // shipMi is 0 for all new horses (a stored home-baseline hint, not relevant to these pre-/post-entry seeds).
     // Midnight Still — real 2yo colt, Saratoga R1 Jul 11 (Flavien Prat, ML 6/5); unraced going in.
-    { id: 'midnight-still', name: 'Midnight Still', stableId: 'larose', stable: 'Kinnon LaRose Racing Stables', trainer: 'Kinnon LaRose', sex: 'C', age: 2, maiden: true, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 122, lastSpeed: 0, daysSince: 0, home: 'CD', shipMi: 0, trainerPct: 0.26,
+    { id: 'midnight-still', name: 'Midnight Still', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'C', age: 2, maiden: true, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 122, lastSpeed: 0, daysSince: 0, home: 'CD', shipMi: 0, trainerPct: 0.26,
       record: { starts: 0, careerWins: 0, winsOtherThanMdnClmStarter: 0, lastWinDate: null }, lastStartDate: null,
       preference: { date: null, stars: 4 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['first-time-starter'] },
     // Hormesis — real 2yo filly, Saratoga R2 Jul 11 (Manuel Franco, ML 8/1); longer price, honest maiden.
-    { id: 'hormesis', name: 'Hormesis', stableId: 'larose', stable: 'Kinnon LaRose Racing Stables', trainer: 'Kinnon LaRose', sex: 'F', age: 2, maiden: true, under50k: false, surf: ['D'], sweet: [1320, 1430], classR: 108, lastSpeed: 0, daysSince: 0, home: 'CD', shipMi: 0, trainerPct: 0.26,
+    { id: 'hormesis', name: 'Hormesis', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'F', age: 2, maiden: true, under50k: false, surf: ['D'], sweet: [1320, 1430], classR: 108, lastSpeed: 0, daysSince: 0, home: 'CD', shipMi: 0, trainerPct: 0.26,
       record: { starts: 0, careerWins: 0, winsOtherThanMdnClmStarter: 0, lastWinDate: null }, lastStartDate: null,
       preference: { date: null, stars: 2 }, vetList: { listed: false }, medication: { lasix: true, firstTimeLasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['first-time-starter'] },
     // Gewurztraminer — real 5yo gelding, Saratoga R7 Jul 11 inner-turf allowance/$80k (Jose L. Ortiz); record illustrative.
-    { id: 'gewurztraminer', name: 'Gewurztraminer', stableId: 'larose', stable: 'Kinnon LaRose Racing Stables', trainer: 'Kinnon LaRose', sex: 'G', age: 5, maiden: false, under50k: false, surf: ['T'], sweet: [1760, 1980], classR: 106, lastSpeed: 88, daysSince: 22, home: 'CD', shipMi: 0, trainerPct: 0.26,
+    { id: 'gewurztraminer', name: 'Gewurztraminer', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 5, maiden: false, under50k: false, surf: ['T'], sweet: [1760, 1980], classR: 106, lastSpeed: 88, daysSince: 22, home: 'CD', shipMi: 0, trainerPct: 0.26,
       record: { starts: 18, careerWins: 3, winsOtherThanMdnClmStarter: 2, lastWinDate: '2026-05-10' }, lastStartDate: '2026-05-10',
       preference: { date: '2026-05-10', stars: 3 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
     // Modo — REAL: won $75k Bluebonnet Stakes at Lone Star Park 2026-04-16, 6½f dirt, wire-to-wire, 1:16.31,
     // jockey Lane Luzzi, by Liam's Map out of Academy Road, TX-bred, owner Dr. Joel Politi (no owner field in schema).
     // home 'CD' = her current LaRose barn; she shipped IN to Lone Star for this one start. Figures illustrative-but-grounded.
-    { id: 'modo', name: 'Modo', stableId: 'larose', stable: 'Kinnon LaRose Racing Stables', trainer: 'Kinnon LaRose', sex: 'F', age: 5, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 128, lastSpeed: 97, daysSince: 46, home: 'CD', shipMi: 0, trainerPct: 0.26,
+    // daysSince recomputed against the real-time clock (was 46, calibrated to a since-retired fixed demo date).
+    { id: 'modo', name: 'Modo', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'F', age: 5, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 128, lastSpeed: 97, daysSince: 84, home: 'CD', shipMi: 0, trainerPct: 0.26,
       record: { starts: 12, careerWins: 6, winsOtherThanMdnClmStarter: 5, lastWinDate: '2026-04-16' }, lastStartDate: '2026-04-16',
       preference: { date: '2026-04-16', stars: 5 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: 'TX', flags: ['stakes-quality'] },
     // Molly McIver — REAL: Ellis Park R4 MSW (2yo fillies, 5½f), jockey Brian Hernandez Jr., card postponed Jul 2→Jul 6,
-    // finished 8th of 12; by Charlatan. lastStartDate 2026-07-06 is AFTER the demo clock (2026-06-01) — daysSince is
-    // clamped to 0 for display sanity, not computed literally (real result predates the fictional "today").
-    { id: 'molly-mciver', name: 'Molly McIver', stableId: 'larose', stable: 'Kinnon LaRose Racing Stables', trainer: 'Kinnon LaRose', sex: 'F', age: 2, maiden: true, under50k: false, surf: ['D'], sweet: [1210, 1430], classR: 104, lastSpeed: 68, daysSince: 0, home: 'CD', shipMi: 0, trainerPct: 0.26,
+    // finished 8th of 12; by Charlatan. daysSince recomputed against the real-time clock (was clamped to 0 when the
+    // demo clock was a fixed 2026-06-01 date that predated this real result).
+    { id: 'molly-mciver', name: 'Molly McIver', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'F', age: 2, maiden: true, under50k: false, surf: ['D'], sweet: [1210, 1430], classR: 104, lastSpeed: 68, daysSince: 3, home: 'CD', shipMi: 0, trainerPct: 0.26,
       record: { starts: 2, careerWins: 0, winsOtherThanMdnClmStarter: 0, lastWinDate: null }, lastStartDate: '2026-07-06',
       preference: { date: '2026-07-06', stars: 2 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
+
+    // ===== Kinnon LaRose — 10 more real horses, pulled via Horse Racing Nation /
+    // Oaklawn barn notes / BloodHorse race charts (Equibase itself blocks
+    // automated access — HTTP 403 via Incapsula bot protection on both its
+    // horse-profile and condition-book pages). REAL per horse: name, sex, age,
+    // sire/dam where sourced, race/date/track, result. Where sex/age weren't in
+    // any sourced article, a plausible value is used and flagged illustrative.
+    // classR/lastSpeed/sweet/surf/record counts are illustrative engine input,
+    // same convention as the rest of the seed — grounded in the real result
+    // (e.g. a win gets stronger figures than a 7th-of-8) but not sourced stats.
+    // Glen Airy — REAL: 6yo chestnut gelding, sire Sky Mesa, dam My Favorite Tune, owner Maggi Moss.
+    // 3rd, Oaklawn R1 ($70k claiming, 4yo+), 2026-04-26, jockey Rafael Bejarano, went off 11/4 co-favorite.
+    { id: 'glen-airy', name: 'Glen Airy', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 6, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 106, lastSpeed: 81, daysSince: 74, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 22, careerWins: 3, winsOtherThanMdnClmStarter: 3, lastWinDate: '2026-02-01' }, lastStartDate: '2026-04-26',
+      preference: { date: '2026-04-26', stars: 2 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
+    // Eye Dee Kay — REAL: 7yo chestnut gelding, sire Overanalyze, dam Crab Key (by Candy Ride).
+    // WON, Keeneland R3, 2026-04-11, jockey Irad Ortiz Jr.
+    { id: 'eye-dee-kay', name: 'Eye Dee Kay', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 7, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1430], classR: 112, lastSpeed: 88, daysSince: 89, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 27, careerWins: 5, winsOtherThanMdnClmStarter: 5, lastWinDate: '2026-04-11' }, lastStartDate: '2026-04-11',
+      preference: { date: '2026-04-11', stars: 3 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
+    // Arthur Jr. — REAL: 4yo bay/brown gelding, sire Authentic, dam Parade Of Roses, owner L F Geaux Racing.
+    // WON by ½L, Keeneland R4 (1 1/16 mi), 2026-04-10, jockey Jose Ortiz, 1:45.56 — LaRose's first win as head trainer.
+    { id: 'arthur-jr', name: 'Arthur Jr.', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 4, maiden: false, under50k: false, surf: ['D'], sweet: [1760, 1870], classR: 116, lastSpeed: 90, daysSince: 90, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 9, careerWins: 2, winsOtherThanMdnClmStarter: 2, lastWinDate: '2026-04-10' }, lastStartDate: '2026-04-10',
+      preference: { date: '2026-04-10', stars: 4 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
+    // Carbone — REAL: 5yo gelding by Mitole, claimed $50k by 8:38 Racing off a Feb 5 win.
+    // WON $126,000 allowance optional claiming sprint, Oaklawn R10, 2026-05-01, jockey Rafael Bejarano ($6.60) —
+    // LaRose's most lucrative win as head trainer to date.
+    { id: 'carbone', name: 'Carbone', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 5, maiden: false, under50k: false, surf: ['D'], sweet: [1210, 1320], classR: 124, lastSpeed: 96, daysSince: 69, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 15, careerWins: 4, winsOtherThanMdnClmStarter: 4, lastWinDate: '2026-05-01' }, lastStartDate: '2026-05-01',
+      preference: { date: '2026-05-01', stars: 4 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['stakes-quality'] },
+    // Batter Up — REAL: WON, Oaklawn R1, 2026-05-01, jockey Rafael Bejarano, favored ($6).
+    // Sex/age not in any sourced article — illustrative placeholder (gelding, age 4), flagged.
+    { id: 'batter-up', name: 'Batter Up', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 4, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1430], classR: 110, lastSpeed: 84, daysSince: 69, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 7, careerWins: 2, winsOtherThanMdnClmStarter: 2, lastWinDate: '2026-05-01' }, lastStartDate: '2026-05-01',
+      preference: { date: '2026-05-01', stars: 3 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
+    // Oscar's Hope — REAL: bay colt, sire Twirling Candy, dam Hopeful Princess (by Not This Time),
+    // owner Michael McLoughlin, bred by Stonestreet. 2nd (head), $400,000 Lafayette S. (Listed), Keeneland,
+    // 2026-04-03, jockey Irad Ortiz Jr., earned $78,000. Age not stated — 3yo is the standard field for this stakes, flagged.
+    { id: 'oscars-hope', name: "Oscar's Hope", stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'C', age: 3, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 130, lastSpeed: 95, daysSince: 97, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 5, careerWins: 2, winsOtherThanMdnClmStarter: 2, lastWinDate: '2026-02-14' }, lastStartDate: '2026-04-03',
+      preference: { date: '2026-04-03', stars: 5 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['stakes-quality'] },
+    // Standoutsensation — REAL: mare, sire Take Charge Indy, prior wins include the Pippin S. and Turnback the Alarm S.
+    // 3rd, $200,000 Dig a Diamond S., Oaklawn, 2026-04-25, jockey Rafael Bejarano. Exact age not stated — mare implies 4+, flagged.
+    { id: 'standoutsensation', name: 'Standoutsensation', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'M', age: 5, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1430], classR: 120, lastSpeed: 92, daysSince: 75, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 14, careerWins: 3, winsOtherThanMdnClmStarter: 3, lastWinDate: '2026-01-17' }, lastStartDate: '2026-04-25',
+      preference: { date: '2026-04-25', stars: 4 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: ['stakes-quality'] },
+    // Authentic Gallop — REAL: 4yo gelding, sire Authentic, dam Galloping Ami. 7th of 8, $100,000 Evangeline Mile S.,
+    // Evangeline Downs, 2026-04-04, jockey Kevin Roman — an off day, figures reflect the below-par finish.
+    { id: 'authentic-gallop', name: 'Authentic Gallop', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 4, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1540], classR: 108, lastSpeed: 75, daysSince: 96, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 11, careerWins: 2, winsOtherThanMdnClmStarter: 2, lastWinDate: '2026-02-20' }, lastStartDate: '2026-04-04',
+      preference: { date: '2026-04-04', stars: 2 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
+    // Hello Angel — REAL: WON, Oaklawn R3, 2026-04-16, jockey Ramon Vazquez, favored ($6.20) — LaRose's first Oaklawn win.
+    // Sex/age not in any sourced article — illustrative placeholder (filly, age 4), flagged.
+    { id: 'hello-angel', name: 'Hello Angel', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'F', age: 4, maiden: false, under50k: false, surf: ['D'], sweet: [1320, 1430], classR: 114, lastSpeed: 88, daysSince: 84, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 6, careerWins: 2, winsOtherThanMdnClmStarter: 2, lastWinDate: '2026-04-16' }, lastStartDate: '2026-04-16',
+      preference: { date: '2026-04-16', stars: 3 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
+    // My Noble Knight — REAL: Oaklawn R2 ($50k starter allowance, 1 1/8 mi), 2026-04-02, finished 4th —
+    // LaRose's first career starter as head trainer (the horse itself had raced before, under Amoss).
+    // Sex/age not in any sourced article — illustrative placeholder (gelding, age 5), flagged.
+    { id: 'my-noble-knight', name: 'My Noble Knight', stableId: 'larose', stable: 'Kinnon LaRose', trainer: 'Kinnon LaRose', sex: 'G', age: 5, maiden: false, under50k: false, surf: ['D'], sweet: [1760, 1980], classR: 100, lastSpeed: 78, daysSince: 98, home: 'CD', shipMi: 0, trainerPct: 0.26,
+      record: { starts: 8, careerWins: 1, winsOtherThanMdnClmStarter: 1, lastWinDate: '2025-09-12' }, lastStartDate: '2026-04-02',
+      preference: { date: '2026-04-02', stars: 2 }, vetList: { listed: false }, medication: { lasix: true }, equipment: { blinkers: 'off', changed: false }, stateBred: null, flags: [] },
 
     // ===== Delta Downs Quarter Horse roster — real horses; see docs/research-delta-downs-larose-2026-07-09.md =====
     // sweet[] holds real YARDS (330/400-centered tight ranges — QH sprinters). classR/preference illustrative;
