@@ -16,13 +16,16 @@
   // ---- resolution + join helpers ------------------------------------------
   function demoStable() {
     return PPData.demoStable() ||
-      { id: 'snellgrove', name: 'Snellgrove Racing', trainer: 'Jack Snellgrove' };
+      { id: 'larose', name: 'Kinnon LaRose Racing Stables', trainer: 'Kinnon LaRose' };
   }
+  // Merge-aware horse lookup: resolves both seeded and user-created horses so a
+  // newly registered horse shows up everywhere a seeded one does.
+  function horseFor(id) { return (id && (PPData.getHorse(id) || PPStore.getCreatedHorse(id))) || null; }
   function stableHorses() {
-    return PPData.listHorses({ stableId: demoStable().id }) || [];
+    return (PPData.listHorses({ stableId: demoStable().id }) || []).concat(PPStore.listCreatedHorses(demoStable().id));
   }
   function horseOr(id, fallback) {
-    return PPData.getHorse(id) || PPData.getHorse(fallback) ||
+    return horseFor(id) || horseFor(fallback) ||
       stableHorses()[0] || PPData.horses[0] || null;
   }
   function meetOfRace(r) {
@@ -49,7 +52,7 @@
   function ctxFor(h) {
     return function (race) {
       const entrants = (PPStore.entriesForRace(race.id) || [])
-        .map(e => PPData.getHorse(e.horseId)).filter(Boolean);
+        .map(e => horseFor(e.horseId)).filter(Boolean);
       const mi = PPData.shipMiles(h.home, trackIdOfRace(race));
       return {
         entrants,
@@ -286,6 +289,7 @@
 
     const rec = h.record || { starts: 0, careerWins: 0 };
     const track = PPData.getTrack(h.home);
+    const vet = h.vetId ? PPData.getVet(h.vetId) : null;
 
     // Status badges.
     const badges = [];
@@ -343,6 +347,7 @@
               <span><i data-lucide="users" class="inline w-3.5 h-3.5 mr-1 -mt-0.5"></i>Trainer: ${esc(h.trainer || '—')}</span>
               <span><i data-lucide="home" class="inline w-3.5 h-3.5 mr-1 -mt-0.5"></i>Home: ${esc(track ? track.name : h.home)}</span>
             </div>
+            ${vet ? `<div class="text-xs text-slate-500 mt-2">Attending vet: ${esc(vet.name)} · ${esc(vet.clinic)}</div>` : ''}
           </div>
           <a href="#recs/${esc(h.id)}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg accent-bg accent-bg-h text-white text-sm">
             <i data-lucide="target" class="w-4 h-4"></i>Find next start
@@ -455,7 +460,7 @@
     if (!race) { paint('scr-race', `<div class="card ring-soft p-6 text-slate-500">Race not found.</div>`); return; }
 
     const entries = PPStore.entriesForRace(race.id) || [];
-    const entrantHorses = entries.map(e => PPData.getHorse(e.horseId)).filter(Boolean);
+    const entrantHorses = entries.map(e => horseFor(e.horseId)).filter(Boolean);
     const target = (race.fieldTarget && race.fieldTarget.min) || 8;
     const fs = fillState(entries.length, target);
     const strength = PPEngine.fieldStrength(entrantHorses, race);
@@ -605,7 +610,7 @@
     };
 
     const sentCard = (req) => {
-      const h = PPData.getHorse(req.horseId);
+      const h = horseFor(req.horseId);
       const race = raceMerged(req.raceId);
       if (!h || !race) return '';
       return `
@@ -635,7 +640,7 @@
     };
 
     const histRow = (req) => {
-      const h = PPData.getHorse(req.horseId);
+      const h = horseFor(req.horseId);
       const race = raceMerged(req.raceId);
       if (!h || !race) return '';
       const done = req.status === 'accepted';
@@ -651,7 +656,7 @@
     };
 
     const bonusCount = sent.reduce((n, req) => {
-      const h = PPData.getHorse(req.horseId), race = raceMerged(req.raceId);
+      const h = horseFor(req.horseId), race = raceMerged(req.raceId);
       if (!h || !race) return n;
       const s = PPEngine.shipping(h, race, ctxFor(h)(race));
       return n + (s && s.bonus > 0 ? 1 : 0);
@@ -817,13 +822,75 @@
       </div>`);
   };
 
+  // ========================================================================
+  // HORSE BUILDER — one-shot register-a-horse form (create + redirect)
+  // ========================================================================
+  R['trainer/horse-builder'] = function () {
+    const st = demoStable();
+
+    const field = (label, control, hint) => `
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">${esc(label)}</label>
+        ${control}
+        ${hint ? `<div class="text-xs text-slate-400 mt-1">${esc(hint)}</div>` : ''}
+      </div>`;
+
+    const opts = (pairs, sel) => pairs.map(p => {
+      const val = Array.isArray(p) ? p[0] : p;
+      const txt = Array.isArray(p) ? p[1] : p;
+      return `<option value="${esc(String(val))}"${String(val) === String(sel) ? ' selected' : ''}>${esc(String(txt))}</option>`;
+    }).join('');
+
+    const selCls = 'w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm';
+    const inpCls = 'w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm';
+
+    const sexOpts = [['F', 'Filly'], ['M', 'Mare'], ['C', 'Colt'], ['G', 'Gelding']];
+    const ageOpts = [2, 3, 4, 5, 6, 7, 8];
+    const registryOpts = [['Jockey Club', 'Jockey Club (Thoroughbred)'], ['AQHA', 'AQHA (Quarter Horse)']];
+    const trackOpts = (PPData.listTracks() || []).map(t => [t.id, t.name]);
+    const vetOpts = [['', 'No vet on file yet']].concat((PPData.listVets() || []).map(v => [v.id, v.name + ' — ' + v.clinic]));
+
+    paint('trainer/horse-builder', `
+      ${breadcrumb([{ label: 'Stable', href: '#dashboard' }, { label: 'Add a horse' }])}
+
+      <div>
+        <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(st.name)}</div>
+        <h1 class="text-2xl font-semibold tracking-tight">Add a horse</h1>
+        <div class="text-sm text-slate-600">Register a new horse into ${esc(st.name)}.</div>
+      </div>
+
+      <div class="card ring-soft p-6 max-w-2xl">
+        <div class="grid sm:grid-cols-2 gap-4">
+          ${field('Horse name', `<input id="hb-name" type="text" required placeholder="e.g. Silver Comet" class="${inpCls}">`)}
+          ${field('Sex', `<select id="hb-sex" class="${selCls}">${opts(sexOpts, 'F')}</select>`)}
+          ${field('Age', `<select id="hb-age" class="${selCls}">${opts(ageOpts, 3)}</select>`)}
+          ${field('Registry', `<select id="hb-registry" class="${selCls}">${opts(registryOpts, 'Jockey Club')}</select>`)}
+          ${field('Home track', `<select id="hb-track" class="${selCls}">${opts(trackOpts)}</select>`)}
+          ${field('Veterinarian', `<select id="hb-vet" class="${selCls}">${opts(vetOpts, '')}</select>`)}
+        </div>
+
+        <div class="mt-4">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Surface</label>
+          <div class="flex items-center gap-5 text-sm">
+            <label class="inline-flex items-center gap-1.5"><input type="checkbox" id="hb-surf-d" checked> Dirt</label>
+            <label class="inline-flex items-center gap-1.5"><input type="checkbox" id="hb-surf-t"> Turf</label>
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center gap-3">
+          <button class="pp-create-horse text-sm px-4 py-2 rounded-lg accent-bg accent-bg-h text-white inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-4 h-4"></i>Register horse →</button>
+          <a href="#dashboard" class="text-sm text-slate-500 hover:text-ink-900">Cancel</a>
+        </div>
+      </div>`);
+  };
+
   // ---- one delegated click listener for all trainer actions ---------------
   document.addEventListener('click', function (e) {
     const submit = e.target.closest && e.target.closest('.pp-submit');
     if (submit) {
       const hid = submit.dataset.horseId, rid = submit.dataset.raceId;
       PPStore.submissions.add({ horseId: hid, raceId: rid });
-      const h = PPData.getHorse(hid), r = raceMerged(rid);
+      const h = horseFor(hid), r = raceMerged(rid);
       toast(esc((h && h.name) || 'Horse') + ' submitted to ' + esc(r ? raceLabel(r) : 'race'));
       if (window.rerender) window.rerender();
       return;
@@ -833,7 +900,7 @@
       const id = acc.dataset.reqId;
       const req = PPStore.requests.get(id);
       PPStore.requests.setStatus(id, 'accepted');
-      const h = req && PPData.getHorse(req.horseId);
+      const h = req && horseFor(req.horseId);
       toast(esc((h && h.name) || 'Horse') + ' entered — request accepted');
       if (window.rerender) window.rerender();
       return;
@@ -842,6 +909,33 @@
     if (dec) {
       PPStore.requests.setStatus(dec.dataset.reqId, 'declined');
       if (window.rerender) window.rerender();
+      return;
+    }
+    const createHorseBtn = e.target.closest && e.target.closest('.pp-create-horse');
+    if (createHorseBtn) {
+      const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+      const checked = id => { const el = document.getElementById(id); return !!(el && el.checked); };
+      const name = val('hb-name');
+      if (!name) { toast('Enter a horse name'); return; }
+      const surf = [];
+      if (checked('hb-surf-d')) surf.push('D');
+      if (checked('hb-surf-t')) surf.push('T');
+      const stable = demoStable();
+      const trackId = val('hb-track');
+      const horse = PPStore.createHorse({
+        name,
+        stableId: stable.id,
+        stable: stable.name,
+        trainer: stable.trainer,
+        sex: val('hb-sex') || 'F',
+        age: +val('hb-age') || 3,
+        registry: val('hb-registry') || 'Jockey Club',
+        home: trackId || 'CD',
+        vetId: val('hb-vet') || null,
+        surf: surf.length ? surf : ['D'],
+      });
+      toast(name + ' added to ' + stable.name);
+      location.hash = '#horse/' + horse.id;
       return;
     }
   });

@@ -3,6 +3,46 @@
 <!-- Append-only session journal, newest entry first.
      Written at the end of every substantive session — by Phil or by an agent. -->
 
+## 2026-07-09 — Track workspace features, then real-trainer/real-track content pivot
+- **Changed (committed, `af74099`..`cd2cbaf`):** Meets list + parameterized meet
+  dashboard; Stalls & ship-ins overview + interactive stall builder (barns,
+  assign/waitlist); Trainer sidebar Condition parser link removed; Build-a-meet
+  flow (meet → race day → race, reusing the Race Builder); race day/meet
+  day-count cap + delete meet/delete race day (soft-delete overlay, cascades,
+  works on seeded and created entities alike); Race Builder's dead Recompute
+  button and read-only condition text fixed.
+- **Changed (uncommitted — this session, pending review):** Replaced the
+  fictional "Snellgrove Racing" demo trainer with the real **Kinnon LaRose**
+  (Tom Amoss's former head assistant, took over the stable April 2026),
+  seeded with his real, cited, currently-active horses (Midnight Still,
+  Hormesis, Gewurztraminer at Saratoga; Modo at Lone Star Park; Molly McIver
+  at Ellis Park — see `docs/research-delta-downs-larose-2026-07-09.md`).
+  Added three real tracks: **Delta Downs** (now the Track workspace's default
+  identity, its current live Quarter Horse meet — required new yards-based
+  distance display + a QH classLadder vocabulary, additive alongside the
+  existing Thoroughbred one), **Saratoga**, **Lone Star Park** — each with
+  real, cited trainers/horses/results. `PPData.today` is now real time
+  (formatted to stay string-comparison-compatible with the seed), not a fixed
+  demo date — Churchill Downs' fictional meet is now naturally
+  historical/closed as a result, by design. Added horse `registry`
+  (Jockey Club/AQHA, derived from track) and a veterinarian roster
+  (`PPData.listVets()`), plus a new Trainer "Add a horse" flow
+  (`PPStore.createHorse`) that selects a vet from that roster. Found and
+  fixed a latent bug along the way: `PPData.shipProgram()`'s tour.html-
+  back-compat fallback silently returned Churchill Downs' Ship & Win numbers
+  for any meet with no program of its own — guarded at the `screens-track.js`
+  call site rather than touching the back-compat-sensitive source function.
+- **Next:** Review the LaRose/Delta Downs content, then commit + push.
+  Consider whether Churchill Downs' now-dormant fictional storyline
+  (vet's-list/Lasix/N1X demonstrations, all Snellgrove-horse-based) needs a
+  replacement demo path, since it's no longer reachable from the Trainer's
+  own dashboard.
+- **Held/blocked:** Investor walkthrough guide; `tour.html` regeneration (now
+  more relevant than before — tour.html still shows the old Snellgrove/CD
+  storyline, since it's a frozen clone; regenerating it would need a decision
+  on whether the tour should follow the new LaRose/Delta Downs content or
+  stay as a fixed historical snapshot). Both still await Phil's go-ahead.
+
 ## 2026-07-06 — Memory retrofit (worklog, decisions, Held tracking)
 - **Changed:** Added `docs/worklog.md` + `docs/decisions.md`; added a **Held** section
   to `plan.md`; registered both files in `CLAUDE.md`'s file map and session ritual.

@@ -5,7 +5,7 @@
 (function () {
   const KEY = 'pp.demo.v1';
   const blank = () => ({ version: 1, submissions: [], requests: [], raceSpecOverrides: {}, stallOverrides: {},
-    createdMeets: [], createdRaceDays: [], createdRaces: [], createdPrograms: [],
+    createdMeets: [], createdRaceDays: [], createdRaces: [], createdPrograms: [], createdHorses: [],
     deletedMeetIds: [], deletedRaceDayIds: [] });
 
   let state = blank();
@@ -126,6 +126,28 @@
   function getCreatedRace(id) { return state.createdRaces.find(r => r.id === id) || null; }
   function listCreatedRaces(raceDayId) { return state.createdRaces.filter(r => r.raceDayId === raceDayId); }
 
+  function createHorse(spec) {
+    const id = newId('horse');
+    const horse = Object.assign({
+      sex: 'F', age: 3, maiden: true, under50k: false, surf: ['D'], sweet: [1320, 1540],
+      classR: 100, lastSpeed: 0, daysSince: 0, shipMi: 0, trainerPct: 0.15,
+      registry: 'Jockey Club', vetId: null,
+      record: { starts: 0, careerWins: 0, winsOtherThanMdnClmStarter: 0, lastWinDate: null },
+      lastStartDate: null,
+      preference: { date: null, stars: 1 },
+      vetList: { listed: false },
+      medication: { lasix: false },
+      equipment: { blinkers: 'off', changed: false },
+      stateBred: null,
+      flags: ['first-time-starter'],
+    }, spec, { id });
+    state.createdHorses.push(horse);
+    save();
+    return horse;
+  }
+  function getCreatedHorse(id) { return state.createdHorses.find(h => h.id === id) || null; }
+  function listCreatedHorses(stableId) { return state.createdHorses.filter(h => h.stableId === stableId); }
+
   function createShipProgram(spec) {
     const id = newId('prog');
     const prog = Object.assign({ type: 'shipAndWin', label: 'Ship & Win' }, spec, { id });
@@ -207,6 +229,7 @@
     createMeet, getCreatedMeet, listCreatedMeets,
     createRaceDay, getCreatedRaceDay, listCreatedRaceDays,
     createRace, getCreatedRace, listCreatedRaces,
+    createHorse, getCreatedHorse, listCreatedHorses,
     createShipProgram, getCreatedProgram,
     deleteMeet, isMeetDeleted,
     deleteRaceDay, isRaceDayDeleted,

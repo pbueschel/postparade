@@ -173,9 +173,9 @@
     <div class="px-3 py-3 border-b sidebar-border relative">
       <button id="wsSwitcher" class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-sm">
         <span class="flex items-center gap-2">
-          <span id="wsAbbr" class="w-5 h-5 rounded-full accent-bg text-white text-[10px] font-bold flex items-center justify-center">SR</span>
+          <span id="wsAbbr" class="w-5 h-5 rounded-full accent-bg text-white text-[10px] font-bold flex items-center justify-center">KL</span>
           <span class="text-left leading-tight">
-            <span id="wsName" class="block text-ink-900">Snellgrove Racing</span>
+            <span id="wsName" class="block text-ink-900">Kinnon LaRose Racing Stables</span>
             <span id="wsRole" class="block text-[10px] text-ink-500">Trainer workspace</span>
           </span>
         </span>
@@ -187,19 +187,19 @@
         <div class="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wider text-ink-500">Your workspaces</div>
 
         <button data-go="trainer" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
-          <span class="w-6 h-6 rounded-full bg-turf-600 text-white text-[10px] font-bold flex items-center justify-center">SR</span>
+          <span class="w-6 h-6 rounded-full bg-turf-600 text-white text-[10px] font-bold flex items-center justify-center">KL</span>
           <span class="flex-1">
-            <span class="block">Snellgrove Racing</span>
-            <span class="block text-[10px] text-ink-500">Trainer · 14 horses</span>
+            <span class="block">Kinnon LaRose Racing Stables</span>
+            <span class="block text-[10px] text-ink-500">Trainer · 5 horses</span>
           </span>
           <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600"></i>
         </button>
 
         <button data-go="track" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
-          <span class="w-6 h-6 rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center">CD</span>
+          <span class="w-6 h-6 rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center">DD</span>
           <span class="flex-1">
-            <span class="block">Churchill Downs</span>
-            <span class="block text-[10px] text-ink-500">Track · summer meet</span>
+            <span class="block">Delta Downs</span>
+            <span class="block text-[10px] text-ink-500">Track · Quarter Horse meet</span>
           </span>
           <i data-lucide="check" class="ws-check w-3.5 h-3.5 text-turf-600 hidden"></i>
         </button>
@@ -257,9 +257,9 @@
 
     <div class="p-3 border-t sidebar-border text-xs text-ink-500">
       <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-full bg-ink-900 flex items-center justify-center text-white font-semibold">JS</div>
+        <div class="w-7 h-7 rounded-full bg-ink-900 flex items-center justify-center text-white font-semibold">KL</div>
         <div class="flex-1 min-w-0">
-          <div class="text-ink-900 truncate">Jack Snellgrove</div>
+          <div class="text-ink-900 truncate">Kinnon LaRose</div>
           <div id="userRole" class="text-[11px] truncate">Head trainer</div>
         </div>
         <a href="index.html" title="Sign out" class="p-1.5 rounded hover:bg-slate-100">
@@ -309,12 +309,12 @@
 
       <!-- Mobile user avatar with popover -->
       <div class="md:hidden relative">
-        <button id="mobileUserBtn" aria-label="Account" class="w-8 h-8 rounded-full bg-ink-900 text-white text-xs font-semibold flex items-center justify-center hover:opacity-90">JS</button>
+        <button id="mobileUserBtn" aria-label="Account" class="w-8 h-8 rounded-full bg-ink-900 text-white text-xs font-semibold flex items-center justify-center hover:opacity-90">KL</button>
         <div id="userPop" class="user-pop absolute right-0 top-full mt-2 w-56 rounded-lg bg-white border border-slate-200 shadow-lg z-40 overflow-hidden">
           <div class="px-3 py-3 border-b border-slate-100 flex items-center gap-2">
-            <div class="w-9 h-9 rounded-full bg-ink-900 text-white text-sm font-semibold flex items-center justify-center">JS</div>
+            <div class="w-9 h-9 rounded-full bg-ink-900 text-white text-sm font-semibold flex items-center justify-center">KL</div>
             <div class="min-w-0">
-              <div class="text-sm font-medium text-ink-900 truncate">Jack Snellgrove</div>
+              <div class="text-sm font-medium text-ink-900 truncate">Kinnon LaRose</div>
               <div id="userRoleMobile" class="text-[11px] text-ink-500 truncate">Head trainer</div>
             </div>
           </div>
@@ -471,6 +471,11 @@
       <!-- rendered by app/screens-trainer.js (PPRenderers) -->
     </section>
 
+    <!-- Add a horse -->
+    <section id="trainer/horse-builder" class="screen p-6 space-y-6">
+      <!-- rendered by app/screens-trainer.js (PPRenderers) -->
+    </section>
+
     <!-- =========================================================== -->
     <!-- OWNER · DASHBOARD (parked — guest-access backlog)           -->
     <!-- =========================================================== -->
@@ -515,7 +520,7 @@
           <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <div>
               <div class="font-semibold">My horses</div>
-              <div class="text-xs text-slate-500">Across Snellgrove Racing, Pletcher Stables, and West Coast Thoroughbreds</div>
+              <div class="text-xs text-slate-500">Across Kinnon LaRose Racing Stables, Pletcher Stables, and West Coast Thoroughbreds</div>
             </div>
           </div>
           <div class="divide-y divide-slate-100 text-sm">
@@ -525,7 +530,7 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <div class="font-medium">Zengraya</div>
-                  <span class="pill bg-slate-100 text-slate-600">Snellgrove Racing</span>
+                  <span class="pill bg-slate-100 text-slate-600">Kinnon LaRose Racing Stables</span>
                 </div>
                 <div class="text-xs text-slate-500">3yo F · last out Apr 11 CD 4th · next: <span class="accent-text">CD R3 Sat Jun 6 (pending)</span></div>
               </div>
@@ -570,7 +575,7 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <div class="font-medium">Painted Reverie</div>
-                  <span class="pill bg-slate-100 text-slate-600">Snellgrove Racing</span>
+                  <span class="pill bg-slate-100 text-slate-600">Kinnon LaRose Racing Stables</span>
                 </div>
                 <div class="text-xs text-slate-500">3yo F · maiden · next: <span class="accent-text">KEE R2 Wed Jun 10 (pending)</span></div>
               </div>
@@ -677,7 +682,7 @@
               <span class="text-slate-700">Churchill Downs R3 · Sat Jun 6 · 2:14pm CT</span>
             </div>
             <div class="text-sm text-slate-500 mt-1">Mdn 75k · 6f Dirt · $85,000 purse · Foley G. up</div>
-            <div class="text-xs text-slate-500 mt-2">Recommended by <span class="text-ink-900 font-medium">Adam Beschizza</span> · Snellgrove Racing</div>
+            <div class="text-xs text-slate-500 mt-2">Recommended by <span class="text-ink-900 font-medium">Adam Beschizza</span> · Kinnon LaRose Racing Stables</div>
           </div>
           <div class="text-right">
             <div class="text-xs text-slate-500">Entries close</div>
@@ -737,7 +742,7 @@
               <span class="text-slate-700">Keeneland R2 · Wed Jun 10 · 1:05pm ET</span>
             </div>
             <div class="text-sm text-slate-500 mt-1">Mdn 50k · 6½f Dirt · $62,000 purse · Jockey TBD</div>
-            <div class="text-xs text-slate-500 mt-2">Recommended by <span class="text-ink-900 font-medium">Adam Beschizza</span> · Snellgrove Racing</div>
+            <div class="text-xs text-slate-500 mt-2">Recommended by <span class="text-ink-900 font-medium">Adam Beschizza</span> · Kinnon LaRose Racing Stables</div>
           </div>
           <div class="text-right">
             <div class="text-xs text-slate-500">Entries close</div>
@@ -806,10 +811,10 @@
             <tbody class="text-slate-700">
               <tr class="border-t border-slate-100"><td class="py-2 px-5">May 22</td><td>Foggy Ridge</td><td>SA · R7 Stk</td><td>WCT</td><td>6/10</td><td class="text-right pr-5">$0</td></tr>
               <tr class="border-t border-slate-100"><td class="py-2 px-5">May 18</td><td>Midnight Carillon</td><td>BEL · R5 Alw</td><td>Pletcher</td><td><span class="pill accent-soft">1st</span></td><td class="text-right pr-5 font-semibold">$54,000</td></tr>
-              <tr class="border-t border-slate-100"><td class="py-2 px-5">May 3</td><td>Painted Reverie</td><td>CD · R2 Mdn</td><td>Snellgrove</td><td>4/11</td><td class="text-right pr-5">$1,200</td></tr>
+              <tr class="border-t border-slate-100"><td class="py-2 px-5">May 3</td><td>Painted Reverie</td><td>CD · R2 Mdn</td><td>LaRose</td><td>4/11</td><td class="text-right pr-5">$1,200</td></tr>
               <tr class="border-t border-slate-100"><td class="py-2 px-5">Apr 27</td><td>Foggy Ridge</td><td>SA · R6 Stk</td><td>WCT</td><td>2/9</td><td class="text-right pr-5 font-semibold">$18,000</td></tr>
               <tr class="border-t border-slate-100"><td class="py-2 px-5">Apr 19</td><td>Midnight Carillon</td><td>AQU · R8 Alw</td><td>Pletcher</td><td><span class="pill accent-soft">1st</span></td><td class="text-right pr-5 font-semibold">$48,000</td></tr>
-              <tr class="border-t border-slate-100"><td class="py-2 px-5">Apr 11</td><td>Zengraya</td><td>CD · R4 Mdn</td><td>Snellgrove</td><td>4/11</td><td class="text-right pr-5">$2,400</td></tr>
+              <tr class="border-t border-slate-100"><td class="py-2 px-5">Apr 11</td><td>Zengraya</td><td>CD · R4 Mdn</td><td>LaRose</td><td>4/11</td><td class="text-right pr-5">$2,400</td></tr>
             </tbody>
           </table>
         </div>
@@ -950,21 +955,22 @@
   /* ---------- Workspace definitions ---------- */
   const workspaces = {
     trainer: {
-      name: 'Snellgrove Racing',
-      abbr: 'SR',
+      name: 'Kinnon LaRose Racing Stables',
+      abbr: 'KL',
       role: 'Trainer workspace',
       userRole: 'Head trainer',
       home: 'dashboard',
       cta: 'Add horse',
+      ctaHref: 'trainer/horse-builder',
       // any of these prefixes count as belonging to this workspace
       prefixes: ['dashboard','horse/','recs/','race/','trainer/','parser'],
     },
     track: {
-      name: 'Churchill Downs',
-      abbr: 'CD',
+      name: 'Delta Downs',
+      abbr: 'DD',
       role: 'Track workspace',
       userRole: 'Racing secretary',
-      home: 'track/meets',
+      home: 'track/meet/ded-2026-quarter',
       cta: 'Build a meet',
       ctaHref: 'track/meet-builder',
       prefixes: ['track/'],

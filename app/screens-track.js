@@ -23,13 +23,29 @@
     [1540, '7 furlongs'], [1760, '1 mile'], [1830, '1 mile 70y'],
     [1870, '1 1/16 mile'], [1980, '1 1/8 mile'],
   ];
+  // Quarter Horse distances are quoted in yards, never furlongs (see DED meet).
+  const QH_DISTANCES = [
+    [300, '300 yards'], [330, '330 yards'], [350, '350 yards'], [400, '400 yards'],
+    [440, '440 yards (¼ mile)'], [550, '550 yards'], [660, '660 yards'], [870, '870 yards'],
+  ];
   const SURFACES = [['D', 'Dirt'], ['T', 'Turf'], ['A', 'All-weather']];
   const RESTRICTS = [['FM3U', 'F&M 3yo and up'], ['3U', '3yo and up (open)'], ['2U', '2yo and up']];
   const TARGETS = [['8', '8'], ['10', '10'], ['12', '12']];
   const TYPES = [['S', 'Maiden Special Weight'], ['M', 'Maiden Claiming'], ['A', 'Allowance'],
-    ['C', 'Claiming'], ['AO', 'Allowance Optional Claiming'], ['N', 'Stakes']];
-  const CLASS_OF_TYPE = { S: 'MSW', M: 'MdnClm', A: 'Alw', C: 'Clm', AO: 'OptClm', N: 'Listed' };
-  const TYPE_OF_CLASS = { MSW: 'S', MdnClm: 'M', Alw: 'A', Clm: 'C', OptClm: 'AO' };
+    ['C', 'Claiming'], ['AO', 'Allowance Optional Claiming'], ['N', 'Stakes'],
+    ['QMDN', 'Quarter Horse Maiden'], ['QSG3', 'Quarter Horse Stakes (G3)'], ['QSG2', 'Quarter Horse Stakes (G2)'],
+    ['QSG1', 'Quarter Horse Stakes (G1)'], ['QRG3', 'Restricted Graded (RG3)'], ['QRG2', 'Restricted Graded (RG2)'],
+    ['QRG1', 'Restricted Graded (RG1)'], ['QFUT', 'Futurity'], ['QDER', 'Derby'], ['QTRL', 'Trial (qualifier)']];
+  const CLASS_OF_TYPE = {
+    S: 'MSW', M: 'MdnClm', A: 'Alw', C: 'Clm', AO: 'OptClm', N: 'Listed',
+    QMDN: 'MDN', QSG3: 'StkG3', QSG2: 'StkG2', QSG1: 'StkG1',
+    QRG3: 'RG3', QRG2: 'RG2', QRG1: 'RG1', QFUT: 'Fut', QDER: 'Der', QTRL: 'Trial',
+  };
+  const TYPE_OF_CLASS = {
+    MSW: 'S', MdnClm: 'M', Alw: 'A', Clm: 'C', OptClm: 'AO',
+    MDN: 'QMDN', StkG3: 'QSG3', StkG2: 'QSG2', StkG1: 'QSG1',
+    RG3: 'QRG3', RG2: 'QRG2', RG1: 'QRG1', Fut: 'QFUT', Der: 'QDER', Trial: 'QTRL',
+  };
 
   // ---- small local helpers -------------------------------------------------
   function mount(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
@@ -58,8 +74,16 @@
     const created = days.reduce((acc, d) => acc.concat(PPStore.listCreatedRaces(d.id)), []);
     return seeded.concat(created);
   }
+  // PPData.shipProgram() falls back to the FIRST ship-and-win program in the
+  // whole seed (a tour.html back-compat behavior we can't change at the
+  // source) whenever a meet's own supplementProgramIds is empty — which would
+  // silently show every program-less meet Churchill Downs' numbers. Guard
+  // against that here instead of touching PPData.shipProgram itself.
   function shipProgramFor(meetId) {
-    return PPStore.getCreatedMeet(meetId) ? PPStore.getCreatedProgram(meetId) : PPData.shipProgram(meetId);
+    if (PPStore.getCreatedMeet(meetId)) return PPStore.getCreatedProgram(meetId);
+    const meet = PPData.getMeet(meetId);
+    if (!meet || !meet.supplementProgramIds || !meet.supplementProgramIds.length) return null;
+    return PPData.shipProgram(meetId);
   }
   function raceDayFor(id) {
     if (!id || PPStore.isRaceDayDeleted(id)) return null;
@@ -79,6 +103,7 @@
     const meet = rd ? meetFor(rd.meetId) : null;
     return meet ? meet.track : 'CD';
   }
+  function isQuarterHorseRace(race) { return raceTrackId(race) === 'DED'; }
   function meetIdForRace(race) {
     if (race.meetId) return race.meetId;
     const rd = PPData.getRaceDay(race.raceDayId);
@@ -103,10 +128,12 @@
     return 'Open';
   }
   function surfLabel(race) { return (race.isTurf || race.surface === 'T') ? 'Turf' : race.surface === 'A' ? 'AWT' : 'Dirt'; }
+  // Quarter Horse races quote distance in yards; Thoroughbred races in furlongs.
+  function distanceLabel(race) { return isQuarterHorseRace(race) ? race.distanceYards + ' yards' : furlongs(race.distanceYards); }
   // "MSW · 6f Dirt · F&M 3yo+ · $85k" — the one-line condition summary.
   function condLine(race) {
     const c = race.conditions || {};
-    return `${race.classLadder} · ${furlongs(race.distanceYards)} ${surfLabel(race)} · ${sexLabel(c.sexes)} ${c.minAge || 3}yo+ · ${fmtMoney(race.purse)}`;
+    return `${race.classLadder} · ${distanceLabel(race)} ${surfLabel(race)} · ${sexLabel(c.sexes)} ${c.minAge || 3}yo+ · ${fmtMoney(race.purse)}`;
   }
   function shortDay(day) {
     const d = new Date(day.date);
@@ -351,13 +378,14 @@
         <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
       </a>
 
+      ${prog ? `
       <div class="card ring-soft p-5 stripe">
-        <div class="flex items-center gap-2 accent-text"><i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold">${esc((prog && prog.label) || 'Ship & Win')}, meet-wide</div></div>
+        <div class="flex items-center gap-2 accent-text"><i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold">${esc(prog.label || 'Ship & Win')}, meet-wide</div></div>
         <div class="mt-2 text-sm text-slate-700">
-          <span class="font-medium">${fmtMoney(prog ? prog.flatAmount : 0)}</span> to any horse shipping in <span class="font-medium">≥ ${prog ? prog.eligibility.minShipMi : 0} mi</span>, applied to underfilled non-stakes races. Individual races can override.
+          <span class="font-medium">${fmtMoney(prog.flatAmount)}</span> to any horse shipping in <span class="font-medium">≥ ${prog.eligibility.minShipMi} mi</span>, applied to underfilled non-stakes races. Individual races can override.
           <span class="text-slate-500">Pool ${fmtMoney(cap.totalBudget)} · ${fmtMoney(cap.claimed)} committed.</span>
         </div>
-      </div>`);
+      </div>` : ''}`);
   };
 
   // ===========================================================================
@@ -433,9 +461,12 @@
     const opts = options.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(selected) ? 'selected' : ''}>${esc(l)}</option>`).join('');
     return `<select id="${id}" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white">${opts}</select>`;
   }
-  function distOptions(sel) {
-    const list = DISTANCES.slice();
-    if (!list.some(d => d[0] === sel)) list.push([sel, furlongs(sel)]);
+  function distOptions(race) {
+    const qh = isQuarterHorseRace(race);
+    const table = qh ? QH_DISTANCES : DISTANCES;
+    const sel = race.distanceYards;
+    const list = table.slice();
+    if (!list.some(d => d[0] === sel)) list.push([sel, qh ? sel + ' yards' : furlongs(sel)]);
     return list;
   }
   function restrictOf(race) {
@@ -527,7 +558,7 @@
           <div class="mt-4 grid sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
             <label class="block"><div class="text-xs text-slate-500 mb-1">Race type</div>${selectHtml('rb-type', TYPES, typeOf(race))}</label>
             <label class="block"><div class="text-xs text-slate-500 mb-1">Surface</div>${selectHtml('rb-surface', SURFACES, race.surface)}</label>
-            <label class="block"><div class="text-xs text-slate-500 mb-1">Distance</div>${selectHtml('rb-distance', distOptions(race.distanceYards), race.distanceYards)}</label>
+            <label class="block"><div class="text-xs text-slate-500 mb-1">Distance</div>${selectHtml('rb-distance', distOptions(race), race.distanceYards)}</label>
             <label class="block"><div class="text-xs text-slate-500 mb-1">Purse</div><input id="rb-purse" type="text" value="${fmtMoney(race.purse)}" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white"></label>
             <label class="block"><div class="text-xs text-slate-500 mb-1">Age / sex restriction</div>${selectHtml('rb-restrict', RESTRICTS, restrictOf(race))}</label>
             <label class="block"><div class="text-xs text-slate-500 mb-1">Field target (max)</div>${selectHtml('rb-target', TARGETS, String(target.max))}</label>
@@ -682,7 +713,7 @@
       const risk = fp && fp.bucket !== 'likely'
         ? ` <span class="pill ${fp.bucket === 'unlikely' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}" title="${esc(fp.detail)}">${Math.round(fp.prob * 100)}% to go</span>` : '';
       return `<li class="flex items-start gap-2"><i data-lucide="trending-down" class="w-4 h-4 ${icon} mt-0.5"></i>
-        <span><span class="font-medium">${esc(r.classLadder)} ${furlongs(r.distanceYards)}</span> · ${esc(day.label || '')} — ${short} short of the ${r.fieldTarget.min}-horse minimum${risk}</span></li>`;
+        <span><span class="font-medium">${esc(r.classLadder)} ${distanceLabel(r)}</span> · ${esc(day.label || '')} — ${short} short of the ${r.fieldTarget.min}-horse minimum${risk}</span></li>`;
     }).join('') || '<li class="text-sm text-slate-400">Every condition is filling — nothing running soft.</li>';
 
     // Trainer activity: live submissions per stable, then head count on grounds.
@@ -785,13 +816,14 @@
         <div class="divide-y divide-slate-100 text-sm">${barnRows}</div>
       </div>
 
+      ${prog ? `
       <div class="card ring-soft p-5 stripe">
-        <div class="flex items-center gap-2 accent-text"><i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold">${esc((prog && prog.label) || 'Ship & Win')}, meet-wide</div></div>
+        <div class="flex items-center gap-2 accent-text"><i data-lucide="truck" class="w-4 h-4"></i><div class="font-semibold">${esc(prog.label || 'Ship & Win')}, meet-wide</div></div>
         <div class="mt-2 text-sm text-slate-700">
-          <span class="font-medium">${fmtMoney(prog ? prog.flatAmount : 0)}</span> to any horse shipping in <span class="font-medium">≥ ${prog ? prog.eligibility.minShipMi : 0} mi</span>, applied to underfilled non-stakes races. Individual races can override.
+          <span class="font-medium">${fmtMoney(prog.flatAmount)}</span> to any horse shipping in <span class="font-medium">≥ ${prog.eligibility.minShipMi} mi</span>, applied to underfilled non-stakes races. Individual races can override.
           <span class="text-slate-500">Pool ${fmtMoney(cap.totalBudget)} · ${fmtMoney(cap.claimed)} committed.</span>
         </div>
-      </div>`);
+      </div>` : ''}`);
   };
 
   // ===========================================================================
