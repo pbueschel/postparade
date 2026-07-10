@@ -154,6 +154,17 @@
       reasons.push({ pass: ok, label: ok ? `${race.stateBredCode}-bred — eligible` : `${race.stateBredCode || 'State'}-bred only` });
     }
 
+    // Registry/discipline gate: a Thoroughbred (Jockey Club) can't run a Quarter
+    // Horse (AQHA) race or vice-versa. The race carries a `discipline` ('TB'|'QH',
+    // stamped in data.js); the horse a `registry` ('Jockey Club'|'AQHA'). Skips
+    // silently unless BOTH are present — tour.html's flat race specs carry neither.
+    const disc = race.discipline;
+    if (disc && h.registry) {
+      const need = disc === 'QH' ? 'AQHA' : 'Jockey Club';
+      const ok = h.registry === need;
+      reasons.push({ pass: ok, label: ok ? `${need}-registered — eligible` : `${need}-registered only` });
+    }
+
     return { eligible: reasons.every(x => x.pass), reasons };
   }
 

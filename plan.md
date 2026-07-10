@@ -86,7 +86,7 @@ Builder "who fits" will happily rank Jockey Club horses into AQHA races and
 vice versa. The 07-09 decision scoped QH display to `screens-track.js`, which
 hides the problem in one direction only.
 
-- [ ] **R3.1 — Registry eligibility gate.** Hard gate in `PPEngine.score`:
+- [x] **R3.1 — Registry eligibility gate.** Hard gate in `PPEngine.score`:
       horse `registry` must match the race's discipline (derive from the meet's
       track / QH class-ladder vocabulary). Per CLAUDE.md rule 3 it's a
       `{pass,label}` gate reason and skips silently when either field is absent
@@ -102,7 +102,7 @@ Track (Delta Downs, Quarter Horse) and the featured Trainer (LaRose,
 Thoroughbred-only) can never transact — R3 makes that formally true. The
 CD ⇄ Snellgrove world that carried the Submit ⇄ Request demo is closed/dormant.
 
-- [ ] **R4.1 — Ellis Park as the loop-carrying meet.** Give the Track
+- [x] **R4.1 — Ellis Park as the loop-carrying meet.** Give the Track
       workspace's meet list a live Ellis Park Thoroughbred card (R1.1 keeps it
       open) where LaRose horses genuinely fit — ELP already has barns/stalls
       seed data and LaRose history (Molly McIver). Delta Downs stays the

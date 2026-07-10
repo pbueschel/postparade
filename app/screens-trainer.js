@@ -296,6 +296,7 @@
     // Status badges.
     const badges = [];
     badges.push(pill('Active', 'accent-soft', 'circle-dot'));
+    if (h.registry) badges.push(disciplinePill(h.registry));
     if (h.maiden) badges.push(pill('Maiden', 'bg-slate-100 text-slate-600'));
     if (h.vetList && h.vetList.listed) {
       const barred = vetBarred(h);

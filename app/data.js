@@ -150,6 +150,7 @@
       end: '2026-06-28',
       status: 'published',
       meetType: 'regular',
+      discipline: 'TB',
       supplementProgramIds: ['cd-ship-and-win'],
     },
     {
@@ -165,6 +166,7 @@
       end: ymd(new Date(Math.max(Date.parse('2026-08-30T00:00:00Z'), rollRaceDay.getTime() + 14 * DAY_MS))),
       status: 'published',
       meetType: 'boutique',
+      discipline: 'TB',
       supplementProgramIds: ['elp-ship-and-win'],
     },
     // Real tracks/meets for the LaRose demo — see docs/research-delta-downs-larose-2026-07-09.md
@@ -172,18 +174,23 @@
       id: 'sar-2026-summer', track: 'SAR', trackName: 'Saratoga',
       name: 'Saratoga — Summer 2026', label: 'Summer meet',
       start: '2026-07-03', end: '2026-09-07', status: 'published', meetType: 'boutique',
+      discipline: 'TB',
       supplementProgramIds: [],
     },
     {
       id: 'ls-2026-spring', track: 'LS', trackName: 'Lone Star Park',
       name: 'Lone Star Park — Spring 2026', label: 'Spring meet',
       start: '2026-04-16', end: '2026-07-12', status: 'published', meetType: 'regular',
+      discipline: 'TB',
       supplementProgramIds: [],
     },
     {
       id: 'ded-2026-quarter', track: 'DED', trackName: 'Delta Downs',
       name: 'Delta Downs — Quarter Horse Meet 2026', label: 'Quarter Horse meet',
       start: '2026-04-24', end: '2026-07-18', status: 'published', meetType: 'regular',
+      // Quarter Horse racing (AQHA) — the app's only non-Thoroughbred meet. Drives
+      // the registry eligibility gate (R3.1) and yards-not-furlongs distance display.
+      discipline: 'QH',
       supplementProgramIds: [],
     },
   ];
@@ -526,10 +533,15 @@
       fieldTarget: { min: 6, max: 9 }, alsoEligibleCap: 3, preferenceSystem: 'date',
       entryClose: rollCloseISO, postTime: rollPostISO('14:00'),
       stateBredRestricted: false, stateBredCode: null,
+      // FICTIONAL demo card (R1.1/R4.1): the non-winners bar is set to N3X so
+      // Kinnon LaRose's real dirt roster (older allowance/claiming winners with
+      // ≤2 wins "other than") genuinely fits — this is the loop-carrying ELP race
+      // the Track office can Request LaRose horses into. Only this invented race's
+      // conditions are tuned; the real horses' facts are never touched.
       conditions: {
         sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3,
-        nonWinners: { kind: 'N_X', count: 1 },
-        text: 'FOR THREE YEAR OLDS AND UPWARD WHICH HAVE NEVER WON A RACE OTHER THAN MAIDEN, CLAIMING, OR STARTER. One Mile And 70 Yards.',
+        nonWinners: { kind: 'N_X', count: 3 },
+        text: 'FOR THREE YEAR OLDS AND UPWARD WHICH HAVE NEVER WON THREE RACES OTHER THAN MAIDEN, CLAIMING, OR STARTER. One Mile And 70 Yards.',
       },
     },
 
@@ -1001,6 +1013,13 @@
   const stallApplicationById = byId(stallApplications);
 
   const meetOfRace = (r) => (r.meetId || (raceDayById[r.raceDayId] || {}).meetId);
+
+  // Discipline stamp (R3.1): each seeded race inherits its meet's discipline
+  // ('TB' Thoroughbred / 'QH' Quarter Horse), so the engine's registry gate and
+  // the yards-vs-furlongs display can read it directly off the race — additive,
+  // never renames a field (tour.html's flat specs carry no `discipline`, so the
+  // gate skips them silently). Defaults to 'TB' if a meet is somehow unresolved.
+  races.forEach((r) => { const m = meetById[meetOfRace(r)]; r.discipline = (m && m.discipline) || 'TB'; });
 
   // ---- Back-compat anchors (tour.html / app.html load this file) -----------
   const race = raceById['cd-jun6-r3'];            // PPData.race — the demo race

@@ -1,5 +1,17 @@
 # Decisions
 
+## 2026-07-09 — Discipline derived from the meet, stamped onto races (R3.1)
+- **Why:** The registry gate needs a per-race discipline, but the engine must
+  stay seed-agnostic and tour-safe. Chosen: add `discipline` ('TB'|'QH') to each
+  meet, then stamp it onto every seeded race at data-build time (mirrors the
+  existing `h.registry` stamp). The engine reads `race.discipline` + `h.registry`
+  directly and skips silently when either is absent — so tour.html's flat race
+  specs (no `discipline`) are untouched, verified byte-identical. Yards-vs-furlongs
+  display was re-keyed off discipline (was DED-track-only) so it generalizes.
+- **Rejected:** Passing discipline only through the screens' engine `ctx` (would
+  miss the smoke-guard and any future call site that doesn't build ctx); a
+  parallel QH engine path (violates the single-entry-point rule).
+
 ## 2026-07-09 — Demo pivots to real trainer/track content; Churchill Downs stays but is no longer featured
 - **Why:** Phil asked to replace the fictional demo trainer with the real
   Kinnon LaRose, then to make Delta Downs the demo's track "going forward,"

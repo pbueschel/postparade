@@ -47,6 +47,16 @@ function pill(text, cls = 'bg-slate-100 text-slate-600', icon = '') {
   return `<span class="pill ${cls}">${i}${text}</span>`;
 }
 
+/* Thoroughbred / Quarter Horse identity pill. Accepts either a horse
+   `registry` ('Jockey Club' | 'AQHA') or a race/meet `discipline` ('TB' | 'QH');
+   Quarter Horse reads amber, Thoroughbred slate. Returns '' for an unknown value
+   so callers can drop it in unconditionally. */
+function disciplinePill(kind) {
+  if (kind === 'AQHA' || kind === 'QH') return pill('Quarter Horse', 'bg-amber-50 text-amber-700', 'flag');
+  if (kind === 'Jockey Club' || kind === 'TB') return pill('Thoroughbred', 'bg-slate-100 text-slate-600', 'flag');
+  return '';
+}
+
 /* Conic-gradient fit ring; color defaults to the active workspace accent. */
 function scoreRing(fit, color) {
   const c = color || (document.body.dataset.ws === 'track' ? '#4f46e5' : '#059669');

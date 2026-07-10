@@ -211,5 +211,37 @@ else {
   }
 }
 
+// R4.1 — the core loop on CURRENT content: the ELP office Requests a LaRose
+// horse for an open Ellis Park race → it lands in the trainer's inbound list →
+// trainer Accepts → the race's fill count rises. Mirrors CLAUDE.md's manual loop.
+const loopRace = 'elp-jul11-r3', loopHorse = 'arthur-jr';
+{
+  const lr = PPStore.raceFor(loopRace), lh = PPData.getHorse(loopHorse);
+  if (!lr || (lr.entryClose || '') <= PPData.today) { console.error('FAIL R4 loop: ELP loop race not open —', loopRace); fails++; }
+  // The requested LaRose (Jockey Club) horse must genuinely fit the ELP race,
+  // else the loop is a demo fiction. Uses the strict per-meet program (R2.1).
+  const loopCtx = { today: PPData.today, program: PPData.shipProgramForMeet('elp-2026-summer') };
+  if (!lh || !E.score(lh, lr, loopCtx).eligible) { console.error('FAIL R4 loop: LaRose horse', loopHorse, 'not eligible for', loopRace); fails++; }
+  const loopBefore = PPStore.entriesForRace(loopRace).length;
+  const loopReq = PPStore.requests.add({ horseId: loopHorse, raceId: loopRace });
+  // Visible to the trainer as an inbound "sent" request (screens-trainer reads this list).
+  if (!PPStore.requests.list({ status: 'sent' }).some(r => r.id === loopReq.id)) { console.error('FAIL R4 loop: request not visible to trainer as sent'); fails++; }
+  if (PPStore.entriesForRace(loopRace).length !== loopBefore) { console.error('FAIL R4 loop: a sent request must not yet count as an entry'); fails++; }
+  PPStore.requests.setStatus(loopReq.id, 'accepted');
+  if (PPStore.entriesForRace(loopRace).length !== loopBefore + 1) { console.error('FAIL R4 loop: accepted request must raise the fill count'); fails++; }
+  else console.log('R4 loop ok: ELP request→accept raised fill on', loopRace);
+}
+
+// R3 — a user-added Quarter Horse is handled sanely: ineligible for TB races via
+// the registry gate, with no crash/blank state in the trainer renderers.
+{
+  const qh = PPStore.createHorse({ name: 'Test QH Filly', stableId: featured ? featured.id : 'larose', registry: 'AQHA', home: 'DED', sex: 'F', age: 3 });
+  tryRender('scr-horse', qh.id);
+  tryRender('scr-recs', qh.id);
+  const anyTbOpen = PPData.listRaces({ openOnly: true }).find(r => r.discipline === 'TB');
+  if (anyTbOpen && E.score(qh, anyTbOpen, { today: PPData.today }).eligible) { console.error('FAIL R3: AQHA horse should be ineligible for a TB race'); fails++; }
+  else console.log('R3 QH-horse sanity ok: AQHA horse gated out of TB races, renderers stable');
+}
+
 console.log(fails ? `SMOKE FAILED: ${fails} failures` : 'SMOKE PASSED');
 process.exit(fails ? 1 : 0);

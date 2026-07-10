@@ -101,7 +101,18 @@
     const meet = rd ? meetFor(rd.meetId) : null;
     return meet ? meet.track : 'CD';
   }
-  function isQuarterHorseRace(race) { return raceTrackId(race) === 'DED'; }
+  // Discipline drives the yards-vs-furlongs display (R3.1). Prefer the race's own
+  // stamped `discipline`; fall back to the meet's, then to the legacy DED-track
+  // check so created races (no stamp yet) still behave. Any QH-discipline race
+  // now quotes yards — generalizes the old DED-only rule without changing it.
+  function raceDiscipline(race) {
+    if (race.discipline) return race.discipline;
+    const rd = raceDayFor(race.raceDayId);
+    const meet = rd ? meetFor(rd.meetId) : (race.meetId ? meetFor(race.meetId) : null);
+    if (meet && meet.discipline) return meet.discipline;
+    return raceTrackId(race) === 'DED' ? 'QH' : 'TB';
+  }
+  function isQuarterHorseRace(race) { return raceDiscipline(race) === 'QH'; }
   function meetIdForRace(race) {
     if (race.meetId) return race.meetId;
     const rd = PPData.getRaceDay(race.raceDayId);
@@ -161,7 +172,7 @@
       return `
         <a href="#track/meet/${esc(meet.id)}" class="card ring-soft p-5 hover:border-indigo-300 transition block">
           <div class="flex items-center justify-between"><div class="font-semibold">${esc(meet.name)}</div>${tag}</div>
-          <div class="text-xs text-slate-500 mt-1">${esc(meet.trackName || '')} · ${esc(meet.label || '')}</div>
+          <div class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">${esc(meet.trackName || '')} · ${esc(meet.label || '')}${disciplinePill(meet.discipline)}</div>
           <div class="text-xs text-slate-500">${fmtDate(meet.start)} – ${fmtDate(meet.end)}</div>
           <div class="mt-3 text-sm text-slate-600">${days.length} race days · ${races.length} races</div>
           <div class="mt-2 flex items-center gap-2 text-xs">
@@ -350,7 +361,7 @@
       <div class="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div class="text-xs text-slate-500 uppercase tracking-wider">${esc(meet.trackName || 'Churchill Downs')} · ${esc(meet.label || 'meet')}</div>
-          <h1 class="text-2xl font-semibold tracking-tight">${esc(meet.name || 'Summer meet')}</h1>
+          <div class="flex items-center gap-2 flex-wrap"><h1 class="text-2xl font-semibold tracking-tight">${esc(meet.name || 'Summer meet')}</h1>${disciplinePill(meet.discipline)}</div>
           <div class="text-sm text-slate-600">${days.length} race days · ${races.length} races · <span class="text-red-600 font-medium">${underfilled} underfilled</span> · ship-in pool ${fmtMoney(cap.totalBudget)}</div>
         </div>
         <div class="flex items-center gap-2">
@@ -491,7 +502,7 @@
     return `
       <div class="px-5 py-3.5 grid grid-cols-12 gap-3 items-center">
         <div class="col-span-1">${scoreRing(s.fit)}</div>
-        <div class="col-span-3"><div class="font-medium">${esc(h.name)}</div><div class="text-xs text-slate-500">${esc(h.sex)} ${h.age}yo · ${esc(h.stable)}</div></div>
+        <div class="col-span-3"><div class="font-medium flex items-center gap-1.5">${esc(h.name)}${disciplinePill(h.registry)}</div><div class="text-xs text-slate-500">${esc(h.sex)} ${h.age}yo · ${esc(h.stable)}</div></div>
         <div class="col-span-2"><div class="text-xs text-slate-500">Trainer</div><div>${esc(h.trainer)}</div></div>
         <div class="col-span-2"><span class="pill ${acceptCls}">Likely yes · ${s.accept}%</span>${s.drawIn ? '<div class="mt-1">' + drawInChip(s.drawIn) + '</div>' : ''}</div>
         <div class="col-span-2 text-xs text-slate-500">${shipTxt}<div class="mt-1 flex flex-wrap gap-1">${bonusBadge}${sigBadges}</div></div>
@@ -543,7 +554,10 @@
 
       <div class="flex items-end justify-between flex-wrap gap-3">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Build Race ${race.raceNumber} — ${esc(day.label || '')}</h1>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-2xl font-semibold tracking-tight">Build Race ${race.raceNumber} — ${esc(day.label || '')}</h1>
+            ${disciplinePill(raceDiscipline(race))}
+          </div>
           <div class="text-sm text-slate-600">Spec the conditions, then PostParade ranks who fits and lets you request them.</div>
         </div>
         <span class="pill ${fs.pill.replace('pill ', '')}" id="rb-status-pill">${fs.label}</span>

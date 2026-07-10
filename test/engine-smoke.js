@@ -116,5 +116,28 @@ global.PPData.shipProgram = savedSP;
 ok('(y) explicit program:null in ctx -> no global fallback, bonus 0', shipExplicitNull.bonus === 0, shipExplicitNull);
 ok('(y) ctx without program key -> global fallback applies', shipNoKey.bonus === 999, shipNoKey);
 
+// (f) Registry/discipline gate (R3.1): Thoroughbred (Jockey Club) ⇄ TB races,
+// Quarter Horse (AQHA) ⇄ QH races. Both directions + the silent-skip path.
+const tbRace = { conditions: { sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3 }, discipline: 'TB' };
+const qhRace = { conditions: { sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3 }, discipline: 'QH' };
+const jcHorse = { sex: 'G', age: 4, maiden: false, surf: ['D'], sweet: [1320, 1540], classR: 110, lastSpeed: 85, daysSince: 20, shipMi: 0, trainerPct: 0.2, registry: 'Jockey Club', record: { starts: 6, careerWins: 2, winsOtherThanMdnClmStarter: 1 } };
+const aqhaHorse = Object.assign({}, jcHorse, { registry: 'AQHA' });
+ok('(f) Jockey Club horse eligible in TB race', E.eligibility(jcHorse, tbRace).eligible === true);
+const jcInQh = E.eligibility(jcHorse, qhRace);
+ok('(f) Jockey Club horse ineligible in QH race', jcInQh.eligible === false, jcInQh);
+ok('(f) QH race names "AQHA-registered only"', jcInQh.reasons.some(r => r.label === 'AQHA-registered only' && r.pass === false), jcInQh.reasons);
+ok('(f) AQHA horse eligible in QH race', E.eligibility(aqhaHorse, qhRace).eligible === true);
+const aqhaInTb = E.eligibility(aqhaHorse, tbRace);
+ok('(f) AQHA horse ineligible in TB race', aqhaInTb.eligible === false, aqhaInTb);
+ok('(f) TB race names "Jockey Club-registered only"', aqhaInTb.reasons.some(r => r.label === 'Jockey Club-registered only' && r.pass === false), aqhaInTb.reasons);
+// Silent skip: a race with no discipline (tour flat spec) adds no registry reason.
+const noDisc = E.eligibility(aqhaHorse, { conditions: { sexes: ['F', 'M', 'G', 'C', 'H', 'R'], minAge: 3 } });
+ok('(f) no-discipline race skips gate (tour flat-spec safe)', noDisc.eligible === true && !noDisc.reasons.some(r => /registered/.test(r.label || '')), noDisc);
+// Silent skip: a horse with no registry (old-shaped) adds no registry reason.
+const noReg = E.eligibility({ sex: 'G', age: 4, maiden: false, surf: ['D'], sweet: [1320, 1540], classR: 110, lastSpeed: 85, daysSince: 20, shipMi: 0, trainerPct: 0.2 }, tbRace);
+ok('(f) no-registry horse skips gate', !noReg.reasons.some(r => /registered/.test(r.label || '')), noReg.reasons);
+// Flat two-arg call (a) must still carry no discipline reason (byte-identical tour path).
+ok('(f) flat-spec score adds no registry reason', !(a.reasons || []).some(r => /registered/.test(r.label || '')), a.reasons);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
