@@ -24,6 +24,128 @@ explicit approval. Session status lives in [`docs/worklog.md`](./docs/worklog.md
 - [ ] **Investor walkthrough guide** — companion doc to the demo/pitch pages.
 - [ ] **`tour.html` regeneration** — one-pass rebuild from the current app;
       procedure in [`docs/playbooks/tour-regeneration.md`](./docs/playbooks/tour-regeneration.md).
+      **Open decision for Phil:** after the 2026-07-09 LaRose/Delta Downs pivot,
+      should the regenerated tour follow the new real-content storyline, or stay
+      a frozen snapshot of the Snellgrove/Churchill Downs demo?
+
+---
+
+## Remediation — 2026-07-09 gap review
+
+Gap analysis of the 2026-07-09 session (`af74099`..`6e95ca5`) against what was
+discussed in [`docs/progress.md`](./docs/progress.md),
+[`docs/worklog.md`](./docs/worklog.md), [`docs/decisions.md`](./docs/decisions.md),
+and this plan. Ordered by urgency. Each item has acceptance criteria; run the
+verification gates (CLAUDE.md) before calling any of them done.
+
+### R1 — Demo decay: the app runs out of open races on 2026-07-11 ⚠️ URGENT
+
+The 07-09 decision switched `PPData.today` to real time and accepted that seeded
+dates "will need periodic date refreshes" — but no refresh mechanism was built.
+As of 07-09 the only races with `entryClose > today` are Saratoga (closes
+**07-10 10:00 ET**) and Delta Downs (closes **07-11**); Ellis Park's Jul 11 card
+already closed on 07-08, one day after the same lapsed-deadline bug class was
+fixed in `f7739b3`. After Saturday: zero open races → Trainer recs, Submit,
+draw-in chips, alerts, and the Track fill story all render empty.
+
+- [ ] **R1.1 — Rolling dates for demo-fiction races.** Derive race day /
+      `entryClose` / `postTime` for *fictional* cards (ELP `elp-jul11-*`, and any
+      future demo cards) relative to `PPData.today` (e.g. always next Saturday,
+      close T-72h), so the demo is perpetually live. Real historical races
+      (Bluebonnet, Old South, Molly McIver's Ellis win) keep fixed real dates —
+      per the 07-09 "real facts vs. engine-input numbers" decision, never shift
+      a cited real result.
+      *Accept:* on any wall-clock date, ≥1 meet has ≥3 open races reachable from
+      both workspaces; seeded real results unchanged; tour.html untouched.
+- [ ] **R1.2 — Smoke-test guard against decay.** `test/app-smoke.js` fails when
+      open-race count < 3 or when the featured trainer has zero open, eligible
+      recommendations.
+      *Accept:* guard trips if R1.1's derivation is reverted to fixed dates.
+
+### R2 — Ship & Win leak fixed on the Track side only
+
+`f7739b3` guarded the `PPData.shipProgram()` back-compat fallback at the
+`screens-track.js` call site (`shipProgramFor`), but the Trainer side still
+leaks: `screens-trainer.js` (engine ctx) passes `PPData.shipProgram(meetOfRace)`,
+whose fallback returns the first ship-and-win program for any meet without one —
+so Saratoga/Lone Star recommendations can show a phantom Ship & Win bonus, and
+`engine.js`'s own no-ctx fallback does the same.
+
+- [ ] **R2.1 — One strict helper, both workspaces.** Add a strict
+      `PPData.shipProgramForMeet(meetId)` (null when the meet has no program);
+      use it in both screens files; keep the loose `shipProgram()` untouched for
+      the tour back-compat contract (CLAUDE.md rule 2).
+      *Accept:* SAR/LS/DED races show no bonus anywhere in either workspace;
+      `tour.html` renders identically; engine-smoke case covers the null path.
+
+### R3 — No discipline gate: Thoroughbreds fit Quarter Horse races
+
+Quarter Horse racing was added additively (QH class ladder, yards display,
+horse `registry`), but the engine never reads `registry` — Delta Downs' Race
+Builder "who fits" will happily rank Jockey Club horses into AQHA races and
+vice versa. The 07-09 decision scoped QH display to `screens-track.js`, which
+hides the problem in one direction only.
+
+- [ ] **R3.1 — Registry eligibility gate.** Hard gate in `PPEngine.score`:
+      horse `registry` must match the race's discipline (derive from the meet's
+      track / QH class-ladder vocabulary). Per CLAUDE.md rule 3 it's a
+      `{pass,label}` gate reason and skips silently when either field is absent
+      (tour's flat specs stay unaffected).
+      *Accept:* DED who-fits lists only AQHA horses; a LaRose horse against a
+      DED race returns `eligible:false` with a named reason; engine-smoke case;
+      tour.html identical.
+
+### R4 — The core loop has no demo path between the featured personas
+
+Plan tenet 4 says "the loop is the product," but after the pivot the featured
+Track (Delta Downs, Quarter Horse) and the featured Trainer (LaRose,
+Thoroughbred-only) can never transact — R3 makes that formally true. The
+CD ⇄ Snellgrove world that carried the Submit ⇄ Request demo is closed/dormant.
+
+- [ ] **R4.1 — Ellis Park as the loop-carrying meet.** Give the Track
+      workspace's meet list a live Ellis Park Thoroughbred card (R1.1 keeps it
+      open) where LaRose horses genuinely fit — ELP already has barns/stalls
+      seed data and LaRose history (Molly McIver). Delta Downs stays the
+      featured QH showcase; ELP carries the two-sided loop.
+      *Accept:* CLAUDE.md's manual loop test passes on current content —
+      Track sends Request to a LaRose horse → appears in `#trainer/requests` →
+      Accept → fill count rises → reload persists → Reset clears.
+
+### R5 — Dormant feature showcases (vet's-list, Lasix, N1X, also-eligible)
+
+The eligibility-gate demonstrations were all built on Snellgrove horses in the
+now-historical Churchill meet and are no longer reachable from the featured
+dashboards; `docs/playbooks/demo-feature.md` still names those horses.
+Flagged in `docs/progress.md`, not fixed.
+
+- [ ] **R5.1 — Recreate showcase states on current content.** On the live
+      LaRose/ELP world: one horse on the vet's list (real vet roster already
+      exists), one N1X near-miss, one over-subscribed race spilling to
+      also-eligibles (the `cd-jun6-r4` pattern). Illustrative states go on
+      demo-fiction entities, never asserted as real facts about LaRose's actual
+      horses — mark them the way the seed already marks engine-input numbers.
+      *Accept:* each showcase reachable ≤2 clicks from a featured dashboard;
+      `docs/playbooks/demo-feature.md` updated to current names.
+
+### R6 — Docs drift from the pivot
+
+- [ ] **R6.1** Annotate §9.4 below as superseded (single-track Churchill MVP →
+      multi-track real content) pointing at `docs/decisions.md` 2026-07-09 —
+      done in this revision, verify it sticks.
+- [ ] **R6.2** Add `docs/progress.md` to CLAUDE.md's file map (it's referenced
+      by the session ritual docs but unmapped).
+- [ ] **R6.3** Worklog corrective entry: the 07-09 entry says the LaRose pivot
+      was "uncommitted — pending review," but `f7739b3`/`6e95ca5` were committed
+      and pushed to public `main` later that evening without a closing worklog
+      update.
+- [ ] **R6.4** §5's shared "condition parser playground" no longer has a nav
+      entry (dead link removed 07-09) — either restore it as a Track-side tool
+      or mark it deferred here.
+
+**Sequencing recommendation:** R1 + R2 immediately (R1 before Saturday or the
+public demo goes dark); R3 + R4 together next (the gate makes the loop-path
+problem explicit, the ELP meet solves it); then R5; R6 alongside. Tour
+regeneration stays Held pending the decision above.
 
 ---
 
@@ -242,6 +364,9 @@ multi-track circuit; explore InCompass/Equibase interop.
    date/stars model is a later refinement.
 4. **MVP scope: single track first** (Churchill Downs + its circuit's trainers).
    Engine already supports cross-track; defer the track filter + circuit nav.
+   *Superseded 2026-07-09* — demo pivoted to real multi-track content (Delta
+   Downs featured, LaRose persona); see `docs/decisions.md`. Kept as the
+   historical record of the original decision.
 5. **Owner guest access: fully parked.** No read-only owner view in v1; keep the
    parked screens/code for the future backlog item.
 

@@ -3,6 +3,30 @@
 <!-- Append-only session journal, newest entry first.
      Written at the end of every substantive session — by Phil or by an agent. -->
 
+## 2026-07-09 (later) — Gap review of the day's session; remediation plan added
+- **Correction to the entry below:** the LaRose/Delta Downs pivot it lists as
+  "uncommitted — pending review" was in fact committed and pushed to public
+  `main` later that evening (`f7739b3`, then `6e95ca5` adding 10 more horses,
+  the stable-name fix, and `docs/progress.md`) without a closing worklog update.
+- **Changed:** Gap analysis of `af74099`..`6e95ca5` vs. the session notes
+  (progress/worklog/decisions) and plan.md. Six gaps found, written up as
+  plan.md → **"Remediation — 2026-07-09 gap review"** (R1–R6, acceptance
+  criteria, sequencing) on branch `plan-gap-remediation`. Headline findings:
+  the real-time-clock decision left the app with **zero open races after
+  2026-07-11** (Saratoga closes 07-10, Delta Downs 07-11, Ellis already closed
+  07-08 — the lapsed-deadline bug class recurred one day after being fixed);
+  the Ship & Win fallback leak was guarded only on the Track side (Trainer recs
+  can still show phantom bonuses via `screens-trainer.js` engine ctx); the
+  engine has **no registry/discipline gate**, so Thoroughbreds rank into Delta
+  Downs' Quarter Horse races; and the featured personas (QH track ⇄ TB trainer)
+  can never transact, leaving plan tenet 4's core loop without a demo path.
+  Also annotated plan.md §9.4 as superseded per the 07-09 decision.
+- **Next:** Phil reviews the remediation plan, merges the branch, then R1+R2
+  before Saturday (07-11) or the public demo goes dark; R3+R4 next.
+- **Held/blocked:** Walkthrough guide; tour regeneration — now with an explicit
+  open decision recorded in plan.md → Held (follow the new LaRose content vs.
+  stay a frozen snapshot). Both still await Phil's go-ahead.
+
 ## 2026-07-09 — Track workspace features, then real-trainer/real-track content pivot
 - **Changed (committed, `af74099`..`cd2cbaf`):** Meets list + parameterized meet
   dashboard; Stalls & ship-ins overview + interactive stall builder (barns,
